@@ -57,19 +57,19 @@ function PreviewCard({
   className?: string;
 }) {
   return (
-    <div className={`preview-card px-5 py-4 ${className}`} style={style}>
+    <div className={`preview-card px-7 py-5 ${className}`} style={style}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.06] text-[11px] font-semibold text-white/50">
+        <div className="flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/[0.06] text-[13px] font-semibold text-white/50">
             {contributor.initials}
           </div>
           <div>
-            <p className="text-[13px] font-medium text-white/80">
+            <p className="text-[16px] font-medium text-white/80">
               {contributor.name}
             </p>
-            <div className="mt-0.5 flex items-center gap-2">
+            <div className="mt-1 flex items-center gap-2.5">
               <span
-                className={`inline-flex items-center rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${tierBg[contributor.tier]} ${tierColors[contributor.tier]}`}
+                className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-medium ${tierBg[contributor.tier]} ${tierColors[contributor.tier]}`}
               >
                 {contributor.tier}
               </span>
@@ -78,7 +78,7 @@ function PreviewCard({
           </div>
         </div>
         <span
-          className={`text-lg font-semibold tabular-nums ${tierColors[contributor.tier]}`}
+          className={`text-2xl font-semibold tabular-nums ${tierColors[contributor.tier]}`}
         >
           {contributor.score}
         </span>
@@ -236,7 +236,7 @@ export default function LandingPage() {
           />
 
           <motion.div
-            className="relative space-y-3"
+            className="relative space-y-4"
             style={{
               transformStyle: "preserve-3d",
               transform: "rotate(-2deg) rotateY(-3deg)",
@@ -252,9 +252,9 @@ export default function LandingPage() {
             <div className="pointer-events-none absolute -inset-6 z-10 rounded-3xl bg-gradient-to-br from-white/[0.02] to-transparent backdrop-blur-[2px]" />
 
             {/* Label */}
-            <div className="mb-4 flex items-center gap-2 px-1">
-              <div className="h-1.5 w-1.5 rounded-full bg-[#5e9f99]" />
-              <span className="text-[11px] font-medium uppercase tracking-[0.15em] text-white/25">
+            <div className="mb-5 flex items-center gap-2.5 px-1">
+              <div className="h-2 w-2 rounded-full bg-[#5e9f99]" />
+              <span className="text-[13px] font-medium uppercase tracking-[0.15em] text-white/25">
                 Contribution scores
               </span>
             </div>

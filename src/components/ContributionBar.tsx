@@ -1,28 +1,21 @@
-"use client";
-
 interface ContributionBarProps {
   score: number; // 0–100
-  segments?: number; // default 16
+  segments?: number;
 }
 
 export function ContributionBar({ score, segments = 16 }: ContributionBarProps) {
-  const filledSegments = Math.round((score / 100) * segments);
+  const filled = Math.round((score / 100) * segments);
 
   return (
-    <div className="flex gap-[2px]">
-      {Array.from({ length: segments }).map((_, i) => {
-        const isFilled = i < filledSegments;
-        return (
-          <div
-            key={i}
-            className={`h-[12px] w-[4px] rounded-[2px] transition-colors ${
-              isFilled
-                ? "bg-white/70 shadow-[0_0_4px_rgba(255,255,255,0.15)]"
-                : "bg-white/[0.08]"
-            }`}
-          />
-        );
-      })}
+    <div className="flex items-center gap-[3px]">
+      {Array.from({ length: segments }).map((_, i) => (
+        <div
+          key={i}
+          className={`h-2.5 w-1.5 rounded-sm transition-opacity ${
+            i < filled ? "bg-current opacity-70" : "bg-white/10"
+          }`}
+        />
+      ))}
     </div>
   );
 }
