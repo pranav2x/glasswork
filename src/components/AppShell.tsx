@@ -16,24 +16,30 @@ export function AppShell({ children }: AppShellProps) {
       <div aria-hidden className="noise-grain" />
 
       {/* ── Navigation Bar ── */}
-      <nav className="glass-nav fixed left-0 right-0 top-0 z-50">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-2.5">
-          <span className="text-lg font-semibold tracking-tight text-white">
-            Glasswork
-          </span>
+      <header className="fixed inset-x-0 top-0 z-30">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 md:px-8">
+          {/* Logo pill with glassmorphism */}
+          <div className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+            <span
+              className="text-[13px] font-medium tracking-wide text-neutral-200"
+              style={{ fontFamily: '"Goudita Serial", serif' }}
+            >
+              Glasswork
+            </span>
+          </div>
+
+          {/* Optional GitHub link — very subtle */}
           <a
             href="#"
-            className="text-[13px] font-medium text-white/30 transition-colors hover:text-white/50"
+            className="hidden text-[10px] uppercase tracking-[0.2em] text-neutral-500 transition-colors hover:text-neutral-300 md:inline"
           >
             GitHub
           </a>
         </div>
-      </nav>
+      </header>
 
       {/* ── Main Content ── */}
-      <main className="relative z-10">
-        {children}
-      </main>
+      <main className="relative z-10">{children}</main>
 
       {/* ── Footer ── */}
       <footer className="fixed bottom-0 left-0 z-20 px-6 pb-5">

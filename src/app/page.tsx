@@ -4,29 +4,27 @@ import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { GlassInput } from "@/components/GlassInput";
+import { ContributionBar } from "@/components/ContributionBar";
 
 /* ── Fake contributor data for the right-side preview ── */
 const previewContributors = [
   {
-    name: "Maya R.",
+    name: "Madhav R.",
     initials: "MR",
     score: 94,
     tier: "Carry" as const,
-    heatmap: [3, 5, 4, 6, 7, 5, 8, 6, 7, 9, 8, 7],
   },
   {
-    name: "Jordan K.",
-    initials: "JK",
+    name: "Eddy X.",
+    initials: "EX",
     score: 71,
     tier: "Solid" as const,
-    heatmap: [2, 3, 4, 3, 5, 4, 3, 4, 5, 4, 3, 4],
   },
   {
-    name: "Alex T.",
-    initials: "AT",
+    name: "Gabe B.",
+    initials: "GB",
     score: 23,
     tier: "Ghost" as const,
-    heatmap: [1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1],
   },
 ];
 
@@ -48,22 +46,6 @@ const cardDepth = [
   { opacity: 0.65, filter: "blur(0.5px)" },
 ];
 
-function HeatmapStrip({ data }: { data: number[] }) {
-  const max = Math.max(...data);
-  return (
-    <div className="flex gap-[3px]">
-      {data.map((v, i) => (
-        <div
-          key={i}
-          className="h-[14px] w-[6px] rounded-[2px]"
-          style={{
-            backgroundColor: `rgba(255,255,255,${0.04 + (v / max) * 0.18})`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
 
 function PreviewCard({
   contributor,
@@ -91,7 +73,7 @@ function PreviewCard({
               >
                 {contributor.tier}
               </span>
-              <HeatmapStrip data={contributor.heatmap} />
+              <ContributionBar score={contributor.score} segments={16} />
             </div>
           </div>
         </div>
