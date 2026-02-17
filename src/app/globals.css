@@ -68,46 +68,6 @@
     opacity: 0.4;
   }
 
-  /* ── Aurora animated layer ── */
-  .aurora-container {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-    filter: blur(80px);
-    will-change: transform;
-  }
-
-  .aurora-orb {
-    position: absolute;
-    width: 60vw;
-    height: 60vw;
-    border-radius: 50%;
-    will-change: transform;
-  }
-
-  .aurora-orb-1 {
-    top: 5%;
-    left: 0%;
-    background: radial-gradient(circle, rgba(210, 175, 110, 0.10) 0%, transparent 65%);
-    animation: aurora-drift-1 24s ease-in-out infinite;
-  }
-
-  .aurora-orb-2 {
-    top: 15%;
-    right: -25%;
-    background: radial-gradient(circle, rgba(50, 55, 100, 0.08) 0%, transparent 70%);
-    animation: aurora-drift-2 28s ease-in-out infinite;
-  }
-
-  .aurora-orb-3 {
-    bottom: -15%;
-    left: 20%;
-    background: radial-gradient(circle, rgba(80, 150, 140, 0.04) 0%, transparent 70%);
-    animation: aurora-drift-3 22s ease-in-out infinite;
-  }
-
   /* ── Glass surfaces ── */
   .glass-surface {
     background: rgba(255, 255, 255, 0.04);
@@ -138,7 +98,7 @@
       0 16px 50px rgba(0, 0, 0, 0.6);
   }
 
-  /* ── Upgraded glass panel — brighter, more physical ── */
+  /* ── Upgraded glass panel with vignette/lens effect ── */
   .glass-panel-hero {
     position: relative;
     overflow: hidden;
@@ -152,6 +112,7 @@
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 1rem;
     box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.14),
       0 24px 80px rgba(0, 0, 0, 0.5);
   }
@@ -218,7 +179,11 @@
   }
 }
 
-/* ── Hero fade-in animation ── */
+/* ═══════════════════════════════════════════
+   Animations
+   ═══════════════════════════════════════════ */
+
+/* ── Hero fade-in ── */
 @keyframes heroFadeIn {
   from {
     opacity: 0;
@@ -234,7 +199,7 @@
   animation: heroFadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* ── Underline draw animation ── */
+/* ── Underline draw (center outward) ── */
 @keyframes underlineDraw {
   from {
     transform: scaleX(0);
@@ -247,8 +212,8 @@
 }
 
 .underline-draw {
-  transform-origin: left center;
-  animation: underlineDraw 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
+  transform-origin: center center;
+  animation: underlineDraw 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
 }
 
 /* ── Glass shimmer sweep ── */
@@ -299,48 +264,95 @@
   animation: previewFadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* ── Aurora drift keyframes ── */
-@keyframes aurora-drift-1 {
+/* ═══════════════════════════════════════════
+   Contribution Background animations
+   ═══════════════════════════════════════════ */
+
+/* ── Aurora blob drifts ── */
+@keyframes auroraFloat1 {
   0%, 100% {
     transform: translate3d(0, 0, 0) scale(1);
   }
-  25% {
-    transform: translate3d(60px, -30px, 0) scale(1.04);
+  33% {
+    transform: translate3d(50px, -30px, 0) scale(1.04);
   }
-  50% {
-    transform: translate3d(30px, 40px, 0) scale(0.97);
-  }
-  75% {
-    transform: translate3d(-40px, 15px, 0) scale(1.02);
+  66% {
+    transform: translate3d(-30px, 25px, 0) scale(0.97);
   }
 }
 
-@keyframes aurora-drift-2 {
+@keyframes auroraFloat2 {
   0%, 100% {
     transform: translate3d(0, 0, 0) scale(1);
   }
-  25% {
-    transform: translate3d(-60px, 40px, 0) scale(1.03);
+  33% {
+    transform: translate3d(-40px, 35px, 0) scale(1.03);
   }
-  50% {
-    transform: translate3d(-30px, -50px, 0) scale(0.96);
-  }
-  75% {
-    transform: translate3d(50px, 30px, 0) scale(1.04);
+  66% {
+    transform: translate3d(30px, -20px, 0) scale(0.98);
   }
 }
 
-@keyframes aurora-drift-3 {
+.cb-aurora-1 {
+  will-change: transform;
+  animation: auroraFloat1 26s ease-in-out infinite;
+}
+
+.cb-aurora-2 {
+  will-change: transform;
+  animation: auroraFloat2 30s ease-in-out infinite;
+}
+
+/* ── SVG curve vertical floats ── */
+@keyframes curveFloat1 {
   0%, 100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  25% {
-    transform: translate3d(40px, 50px, 0) scale(0.98);
+    transform: translateY(0);
   }
   50% {
-    transform: translate3d(-70px, -20px, 0) scale(1.06);
+    transform: translateY(-6px);
   }
-  75% {
-    transform: translate3d(20px, -40px, 0) scale(0.99);
+}
+
+@keyframes curveFloat2 {
+  0%, 100% {
+    transform: translateY(0);
   }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+@keyframes curveFloat3 {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.cb-curve-float-1 {
+  animation: curveFloat1 25s ease-in-out infinite;
+}
+
+.cb-curve-float-2 {
+  animation: curveFloat2 28s ease-in-out infinite;
+}
+
+.cb-curve-float-3 {
+  animation: curveFloat3 32s ease-in-out infinite;
+}
+
+/* ── Dot shimmer sweep ── */
+@keyframes dotShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.cb-dot-shimmer {
+  animation: dotShimmer 12s ease-in-out infinite;
 }

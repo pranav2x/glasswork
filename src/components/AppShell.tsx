@@ -1,5 +1,7 @@
 "use client";
 
+import { ContributionBackground } from "@/components/ContributionBackground";
+
 interface AppShellProps {
   children: React.ReactNode;
 }
@@ -7,12 +9,8 @@ interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   return (
     <div className="relative min-h-screen">
-      {/* ── Aurora animated layer ── */}
-      <div aria-hidden className="aurora-container">
-        <div className="aurora-orb aurora-orb-1" />
-        <div className="aurora-orb aurora-orb-2" />
-        <div className="aurora-orb aurora-orb-3" />
-      </div>
+      {/* ── Contribution Currents background system ── */}
+      <ContributionBackground />
 
       {/* ── Noise grain overlay ── */}
       <div aria-hidden className="noise-grain" />
@@ -20,12 +18,9 @@ export function AppShell({ children }: AppShellProps) {
       {/* ── Navigation Bar ── */}
       <nav className="glass-nav fixed left-0 right-0 top-0 z-50">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-2.5">
-          {/* Left: Wordmark only */}
           <span className="text-lg font-semibold tracking-tight text-white">
             Glasswork
           </span>
-
-          {/* Right: Single ghost link */}
           <a
             href="#"
             className="text-[13px] font-medium text-white/30 transition-colors hover:text-white/50"
