@@ -9,10 +9,17 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { api } from "../../convex/_generated/api";
 import {
   Search,
-  BarChart3,
+  Smile,
+  Layers,
+  LayoutGrid,
+  Circle,
+  SlidersHorizontal,
+  Link2,
   Settings,
   LogOut,
-  User,
+  ChevronDown,
+  UserPlus,
+  BarChart3,
 } from "lucide-react";
 
 interface AppShellProps {
@@ -27,81 +34,6 @@ function getInitials(name?: string | null): string {
     .join("")
     .toUpperCase()
     .slice(0, 2);
-}
-
-function AccountMenu() {
-  const { signOut } = useAuthActions();
-  const user = useQuery(api.users.getCurrentUser);
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
-  return (
-    <div className="relative" ref={ref}>
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-brand/20 bg-brand/[0.08] transition-all hover:border-brand/40 hover:ring-2 hover:ring-brand/10 focus:outline-none"
-        aria-label="Account menu"
-      >
-        {user?.image ? (
-          <Image
-            src={user.image}
-            alt={user.name ?? "Profile"}
-            width={32}
-            height={32}
-            className="h-full w-full object-cover"
-            referrerPolicy="no-referrer"
-          />
-        ) : (
-          <span className="text-[11px] font-semibold text-brand">
-            {getInitials(user?.name)}
-          </span>
-        )}
-      </button>
-
-      {open && (
-        <div className="absolute right-0 top-11 z-50 min-w-[200px] overflow-hidden rounded-xl border border-warm-200/60 bg-white shadow-layered-lg">
-          <div className="border-b border-warm-200 px-4 py-3">
-            <p className="truncate text-[13px] font-medium text-warm-800">
-              {user?.name ?? "Signed in"}
-            </p>
-            {user?.email && (
-              <p className="truncate text-[11px] text-warm-500">{user.email}</p>
-            )}
-          </div>
-          <div className="py-1">
-            <Link
-              href="/app"
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2.5 text-[13px] text-warm-600 transition-colors hover:bg-warm-100 hover:text-warm-800"
-            >
-              <BarChart3 className="h-3.5 w-3.5" />
-              Workspace
-            </Link>
-            <button
-              onClick={() => {
-                setOpen(false);
-                void signOut();
-              }}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-warm-500 transition-colors hover:bg-warm-100 hover:text-danger"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              Sign out
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
 }
 
 function SettingsPopover() {
@@ -124,35 +56,55 @@ function SettingsPopover() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className={`flex h-10 w-10 items-center justify-center rounded-lg transition-all ${
+        className={`group/settings relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
           open
-            ? "bg-brand/[0.1] text-brand"
+            ? "bg-warm-100 text-warm-700"
             : "text-warm-400 hover:bg-warm-100 hover:text-warm-600"
         }`}
-        title="Settings"
+        title="Settings & Account"
       >
-        <Settings className="h-[18px] w-[18px]" strokeWidth={1.8} />
+        <Settings className="h-[18px] w-[18px]" strokeWidth={1.5} />
       </button>
 
       {open && (
-        <div className="absolute bottom-0 left-[52px] z-50 min-w-[200px] overflow-hidden rounded-xl border border-warm-200/60 bg-white shadow-layered-lg">
+        <div className="absolute bottom-0 left-[56px] z-50 min-w-[220px] overflow-hidden rounded-2xl border border-warm-200 bg-white shadow-layered-lg">
           {user && (
-            <div className="flex items-center gap-2.5 border-b border-warm-100 px-4 py-3">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand/[0.1] text-[11px] font-semibold text-brand">
-                {user.name?.charAt(0).toUpperCase() ?? <User className="h-3.5 w-3.5" />}
+            <div className="flex items-center gap-3 border-b border-warm-100 px-4 py-3.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm-100">
+                {user.image ? (
+                  <Image
+                    src={user.image}
+                    alt={user.name ?? "Profile"}
+                    width={32}
+                    height={32}
+                    className="h-full w-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <span className="text-[11px] font-semibold text-warm-600">
+                    {getInitials(user.name)}
+                  </span>
+                )}
               </div>
               <div className="min-w-0">
-                <p className="truncate text-[13px] font-medium text-warm-800">{user.name ?? "Account"}</p>
+                <p className="truncate text-[13px] font-semibold text-warm-900">
+                  {user.name ?? "Account"}
+                </p>
                 {user.email && (
-                  <p className="truncate text-[11px] text-warm-400">{user.email}</p>
+                  <p className="truncate text-[11px] text-warm-500">
+                    {user.email}
+                  </p>
                 )}
               </div>
             </div>
           )}
-          <div className="py-1">
+          <div className="py-1.5">
             <button
-              onClick={() => { setOpen(false); void signOut(); }}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-warm-500 transition-colors hover:bg-warm-100 hover:text-danger"
+              onClick={() => {
+                setOpen(false);
+                void signOut();
+              }}
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] font-medium text-warm-500 transition-colors hover:bg-warm-50 hover:text-danger"
             >
               <LogOut className="h-3.5 w-3.5" />
               Sign out
@@ -164,6 +116,43 @@ function SettingsPopover() {
   );
 }
 
+function SidebarIcon({
+  icon: Icon,
+  label,
+  isActive,
+  href,
+  onClick,
+}: {
+  icon: typeof BarChart3;
+  label: string;
+  isActive?: boolean;
+  href?: string;
+  onClick?: () => void;
+}) {
+  const content = (
+    <button
+      onClick={onClick}
+      className={`group/icon relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
+        isActive
+          ? "bg-warm-100 text-warm-700"
+          : "text-warm-400 hover:bg-warm-100 hover:text-warm-600"
+      }`}
+      title={label}
+    >
+      <Icon className="h-[18px] w-[18px]" strokeWidth={1.5} />
+
+      <span className="pointer-events-none absolute left-[52px] whitespace-nowrap rounded-lg bg-warm-900 px-2.5 py-1 text-[11px] font-medium text-white opacity-0 shadow-md transition-opacity group-hover/icon:opacity-100">
+        {label}
+      </span>
+    </button>
+  );
+
+  if (href) {
+    return <Link href={href}>{content}</Link>;
+  }
+  return content;
+}
+
 function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -172,12 +161,15 @@ function Sidebar() {
     if (pathname !== "/app") {
       router.push("/app");
       setTimeout(() => {
-        const searchBtn = document.querySelector<HTMLButtonElement>("[data-search-trigger]");
+        const searchBtn =
+          document.querySelector<HTMLButtonElement>("[data-search-trigger]");
         searchBtn?.click();
       }, 200);
     } else {
-      const searchBtn = document.querySelector<HTMLButtonElement>("[data-search-trigger]");
-      const searchInput = document.querySelector<HTMLInputElement>("[data-search-input]");
+      const searchInput =
+        document.querySelector<HTMLInputElement>("[data-search-input]");
+      const searchBtn =
+        document.querySelector<HTMLButtonElement>("[data-search-trigger]");
       if (searchInput) {
         searchInput.focus();
       } else {
@@ -186,64 +178,93 @@ function Sidebar() {
     }
   };
 
+  const isAnalysesActive =
+    pathname === "/app" || pathname.startsWith("/results");
+
   return (
-    <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col items-center border-r border-warm-200/60 bg-white shadow-[1px_0_8px_rgba(0,0,0,0.03)]">
+    <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col items-center border-r border-warm-200 bg-white">
       <div className="flex h-14 items-center justify-center">
         <Link href="/app">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-gold to-gold-dark shadow-sm">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warm-900 shadow-sm transition-transform duration-200 hover:scale-105">
             <span className="text-[11px] font-bold text-white">G</span>
           </div>
         </Link>
       </div>
 
-      <nav className="mt-2 flex flex-col items-center gap-1">
-        {/* Search */}
-        <button
-          onClick={handleSearch}
-          className="flex h-10 w-10 items-center justify-center rounded-lg text-warm-400 transition-all hover:bg-warm-100 hover:text-warm-600"
-          title="Search"
-        >
-          <Search className="h-[18px] w-[18px]" strokeWidth={1.8} />
-        </button>
-
-        {/* Analyses */}
-        <Link href="/app">
-          <button
-            className={`flex h-10 w-10 items-center justify-center rounded-lg transition-all ${
-              pathname === "/app" || pathname.startsWith("/results")
-                ? "bg-brand/[0.1] text-brand"
-                : "text-warm-400 hover:bg-warm-100 hover:text-warm-600"
-            }`}
-            title="Analyses"
-          >
-            <BarChart3 className="h-[18px] w-[18px]" strokeWidth={1.8} />
-          </button>
-        </Link>
-
-        {/* Settings — opens popover with sign out */}
-        <SettingsPopover />
+      <nav className="mt-2 flex flex-1 flex-col items-center gap-1">
+        <SidebarIcon icon={Search} label="Search" onClick={handleSearch} />
+        <SidebarIcon icon={Smile} label="Feedback" />
+        <SidebarIcon icon={Layers} label="Collections" />
+        <SidebarIcon
+          icon={LayoutGrid}
+          label="Analyses"
+          href="/app"
+          isActive={isAnalysesActive}
+        />
+        <SidebarIcon icon={Circle} label="Projects" />
+        <SidebarIcon icon={SlidersHorizontal} label="Workflows" />
+        <SidebarIcon icon={Link2} label="Connections" />
+        <SidebarIcon icon={Layers} label="Integrations" />
       </nav>
+
+      <div className="mb-4">
+        <SettingsPopover />
+      </div>
     </aside>
   );
 }
 
-function DashboardTopBar() {
-  const { isAuthenticated } = useConvexAuth();
+function UserAvatar() {
+  const user = useQuery(api.users.getCurrentUser);
 
   return (
-    <header className="sticky top-0 z-20 border-b border-warm-200/60 bg-white/80 shadow-[0_1px_4px_rgba(0,0,0,0.03)] backdrop-blur-xl">
+    <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm-200">
+      {user?.image ? (
+        <Image
+          src={user.image}
+          alt={user?.name ?? "Profile"}
+          width={32}
+          height={32}
+          className="h-full w-full object-cover"
+          referrerPolicy="no-referrer"
+        />
+      ) : (
+        <span className="text-[11px] font-semibold text-warm-600">
+          {getInitials(user?.name)}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function DashboardTopBar() {
+  return (
+    <header className="sticky top-0 z-20 border-b border-warm-200/60 bg-white/80 backdrop-blur-xl">
       <div className="flex h-14 items-center justify-between px-6">
-        <div className="flex items-center gap-3">
-          <Link href="/app" className="flex items-center gap-2 transition-opacity hover:opacity-70">
-            <div className="h-4 w-4 rounded bg-gradient-to-br from-gold to-gold-dark" />
-            <span className="text-[13px] font-medium text-warm-700">
+        <div className="flex items-center gap-2">
+          <Link
+            href="/app"
+            className="flex items-center gap-2 transition-opacity hover:opacity-70"
+          >
+            <div className="h-4 w-4 rounded bg-warm-900" />
+            <span className="text-[13px] font-semibold text-warm-700">
               Glasswork
             </span>
           </Link>
         </div>
 
         <div className="flex items-center gap-3">
-          {isAuthenticated && <AccountMenu />}
+          <button className="flex items-center gap-1 rounded-lg px-3 py-1.5 text-[13px] font-medium text-warm-500 transition-colors hover:bg-warm-50 hover:text-warm-700">
+            Manage
+            <ChevronDown className="h-3 w-3 opacity-50" />
+          </button>
+
+          <button className="flex items-center gap-1.5 rounded-lg bg-warm-900 px-3.5 py-1.5 text-[13px] font-semibold text-white shadow-sm transition-all duration-200 hover:bg-warm-800">
+            <UserPlus className="h-3.5 w-3.5" />
+            Invite
+          </button>
+
+          <UserAvatar />
         </div>
       </div>
     </header>
@@ -255,10 +276,11 @@ export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const isWorkspace =
     pathname.startsWith("/app") || pathname.startsWith("/results");
+  const isSignIn = pathname === "/sign-in";
 
   if (isWorkspace && isAuthenticated) {
     return (
-      <div className="relative min-h-screen bg-surface">
+      <div className="relative min-h-screen bg-surface grain-overlay">
         <Sidebar />
         <div className="pl-[56px]">
           <DashboardTopBar />
@@ -266,6 +288,10 @@ export function AppShell({ children }: AppShellProps) {
         </div>
       </div>
     );
+  }
+
+  if (isSignIn) {
+    return <>{children}</>;
   }
 
   return (

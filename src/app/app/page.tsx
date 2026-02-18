@@ -14,8 +14,10 @@ import {
   Search,
   LayoutGrid,
   List,
-  SlidersHorizontal,
   Plus,
+  Infinity,
+  Filter,
+  Group,
 } from "lucide-react";
 
 type FilterType = "all" | "google_doc" | "github_repo";
@@ -34,10 +36,12 @@ export default function WorkspacePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("card");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isViewOpen, setIsViewOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
+  const viewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
@@ -47,11 +51,20 @@ export default function WorkspacePage() {
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+      if (
+        filterRef.current &&
+        !filterRef.current.contains(e.target as Node)
+      ) {
         setIsFilterOpen(false);
       }
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(e.target as Node)
+      ) {
         if (!searchQuery) setIsSearchOpen(false);
+      }
+      if (viewRef.current && !viewRef.current.contains(e.target as Node)) {
+        setIsViewOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClick);
@@ -76,15 +89,19 @@ export default function WorkspacePage() {
   });
 
   const currentFilterLabel =
-    filterOptions.find((f) => f.value === activeFilter)?.label ?? "All analyses";
+    filterOptions.find((f) => f.value === activeFilter)?.label ??
+    "All analyses";
 
   if (isAuthLoading) {
     return (
       <div className="space-y-8">
         <Skeleton className="h-10 w-48 rounded-lg bg-warm-200" />
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-[180px] rounded-2xl bg-warm-100" />
+            <Skeleton
+              key={i}
+              className="h-[190px] rounded-2xl bg-warm-100"
+            />
           ))}
         </div>
       </div>
@@ -93,7 +110,8 @@ export default function WorkspacePage() {
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-5">
+        {/* Page title */}
         <div className="hero-fade-in">
           <h1 className="text-[28px] font-semibold tracking-tight text-warm-900">
             Analyses
@@ -105,24 +123,25 @@ export default function WorkspacePage() {
           className="hero-fade-in flex flex-wrap items-center justify-between gap-3"
           style={{ animationDelay: "0.06s" }}
         >
-          <div className="flex items-center gap-2">
+          {/* Left: filter controls */}
+          <div className="flex items-center gap-3">
             <div className="relative" ref={filterRef}>
               <button
                 onClick={() => setIsFilterOpen((v) => !v)}
                 className={cn(
-                  "flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[13px] font-medium transition-all",
+                  "flex items-center gap-2 rounded-full border px-3.5 py-[7px] text-[13px] font-medium transition-all duration-200",
                   isFilterOpen || activeFilter !== "all"
-                    ? "border-brand/30 bg-brand/[0.06] text-brand-dark"
-                    : "border-warm-200/60 bg-white text-warm-600 shadow-layered hover:shadow-layered-md hover:text-warm-800"
+                    ? "border-warm-300 bg-warm-50 text-warm-900"
+                    : "border-warm-200 bg-white text-warm-600 hover:border-warm-300 hover:text-warm-800"
                 )}
               >
-                <SlidersHorizontal className="h-3.5 w-3.5" />
+                <Infinity className="h-3.5 w-3.5 opacity-50" />
                 {currentFilterLabel}
-                <ChevronDown className="h-3 w-3 opacity-50" />
+                <ChevronDown className="h-3 w-3 opacity-40" />
               </button>
 
               {isFilterOpen && (
-                <div className="absolute left-0 top-10 z-40 min-w-[180px] overflow-hidden rounded-xl border border-warm-200/60 bg-white py-1 shadow-layered-lg">
+                <div className="absolute left-0 top-10 z-40 min-w-[180px] overflow-hidden rounded-xl border border-warm-200 bg-white py-1 shadow-layered-lg">
                   {filterOptions.map((opt) => (
                     <button
                       key={opt.value}
@@ -131,10 +150,10 @@ export default function WorkspacePage() {
                         setIsFilterOpen(false);
                       }}
                       className={cn(
-                        "flex w-full items-center px-4 py-2.5 text-left text-[13px] transition-colors",
+                        "flex w-full items-center px-4 py-2.5 text-left text-[13px] font-medium transition-colors",
                         activeFilter === opt.value
-                          ? "bg-brand/[0.06] text-brand-dark"
-                          : "text-warm-600 hover:bg-warm-50 hover:text-warm-800"
+                          ? "bg-warm-100 text-warm-900"
+                          : "text-warm-500 hover:bg-warm-50 hover:text-warm-800"
                       )}
                     >
                       {opt.label}
@@ -143,13 +162,20 @@ export default function WorkspacePage() {
                 </div>
               )}
             </div>
+
+            <button className="flex items-center gap-1.5 text-[13px] font-medium text-warm-400 transition-colors hover:text-warm-600">
+              <Plus className="h-3.5 w-3.5" />
+              Filter
+            </button>
           </div>
 
+          {/* Right: find, group, view toggle */}
           <div className="flex items-center gap-2">
+            {/* Find */}
             <div className="relative" ref={searchRef}>
               {isSearchOpen ? (
-                <div className="flex items-center gap-2 rounded-lg border border-brand/30 bg-white px-3 py-1.5 shadow-layered ring-2 ring-brand/10">
-                  <Search className="h-3.5 w-3.5 text-brand" />
+                <div className="flex items-center gap-2 rounded-full border border-warm-300 bg-white px-3.5 py-[7px] shadow-sm ring-1 ring-warm-200">
+                  <Search className="h-3.5 w-3.5 text-warm-400" />
                   <input
                     type="text"
                     value={searchQuery}
@@ -157,14 +183,14 @@ export default function WorkspacePage() {
                     placeholder="Search analyses..."
                     autoFocus
                     data-search-input
-                    className="w-40 bg-transparent text-[13px] text-warm-800 placeholder:text-warm-400 focus:outline-none"
+                    className="w-40 bg-transparent text-[13px] text-warm-900 placeholder:text-warm-400 focus:outline-none"
                   />
                 </div>
               ) : (
                 <button
                   data-search-trigger
                   onClick={() => setIsSearchOpen(true)}
-                  className="flex items-center gap-2 rounded-lg border border-warm-200/60 bg-white px-3 py-1.5 text-[13px] text-warm-500 shadow-layered transition-all hover:shadow-layered-md hover:text-warm-700"
+                  className="flex items-center gap-1.5 rounded-full border border-warm-200 bg-white px-3.5 py-[7px] text-[13px] font-medium text-warm-500 transition-all duration-200 hover:border-warm-300 hover:text-warm-700"
                 >
                   <Search className="h-3.5 w-3.5" />
                   Find
@@ -172,31 +198,61 @@ export default function WorkspacePage() {
               )}
             </div>
 
-            <div className="flex items-center rounded-lg border border-warm-200/60 bg-white shadow-layered">
+            {/* Group */}
+            <button className="flex items-center gap-1.5 rounded-full border border-warm-200 bg-white px-3.5 py-[7px] text-[13px] font-medium text-warm-500 transition-all duration-200 hover:border-warm-300 hover:text-warm-700">
+              <Group className="h-3.5 w-3.5" />
+              Group
+            </button>
+
+            {/* View mode dropdown */}
+            <div className="relative" ref={viewRef}>
               <button
-                onClick={() => setViewMode("card")}
-                className={cn(
-                  "flex items-center gap-1.5 rounded-l-lg px-3 py-1.5 text-[13px] transition-colors",
-                  viewMode === "card"
-                    ? "bg-warm-100 text-warm-800"
-                    : "text-warm-400 hover:text-warm-600"
-                )}
+                onClick={() => setIsViewOpen((v) => !v)}
+                className="flex items-center gap-1.5 rounded-full border border-warm-200 bg-white px-3.5 py-[7px] text-[13px] font-medium text-warm-500 transition-all duration-200 hover:border-warm-300 hover:text-warm-700"
               >
-                <LayoutGrid className="h-3.5 w-3.5" />
-                Card
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={cn(
-                  "flex items-center gap-1.5 rounded-r-lg px-3 py-1.5 text-[13px] transition-colors",
-                  viewMode === "list"
-                    ? "bg-warm-100 text-warm-800"
-                    : "text-warm-400 hover:text-warm-600"
+                {viewMode === "card" ? (
+                  <LayoutGrid className="h-3.5 w-3.5" />
+                ) : (
+                  <List className="h-3.5 w-3.5" />
                 )}
-              >
-                <List className="h-3.5 w-3.5" />
-                List
+                {viewMode === "card" ? "Card" : "List"}
+                <ChevronDown className="h-3 w-3 opacity-40" />
               </button>
+
+              {isViewOpen && (
+                <div className="absolute right-0 top-10 z-40 min-w-[120px] overflow-hidden rounded-xl border border-warm-200 bg-white py-1 shadow-layered-lg">
+                  <button
+                    onClick={() => {
+                      setViewMode("card");
+                      setIsViewOpen(false);
+                    }}
+                    className={cn(
+                      "flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] font-medium transition-colors",
+                      viewMode === "card"
+                        ? "bg-warm-100 text-warm-900"
+                        : "text-warm-500 hover:bg-warm-50 hover:text-warm-800"
+                    )}
+                  >
+                    <LayoutGrid className="h-3.5 w-3.5" />
+                    Card
+                  </button>
+                  <button
+                    onClick={() => {
+                      setViewMode("list");
+                      setIsViewOpen(false);
+                    }}
+                    className={cn(
+                      "flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] font-medium transition-colors",
+                      viewMode === "list"
+                        ? "bg-warm-100 text-warm-900"
+                        : "text-warm-500 hover:bg-warm-50 hover:text-warm-800"
+                    )}
+                  >
+                    <List className="h-3.5 w-3.5" />
+                    List
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -206,8 +262,8 @@ export default function WorkspacePage() {
           <div
             className={cn(
               viewMode === "card"
-                ? "grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                : "space-y-3"
+                ? "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                : "space-y-2"
             )}
           >
             {Array.from({ length: 4 }).map((_, i) => (
@@ -215,7 +271,9 @@ export default function WorkspacePage() {
                 key={i}
                 className={cn(
                   "bg-warm-100",
-                  viewMode === "card" ? "h-[180px] rounded-2xl" : "h-16 rounded-xl"
+                  viewMode === "card"
+                    ? "h-[190px] rounded-2xl"
+                    : "h-16 rounded-xl"
                 )}
               />
             ))}
@@ -229,7 +287,7 @@ export default function WorkspacePage() {
               <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-warm-200 bg-warm-50">
                 <LayoutGrid className="h-7 w-7 text-warm-300" />
               </div>
-              <h2 className="text-[18px] font-semibold text-warm-800">
+              <h2 className="text-xl font-semibold text-warm-900">
                 {searchQuery ? "No matches found" : "No analyses yet"}
               </h2>
               <p className="mt-2 text-[14px] leading-relaxed text-warm-500">
@@ -240,7 +298,7 @@ export default function WorkspacePage() {
               {!searchQuery && (
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="mt-5 inline-flex items-center gap-2 rounded-xl bg-brand px-5 py-2.5 text-[13px] font-semibold text-white shadow-layered transition-all hover:bg-brand-dark hover:shadow-layered-md"
+                  className="mt-5 inline-flex items-center gap-2 rounded-xl bg-warm-900 px-5 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-all duration-200 hover:bg-warm-800 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <Plus className="h-4 w-4" />
                   New analysis
@@ -249,15 +307,25 @@ export default function WorkspacePage() {
             </div>
           </div>
         ) : viewMode === "card" ? (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredAnalyses.map((analysis, i) => (
-              <AnalysisCard key={analysis._id} analysis={analysis} index={i} variant="card" />
+              <AnalysisCard
+                key={analysis._id}
+                analysis={analysis}
+                index={i}
+                variant="card"
+              />
             ))}
           </div>
         ) : (
           <div className="space-y-2">
             {filteredAnalyses.map((analysis, i) => (
-              <AnalysisCard key={analysis._id} analysis={analysis} index={i} variant="list" />
+              <AnalysisCard
+                key={analysis._id}
+                analysis={analysis}
+                index={i}
+                variant="list"
+              />
             ))}
           </div>
         )}
@@ -266,13 +334,16 @@ export default function WorkspacePage() {
       {/* FAB */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-8 right-8 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-brand shadow-layered-lg transition-all hover:scale-105 hover:bg-brand-dark hover:shadow-xl active:scale-95"
+        className="ripple-effect group fixed bottom-8 right-8 z-30 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-warm-900 shadow-layered-lg transition-all duration-200 hover:scale-110 hover:bg-warm-800 hover:shadow-xl active:scale-95"
         aria-label="New analysis"
       >
-        <Plus className="h-6 w-6 text-white" strokeWidth={2.5} />
+        <Plus className="fab-icon h-6 w-6 text-white" strokeWidth={2.5} />
       </button>
 
-      <NewAnalysisModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <NewAnalysisModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </>
   );
 }

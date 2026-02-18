@@ -8,6 +8,7 @@ import { api } from "../../convex/_generated/api";
 import { GlassInput } from "@/components/GlassInput";
 import { GlassButton } from "@/components/GlassButton";
 import { cn } from "@/lib/utils";
+import { FileText, Github } from "lucide-react";
 
 interface NewAnalysisModalProps {
   isOpen: boolean;
@@ -124,66 +125,69 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-warm-900/20 backdrop-blur-sm" onClick={onClose} />
+      {/* Backdrop */}
+      <div className="animate-modal-overlay absolute inset-0 bg-warm-900/30 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-lg rounded-2xl border border-warm-200/60 bg-white p-6 shadow-layered-lg">
+      {/* Modal */}
+      <div className="animate-modal-enter relative w-full max-w-lg rounded-2xl border border-warm-200 bg-white p-8 shadow-layered-lg">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-warm-400 transition-colors hover:text-warm-600"
+          className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-all duration-200 hover:bg-warm-100 hover:text-warm-600"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </button>
 
-        <h2 className="font-display text-xl font-semibold tracking-display text-warm-900">
+        <h2 className="font-display text-2xl font-normal tracking-display text-warm-900">
           New analysis
         </h2>
-        <p className="mt-1 text-[13px] text-warm-500">
+        <p className="mt-1.5 text-[13px] text-warm-500">
           Choose a source to analyze contributions.
         </p>
 
-        <div className="mt-5 flex gap-6 border-b border-warm-200 pb-3">
+        {/* Segmented control tab switcher */}
+        <div className="mt-6 flex rounded-xl bg-warm-100 p-1">
           <button
             onClick={() => { setActiveTab("doc"); setError(null); }}
             className={cn(
-              "relative pb-3 text-[13px] font-medium transition-colors",
-              activeTab === "doc" ? "text-warm-900" : "text-warm-400 hover:text-warm-600"
+              "flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-[13px] font-semibold transition-all duration-200",
+              activeTab === "doc"
+                ? "bg-white text-warm-900 shadow-sm"
+                : "text-warm-500 hover:text-warm-700"
             )}
           >
+            <FileText className="h-4 w-4" />
             Google Doc
-            {activeTab === "doc" && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-brand" />
-            )}
           </button>
           <button
             onClick={() => { setActiveTab("repo"); setError(null); }}
             className={cn(
-              "relative pb-3 text-[13px] font-medium transition-colors",
-              activeTab === "repo" ? "text-warm-900" : "text-warm-400 hover:text-warm-600"
+              "flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-[13px] font-semibold transition-all duration-200",
+              activeTab === "repo"
+                ? "bg-white text-warm-900 shadow-sm"
+                : "text-warm-500 hover:text-warm-700"
             )}
           >
+            <Github className="h-4 w-4" />
             GitHub Repo
-            {activeTab === "repo" && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-brand" />
-            )}
           </button>
         </div>
 
-        <div className="mt-5">
+        <div className="mt-6">
           {activeTab === "doc" && (
             <div className="space-y-4">
               {isLoadingDocs && (
                 <div className="space-y-2">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="h-12 animate-pulse rounded-lg bg-warm-100" />
+                    <div key={i} className="h-12 animate-pulse rounded-xl bg-warm-100" />
                   ))}
                 </div>
               )}
 
               {!isLoadingDocs && needsReauth && (
-                <div className="rounded-xl border border-gold/30 bg-gold/5 px-4 py-3">
-                  <p className="text-[13px] font-medium text-warm-800">
+                <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3.5">
+                  <p className="text-[13px] font-semibold text-warm-900">
                     Google access expired
                   </p>
                   <p className="mt-0.5 text-[12px] text-warm-500">
@@ -191,7 +195,7 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
                   </p>
                   <button
                     onClick={() => signIn("google", { redirectTo: "/app" })}
-                    className="mt-2.5 rounded-lg bg-warm-800 px-3.5 py-1.5 text-[12px] font-medium text-white transition-all hover:bg-warm-900"
+                    className="mt-3 rounded-lg bg-warm-900 px-4 py-2 text-[12px] font-semibold text-white transition-all duration-200 hover:bg-warm-800"
                   >
                     Reconnect Google
                   </button>
@@ -200,7 +204,7 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
 
               {!isLoadingDocs && !needsReauth && recentDocs.length > 0 && (
                 <div className="max-h-48 space-y-1 overflow-y-auto">
-                  <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.1em] text-warm-400">
+                  <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-warm-400">
                     Recent Docs
                   </p>
                   {recentDocs.map((doc) => (
@@ -208,10 +212,11 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
                       key={doc.id}
                       onClick={() => handleDocSelect(doc.id, doc.name)}
                       disabled={isSubmitting}
-                      className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-warm-50 disabled:opacity-50"
+                      className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-200 hover:bg-warm-50 disabled:opacity-50"
                     >
-                      <span className="truncate text-[13px] text-warm-700">{doc.name}</span>
-                      <span className="shrink-0 text-[11px] text-warm-400">{formatDate(doc.modifiedTime)}</span>
+                      <FileText className="h-4 w-4 shrink-0 text-warm-500" />
+                      <span className="truncate text-[13px] font-medium text-warm-800">{doc.name}</span>
+                      <span className="ml-auto shrink-0 text-[11px] text-warm-400">{formatDate(doc.modifiedTime)}</span>
                     </button>
                   ))}
                 </div>
@@ -219,7 +224,7 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
 
               <div className="space-y-2">
                 {recentDocs.length > 0 && (
-                  <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-warm-400">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-warm-400">
                     Or paste a link
                   </p>
                 )}
@@ -244,7 +249,7 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
                   value={repoInput}
                   onChange={(e) => { setRepoInput(e.target.value); setError(null); }}
                 />
-                <p className="px-1 text-[10px] text-warm-400">
+                <p className="px-1 text-[11px] text-warm-400">
                   We read public commit history. No tokens required.
                 </p>
               </div>
@@ -255,7 +260,7 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
             </div>
           )}
 
-          {error && <p className="mt-3 text-[12px] text-danger">{error}</p>}
+          {error && <p className="mt-3 text-[12px] font-medium text-danger">{error}</p>}
         </div>
       </div>
     </div>
