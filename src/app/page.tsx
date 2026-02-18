@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { useConvexAuth, useMutation } from "convex/react";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { motion } from "framer-motion";
+import { api } from "../../convex/_generated/api";
 import { GlassInput } from "@/components/GlassInput";
 import { ContributionBar } from "@/components/ContributionBar";
 
@@ -46,7 +49,6 @@ const cardDepth = [
   { opacity: 0.65, filter: "blur(0.5px)" },
 ];
 
-
 function PreviewCard({
   contributor,
   style,
@@ -88,7 +90,61 @@ function PreviewCard({
 }
 
 export default function LandingPage() {
+  const router = useRouter();
+  const { isAuthenticated } = useConvexAuth();
+  const { signIn } = useAuthActions();
+  const createAnalysis = useMutation(api.analyses.createAnalysis);
+
   const [activeTab, setActiveTab] = useState<"doc" | "repo">("doc");
+  const [repoInput, setRepoInput] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // If already authenticated, show a link to workspace
+  const handleGoogleSignIn = useCallback(async () => {
+    if (isAuthenticated) {
+      router.push("/app");
+      return;
+    }
+    try {
+      await signIn("google", { redirectTo: "/app" });
+    } catch (err) {
+      console.error("Sign in failed:", err);
+    }
+  }, [isAuthenticated, router, signIn]);
+
+  const handleRepoAnalyze = useCallback(async () => {
+    const trimmed = repoInput.trim();
+    if (!/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(trimmed)) {
+      setError('Use "owner/repo" format (e.g. "facebook/react")');
+      return;
+    }
+
+    if (!isAuthenticated) {
+      // For GitHub repos, we still need auth to store the analysis
+      try {
+        await signIn("google", { redirectTo: "/app" });
+      } catch (err) {
+        console.error("Sign in failed:", err);
+      }
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      const analysisId = await createAnalysis({
+        sourceType: "github_repo",
+        sourceId: trimmed,
+        title: trimmed,
+      });
+      router.push(`/results/${analysisId}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create analysis");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [repoInput, isAuthenticated, signIn, createAnalysis, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-20">
@@ -152,7 +208,10 @@ export default function LandingPage() {
               {/* Minimal tabs */}
               <div className="mb-6 flex gap-6 border-b border-white/[0.06] pb-3">
                 <button
-                  onClick={() => setActiveTab("doc")}
+                  onClick={() => {
+                    setActiveTab("doc");
+                    setError(null);
+                  }}
                   className={`relative pb-3 text-[13px] font-medium transition-colors ${
                     activeTab === "doc"
                       ? "text-white"
@@ -165,7 +224,10 @@ export default function LandingPage() {
                   )}
                 </button>
                 <button
-                  onClick={() => setActiveTab("repo")}
+                  onClick={() => {
+                    setActiveTab("repo");
+                    setError(null);
+                  }}
                   className={`relative pb-3 text-[13px] font-medium transition-colors ${
                     activeTab === "repo"
                       ? "text-white"
@@ -183,32 +245,44 @@ export default function LandingPage() {
               {activeTab === "doc" && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <GlassInput placeholder="Paste Google Doc link" />
-                    <p className="px-1 text-[10px] text-[#444]">
-                      We&apos;ll ask Google once to read revision metadata.
+                    <p className="px-1 text-[12px] text-white/40">
+                      Sign in with Google to analyze Doc revision history.
                     </p>
                   </div>
-                  <Link href="/results" className="block">
-                    <button className="w-full rounded-xl bg-gradient-to-b from-[#c9a96e]/90 to-[#b8935a]/90 px-5 py-3 text-sm font-medium text-[#1a1a1a] transition-all hover:from-[#d4b87a]/95 hover:to-[#c9a96e]/95 hover:shadow-[0_4px_20px_rgba(216,185,137,0.25)] active:shadow-[inset_0_2px_6px_rgba(0,0,0,0.2)]">
-                      Continue with Google
-                    </button>
-                  </Link>
+                  <button
+                    onClick={handleGoogleSignIn}
+                    className="w-full rounded-xl bg-gradient-to-b from-[#c9a96e]/90 to-[#b8935a]/90 px-5 py-3 text-sm font-medium text-[#1a1a1a] transition-all hover:from-[#d4b87a]/95 hover:to-[#c9a96e]/95 hover:shadow-[0_4px_20px_rgba(216,185,137,0.25)] active:shadow-[inset_0_2px_6px_rgba(0,0,0,0.2)]"
+                  >
+                    {isAuthenticated ? "Go to Workspace" : "Continue with Google"}
+                  </button>
                 </div>
               )}
 
               {activeTab === "repo" && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <GlassInput placeholder="owner/repo" />
+                    <GlassInput
+                      placeholder="owner/repo"
+                      value={repoInput}
+                      onChange={(e) => {
+                        setRepoInput(e.target.value);
+                        setError(null);
+                      }}
+                    />
                     <p className="px-1 text-[10px] text-[#444]">
                       We read public commit history. No tokens required.
                     </p>
                   </div>
-                  <Link href="/results" className="block">
-                    <button className="w-full rounded-xl bg-gradient-to-b from-[#c9a96e]/90 to-[#b8935a]/90 px-5 py-3 text-sm font-medium text-[#1a1a1a] transition-all hover:from-[#d4b87a]/95 hover:to-[#c9a96e]/95 hover:shadow-[0_4px_20px_rgba(216,185,137,0.25)] active:shadow-[inset_0_2px_6px_rgba(0,0,0,0.2)]">
-                      Analyze repo
-                    </button>
-                  </Link>
+                  <button
+                    onClick={handleRepoAnalyze}
+                    disabled={isSubmitting || !repoInput.trim()}
+                    className="w-full rounded-xl bg-gradient-to-b from-[#c9a96e]/90 to-[#b8935a]/90 px-5 py-3 text-sm font-medium text-[#1a1a1a] transition-all hover:from-[#d4b87a]/95 hover:to-[#c9a96e]/95 hover:shadow-[0_4px_20px_rgba(216,185,137,0.25)] active:shadow-[inset_0_2px_6px_rgba(0,0,0,0.2)] disabled:opacity-50"
+                  >
+                    {isSubmitting ? "Creating..." : "Analyze repo"}
+                  </button>
+                  {error && (
+                    <p className="text-[12px] text-[#f97373]">{error}</p>
+                  )}
                 </div>
               )}
             </div>
