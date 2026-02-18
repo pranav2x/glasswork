@@ -1,11 +1,7 @@
-/**
- * Shared scoring utilities for Fair Share Score computation.
- * These are pure functions used by both Google Doc and GitHub analysis actions.
- */
-
 export interface ContributionInput {
   name: string;
   emailOrHandle?: string;
+  avatarUrl?: string;
   metric: number;
   timestamps: number[];
   rawStats: Record<string, number>;
@@ -14,6 +10,7 @@ export interface ContributionInput {
 export interface ScoredContributor {
   name: string;
   emailOrHandle?: string;
+  avatarUrl?: string;
   score: number;
   tier: "carry" | "solid" | "ghost";
   rawStats: Record<string, number>;
@@ -21,22 +18,28 @@ export interface ScoredContributor {
 }
 
 /**
- * Normalizes contribution metrics to 0–100 Fair Share Scores and assigns tiers.
+ * Fair Share Score: 100 = exactly your fair share (1/N of total work).
+ * > 100 = overcontributor, < 100 = undercontributor.
  *
- * Algorithm:
- *   score = round((userMetric / maxMetric) * 100)
- *   tier = "carry" if top scorer, "ghost" if score < 25 or bottom third, "solid" otherwise
+ * Score = (Your Contribution / (Total Team Contribution / Team Size)) * 100
+ *
+ * Tiers:
+ *   >= 120 → carry (gold)
+ *   50-119 → solid (green)
+ *   < 50   → ghost (red)
  */
 export function computeFairShareScores(
   contributions: ContributionInput[]
 ): ScoredContributor[] {
   if (contributions.length === 0) return [];
 
-  const maxMetric = Math.max(...contributions.map((c) => c.metric));
-  if (maxMetric === 0) {
+  const totalMetric = contributions.reduce((sum, c) => sum + c.metric, 0);
+
+  if (totalMetric === 0) {
     return contributions.map((c) => ({
       name: c.name,
       emailOrHandle: c.emailOrHandle,
+      avatarUrl: c.avatarUrl,
       score: 0,
       tier: "ghost" as const,
       rawStats: c.rawStats,
@@ -44,54 +47,25 @@ export function computeFairShareScores(
     }));
   }
 
-  const scored = contributions.map((c) => ({
-    name: c.name,
-    emailOrHandle: c.emailOrHandle,
-    score: Math.round((c.metric / maxMetric) * 100),
-    rawStats: c.rawStats,
-    timestamps: c.timestamps,
-  }));
+  const fairShare = totalMetric / contributions.length;
 
-  // Sort descending by score to determine tiers
-  const sortedScores = [...scored].sort((a, b) => b.score - a.score);
-  const topScore = sortedScores[0].score;
-  const thirdIdx = Math.ceil(sortedScores.length / 3);
-  const bottomThirdThreshold =
-    sortedScores.length > 2
-      ? sortedScores[sortedScores.length - thirdIdx]?.score ?? 0
-      : 0;
+  return contributions.map((c) => {
+    const score = Math.round((c.metric / fairShare) * 100);
+    const tier: "carry" | "solid" | "ghost" =
+      score >= 120 ? "carry" : score >= 50 ? "solid" : "ghost";
 
-  return scored.map((c) => ({
-    name: c.name,
-    emailOrHandle: c.emailOrHandle,
-    score: c.score,
-    tier: assignTier(c.score, topScore, bottomThirdThreshold),
-    rawStats: c.rawStats,
-    heatmapData: generateHeatmapData(c.timestamps),
-  }));
+    return {
+      name: c.name,
+      emailOrHandle: c.emailOrHandle,
+      avatarUrl: c.avatarUrl,
+      score,
+      tier,
+      rawStats: c.rawStats,
+      heatmapData: generateHeatmapData(c.timestamps),
+    };
+  });
 }
 
-/**
- * Assigns a tier label based on the score relative to others.
- * - "carry": the top scorer
- * - "ghost": score < 25 OR in the bottom third
- * - "solid": everything else
- */
-function assignTier(
-  score: number,
-  topScore: number,
-  bottomThirdThreshold: number
-): "carry" | "solid" | "ghost" {
-  if (score === topScore && score > 0) return "carry";
-  if (score < 25 || score <= bottomThirdThreshold) return "ghost";
-  return "solid";
-}
-
-/**
- * Buckets activity timestamps into a 20-cell heatmap array with values 0–1.
- * Each cell represents an equal slice of the time window.
- * Values are normalized relative to the busiest bucket.
- */
 export function generateHeatmapData(
   timestamps: number[],
   cells: number = 20
@@ -118,11 +92,6 @@ export function generateHeatmapData(
   return buckets.map((b) => Math.round((b / maxBucket) * 100) / 100);
 }
 
-/**
- * Computes a recency-weighted metric for revision/commit counts.
- * Newer activities get a bonus: weight = 1 + 0.5 * recencyFactor
- * where recencyFactor ranges from 0 (oldest) to 1 (newest).
- */
 export function recencyWeightedSum(timestamps: number[]): number {
   if (timestamps.length === 0) return 0;
   if (timestamps.length === 1) return 1.5;

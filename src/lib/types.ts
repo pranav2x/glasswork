@@ -2,6 +2,8 @@ export interface DocStats {
   revisions: number;
   wordsAdded: number;
   wordsDeleted: number;
+  charsAdded?: number;
+  charsRemoved?: number;
 }
 
 export interface RepoStats {

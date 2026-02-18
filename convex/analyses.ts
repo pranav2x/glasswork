@@ -186,6 +186,7 @@ export const writeContributors = internalMutation({
       v.object({
         name: v.string(),
         emailOrHandle: v.optional(v.string()),
+        avatarUrl: v.optional(v.string()),
         score: v.number(),
         tier: v.union(
           v.literal("carry"),
@@ -198,7 +199,6 @@ export const writeContributors = internalMutation({
     ),
   },
   handler: async (ctx, args) => {
-    // Delete existing contributors for this analysis
     const existing = await ctx.db
       .query("contributors")
       .withIndex("by_analysisId", (q) => q.eq("analysisId", args.analysisId))
@@ -208,12 +208,12 @@ export const writeContributors = internalMutation({
       await ctx.db.delete(c._id);
     }
 
-    // Insert new contributors
     for (const c of args.contributors) {
       await ctx.db.insert("contributors", {
         analysisId: args.analysisId,
         name: c.name,
         emailOrHandle: c.emailOrHandle,
+        avatarUrl: c.avatarUrl,
         score: c.score,
         tier: c.tier,
         rawStats: c.rawStats,

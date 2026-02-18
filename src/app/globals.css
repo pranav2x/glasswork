@@ -4,30 +4,25 @@
 
 @layer base {
   :root {
-    --background: 220 14% 2%;
-    --foreground: 30 14% 90%;
-    --card: 220 14% 4%;
-    --card-foreground: 30 14% 90%;
-    --popover: 220 14% 4%;
-    --popover-foreground: 30 14% 90%;
-    --primary: 36 44% 66%;
-    --primary-foreground: 0 0% 8%;
-    --secondary: 220 8% 12%;
-    --secondary-foreground: 30 14% 90%;
-    --muted: 220 8% 14%;
-    --muted-foreground: 30 6% 55%;
-    --accent: 220 8% 14%;
-    --accent-foreground: 30 14% 90%;
-    --destructive: 0 85% 70%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%;
-    --input: 0 0% 16%;
-    --ring: 36 44% 66%;
-    --chart-1: 255 53% 79%;
-    --chart-2: 170 25% 50%;
-    --chart-3: 36 44% 66%;
-    --chart-4: 0 85% 70%;
-    --chart-5: 30 14% 90%;
+    --background: 40 20% 98%;
+    --foreground: 30 10% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 30 10% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 10% 10%;
+    --primary: 36 44% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 10% 95%;
+    --secondary-foreground: 30 10% 20%;
+    --muted: 40 10% 95%;
+    --muted-foreground: 30 6% 45%;
+    --accent: 40 10% 95%;
+    --accent-foreground: 30 10% 20%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 35 10% 88%;
+    --input: 35 10% 88%;
+    --ring: 36 44% 60%;
     --radius: 0.75rem;
   }
 
@@ -37,133 +32,18 @@
   }
 
   body {
-    background:
-      radial-gradient(ellipse 70% 50% at 30% 35%, rgba(200, 170, 110, 0.09) 0%, transparent 65%),
-      radial-gradient(ellipse 80% 50% at 20% 50%, rgba(60, 60, 120, 0.06) 0%, transparent 70%),
-      radial-gradient(ellipse 50% 70% at 70% 70%, rgba(70, 130, 130, 0.04) 0%, transparent 60%),
-      #060609;
-    color: #e8e4de;
+    background: #FAFAF8;
+    color: #1A1815;
     font-family: var(--font-body), system-ui, sans-serif;
   }
 
   * {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: #E8E5E0;
   }
 
   ::selection {
-    background: rgba(216, 185, 137, 0.3);
-    color: #fff;
-  }
-}
-
-@layer components {
-  /* ── Noise grain overlay ── */
-  .noise-grain {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    opacity: 0.4;
-  }
-
-  /* ── Glass surfaces ── */
-  .glass-surface {
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(32px);
-    -webkit-backdrop-filter: blur(32px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1rem;
-  }
-
-  .glass-surface-hover {
-    transition: all 200ms ease;
-  }
-
-  .glass-surface-hover:hover {
-    transform: translateY(-3px);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
-    border-color: rgba(255, 255, 255, 0.26);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.22),
-      0 28px 90px rgba(0, 0, 0, 0.65);
-  }
-
-  .glass-surface-hover:active {
-    transform: translateY(0);
-    box-shadow:
-      inset 0 2px 6px rgba(0, 0, 0, 0.45),
-      0 16px 50px rgba(0, 0, 0, 0.6);
-  }
-
-  /* ── Upgraded glass panel with vignette/lens effect ── */
-  .glass-panel-hero {
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(
-      168deg,
-      rgba(255, 255, 255, 0.07) 0%,
-      rgba(255, 255, 255, 0.025) 100%
-    );
-    backdrop-filter: blur(36px);
-    -webkit-backdrop-filter: blur(36px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 1rem;
-    box-shadow:
-      inset 0 0 0 1px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.14),
-      0 24px 80px rgba(0, 0, 0, 0.5);
-  }
-
-  .glass-nav {
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.06) 0%,
-      rgba(255, 255, 255, 0.02) 100%
-    );
-    -webkit-backdrop-filter: blur(24px);
-  }
-
-  .glass-input {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    transition: all 200ms ease;
-  }
-
-  .glass-input:hover {
-    border-color: rgba(255, 255, 255, 0.14);
-  }
-
-  .glass-input:focus {
-    border-color: rgba(255, 255, 255, 0.18);
-    outline: none;
-  }
-
-  /* ── Preview card glass ── */
-  .preview-card {
-    background: linear-gradient(
-      170deg,
-      rgba(255, 255, 255, 0.06) 0%,
-      rgba(255, 255, 255, 0.02) 100%
-    );
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 0.875rem;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-  }
-
-  .tier-carry {
-    color: #d8b989;
-  }
-
-  .tier-solid {
-    color: #5e9f99;
-  }
-
-  .tier-ghost {
-    color: #f97373;
+    background: rgba(201, 169, 110, 0.2);
+    color: #1A1815;
   }
 }
 
@@ -181,11 +61,7 @@
   }
 }
 
-/* ═══════════════════════════════════════════
-   Animations
-   ═══════════════════════════════════════════ */
-
-/* ── Hero fade-in ── */
+/* Animations */
 @keyframes heroFadeIn {
   from {
     opacity: 0;
@@ -201,7 +77,6 @@
   animation: heroFadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* ── Underline draw (center outward) ── */
 @keyframes underlineDraw {
   from {
     transform: scaleX(0);
@@ -216,145 +91,4 @@
 .underline-draw {
   transform-origin: center center;
   animation: underlineDraw 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
-}
-
-/* ── Glass shimmer sweep ── */
-@keyframes glassShimmer {
-  0%, 90%, 100% {
-    transform: translateX(-120%);
-    opacity: 0;
-  }
-  93% {
-    opacity: 1;
-  }
-  96% {
-    transform: translateX(120%);
-    opacity: 0;
-  }
-}
-
-.glass-shimmer::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 40%,
-    rgba(255, 255, 255, 0.04) 45%,
-    rgba(255, 255, 255, 0.06) 50%,
-    rgba(255, 255, 255, 0.04) 55%,
-    transparent 60%
-  );
-  animation: glassShimmer 14s ease-in-out infinite;
-  pointer-events: none;
-  border-radius: inherit;
-}
-
-/* ── Preview cards fade-in ── */
-@keyframes previewFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(24px) rotateX(4deg);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) rotateX(0deg);
-  }
-}
-
-.preview-fade-in {
-  animation: previewFadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* ═══════════════════════════════════════════
-   Contribution Background animations
-   ═══════════════════════════════════════════ */
-
-/* ── Aurora blob drifts ── */
-@keyframes auroraFloat1 {
-  0%, 100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  33% {
-    transform: translate3d(50px, -30px, 0) scale(1.04);
-  }
-  66% {
-    transform: translate3d(-30px, 25px, 0) scale(0.97);
-  }
-}
-
-@keyframes auroraFloat2 {
-  0%, 100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  33% {
-    transform: translate3d(-40px, 35px, 0) scale(1.03);
-  }
-  66% {
-    transform: translate3d(30px, -20px, 0) scale(0.98);
-  }
-}
-
-.cb-aurora-1 {
-  will-change: transform;
-  animation: auroraFloat1 26s ease-in-out infinite;
-}
-
-.cb-aurora-2 {
-  will-change: transform;
-  animation: auroraFloat2 30s ease-in-out infinite;
-}
-
-/* ── SVG curve vertical floats ── */
-@keyframes curveFloat1 {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
-@keyframes curveFloat2 {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(6px);
-  }
-}
-
-@keyframes curveFloat3 {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-.cb-curve-float-1 {
-  animation: curveFloat1 25s ease-in-out infinite;
-}
-
-.cb-curve-float-2 {
-  animation: curveFloat2 28s ease-in-out infinite;
-}
-
-.cb-curve-float-3 {
-  animation: curveFloat3 32s ease-in-out infinite;
-}
-
-/* ── Dot shimmer sweep ── */
-@keyframes dotShimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.cb-dot-shimmer {
-  animation: dotShimmer 12s ease-in-out infinite;
 }

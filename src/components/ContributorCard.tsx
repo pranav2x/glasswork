@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useSpring, useMotionValue, useTransform } from "framer-motion";
+import { useEffect } from "react";
 import { GlassPanel } from "@/components/GlassPanel";
 import { LiquidHeatmap } from "@/components/LiquidHeatmap";
 import { Badge } from "@/components/ui/badge";
@@ -13,9 +14,9 @@ interface ContributorCardProps {
 }
 
 const tierConfig = {
-  carry: { label: "THE CARRY", className: "tier-carry" },
-  solid: { label: "SOLID", className: "tier-solid" },
-  ghost: { label: "GHOST", className: "tier-ghost" },
+  carry: { label: "THE CARRY", color: "text-carry", bg: "bg-carry/10 border-carry/20" },
+  solid: { label: "SOLID", color: "text-solid", bg: "bg-solid/10 border-solid/20" },
+  ghost: { label: "GHOST", color: "text-ghost", bg: "bg-ghost/10 border-ghost/20" },
 };
 
 function getInitials(name: string): string {
@@ -29,6 +30,25 @@ function getInitials(name: string): string {
 
 function isDocStats(stats: DocStats | RepoStats): stats is DocStats {
   return "revisions" in stats;
+}
+
+function AnimatedScore({ value, tier }: { value: number; tier: string }) {
+  const motionValue = useMotionValue(0);
+  const spring = useSpring(motionValue, { stiffness: 60, damping: 20 });
+  const display = useTransform(spring, (v) => Math.round(v));
+
+  useEffect(() => {
+    motionValue.set(value);
+  }, [value, motionValue]);
+
+  return (
+    <motion.span className={cn(
+      "font-display text-4xl font-semibold tracking-display",
+      tier === "ghost" && "animate-glitch"
+    )}>
+      {display}
+    </motion.span>
+  );
 }
 
 export function ContributorCard({ contributor, index }: ContributorCardProps) {
@@ -47,7 +67,6 @@ export function ContributorCard({ contributor, index }: ContributorCardProps) {
       }}
     >
       <GlassPanel hoverable className="flex flex-col gap-5 p-6">
-        {/* ── Header: Avatar + name ── */}
         <div className="flex items-center gap-3">
           <div
             className={cn(
@@ -60,41 +79,58 @@ export function ContributorCard({ contributor, index }: ContributorCardProps) {
             {getInitials(name)}
           </div>
           <div className="min-w-0">
-            <p className="truncate text-[15px] font-medium text-white/90">
+            <p className="truncate text-[15px] font-medium text-warm-800">
               {name}
             </p>
-            <p className="truncate text-[12px] text-white/35">
+            <p className="truncate text-[12px] text-warm-400">
               {email || handle || ""}
             </p>
           </div>
         </div>
 
-        {/* ── Stats pills ── */}
         <div className="flex flex-wrap gap-2">
           {isDocStats(stats) ? (
-            <Badge
-              variant="outline"
-              className="border-docs-accent/20 bg-docs-accent/[0.06] text-[11px] text-docs-accent/80"
-            >
-              {stats.revisions} revisions
-            </Badge>
+            <>
+              <Badge
+                variant="outline"
+                className="border-docs-accent/20 bg-docs-accent/[0.06] text-[11px] text-docs-accent"
+              >
+                {stats.revisions} revisions
+              </Badge>
+              {stats.charsAdded !== undefined && stats.charsAdded > 0 && (
+                <Badge
+                  variant="outline"
+                  className="border-docs-accent/20 bg-docs-accent/[0.06] text-[11px] text-docs-accent"
+                >
+                  +{stats.charsAdded.toLocaleString()} chars
+                </Badge>
+              )}
+              {stats.wordsAdded > 0 && (
+                <Badge
+                  variant="outline"
+                  className="border-docs-accent/20 bg-docs-accent/[0.06] text-[11px] text-docs-accent"
+                >
+                  ~{stats.wordsAdded.toLocaleString()} words
+                </Badge>
+              )}
+            </>
           ) : (
             <>
               <Badge
                 variant="outline"
-                className="border-repo-accent/20 bg-repo-accent/[0.06] text-[11px] text-repo-accent/80"
+                className="border-repo-accent/20 bg-repo-accent/[0.06] text-[11px] text-repo-accent"
               >
                 {stats.commits} commits
               </Badge>
               <Badge
                 variant="outline"
-                className="border-repo-accent/20 bg-repo-accent/[0.06] text-[11px] text-repo-accent/80"
+                className="border-repo-accent/20 bg-repo-accent/[0.06] text-[11px] text-repo-accent"
               >
                 +{stats.linesAdded.toLocaleString()}
               </Badge>
               <Badge
                 variant="outline"
-                className="border-repo-accent/20 bg-repo-accent/[0.06] text-[11px] text-repo-accent/80"
+                className="border-repo-accent/20 bg-repo-accent/[0.06] text-[11px] text-repo-accent"
               >
                 &minus;{stats.linesDeleted.toLocaleString()}
               </Badge>
@@ -102,23 +138,15 @@ export function ContributorCard({ contributor, index }: ContributorCardProps) {
           )}
         </div>
 
-        {/* ── Fair Share Score ── */}
         <div className="flex items-end justify-between">
           <div>
-            <p className="font-display text-4xl font-semibold tracking-display text-white/90">
-              {fairShareScore}
-            </p>
-            <p
-              className={cn(
-                "mt-1 text-[10px] font-semibold uppercase tracking-micro",
-                tierInfo.className
-              )}
-            >
+            <div className="text-warm-800">
+              <AnimatedScore value={fairShareScore} tier={tier} />
+            </div>
+            <p className={cn("mt-1 text-[10px] font-semibold uppercase tracking-micro", tierInfo.color)}>
               {tierInfo.label}
             </p>
           </div>
-
-          {/* ── Heatmap ── */}
           <LiquidHeatmap mode={source} data={heatmapData} />
         </div>
       </GlassPanel>

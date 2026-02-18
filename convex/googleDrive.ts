@@ -3,6 +3,7 @@
 import { action } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { googleFetch } from "./googleApi";
 
 interface DriveFile {
   id: string;
@@ -10,10 +11,6 @@ interface DriveFile {
   modifiedTime: string;
 }
 
-/**
- * Lists the user's recent Google Docs (up to 20) using the Drive API.
- * Requires the user to be authenticated with Google and have a stored access token.
- */
 export const listRecentDocs = action({
   args: {},
   handler: async (ctx) => {
@@ -36,11 +33,11 @@ export const listRecentDocs = action({
       fields: "files(id,name,modifiedTime)",
     });
 
-    const res = await fetch(
-      `https://www.googleapis.com/drive/v3/files?${params}`,
-      {
-        headers: { Authorization: `Bearer ${user.googleAccessToken}` },
-      }
+    const res = await googleFetch(
+      ctx,
+      userId,
+      user,
+      `https://www.googleapis.com/drive/v3/files?${params}`
     );
 
     if (!res.ok) {

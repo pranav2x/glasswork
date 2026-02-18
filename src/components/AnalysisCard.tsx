@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { cn } from "@/lib/utils";
 import {
-  MoreHorizontal,
   FileText,
   Github,
   Users,
@@ -48,46 +47,49 @@ function formatTimeAgo(timestamp: number): string {
   return new Date(timestamp).toLocaleDateString();
 }
 
-function ContextMenu({
-  analysisId,
-  onClose,
-}: {
-  analysisId: string;
-  onClose: () => void;
-}) {
+function DeleteButton({ analysisId }: { analysisId: string }) {
   const deleteAnalysis = useMutation(api.analyses.deleteAnalysis);
-  const ref = useRef<HTMLDivElement>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        onClose();
-      }
+  async function handleDelete(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirming) {
+      setConfirming(true);
+      // Auto-cancel confirm state after 3 seconds
+      setTimeout(() => setConfirming(false), 3000);
+      return;
     }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [onClose]);
+    setDeleting(true);
+    try {
+      await deleteAnalysis({ analysisId: analysisId as Id<"analyses"> });
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  if (confirming) {
+    return (
+      <button
+        onClick={handleDelete}
+        disabled={deleting}
+        className="flex items-center gap-1 rounded-lg bg-danger px-2 py-1 text-[11px] font-medium text-white transition-all hover:bg-danger/90"
+      >
+        <Trash2 className="h-3 w-3" />
+        {deleting ? "Deleting..." : "Confirm"}
+      </button>
+    );
+  }
 
   return (
-    <div
-      ref={ref}
-      className="absolute right-0 top-8 z-50 min-w-[140px] overflow-hidden rounded-xl border border-white/[0.08] bg-[#0c0c12]/95 py-1 shadow-2xl backdrop-blur-xl"
+    <button
+      onClick={handleDelete}
+      className="flex h-7 w-7 items-center justify-center rounded-lg text-warm-300 opacity-0 transition-all group-hover:opacity-100 hover:bg-danger/8 hover:text-danger"
+      title="Delete"
     >
-      <button
-        onClick={async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          await deleteAnalysis({
-            analysisId: analysisId as Id<"analyses">,
-          });
-          onClose();
-        }}
-        className="flex w-full items-center gap-2.5 px-4 py-2 text-left text-[13px] text-[#f97373]/80 transition-colors hover:bg-[#f97373]/[0.06] hover:text-[#f97373]"
-      >
-        <Trash2 className="h-3.5 w-3.5" />
-        Delete
-      </button>
-    </div>
+      <Trash2 className="h-3.5 w-3.5" />
+    </button>
   );
 }
 
@@ -96,54 +98,42 @@ export function AnalysisCard({
   index,
   variant = "card",
 }: AnalysisCardProps) {
-  const [menuOpen, setMenuOpen] = useState(false);
   const isDoc = analysis.sourceType === "google_doc";
   const isPending = analysis.status === "pending";
   const isError = analysis.status === "error";
 
   const SourceIcon = isDoc ? FileText : Github;
   const iconBg = isDoc
-    ? "bg-[#a894ff]/10 text-[#a894ff]"
-    : "bg-[#5e9f99]/10 text-[#5e9f99]";
+    ? "bg-docs-accent/10 text-docs-accent"
+    : "bg-repo-accent/10 text-repo-accent";
 
   if (variant === "list") {
     return (
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{
-          delay: index * 0.03,
-          duration: 0.4,
-          ease: [0.22, 1, 0.36, 1],
-        }}
+        transition={{ delay: index * 0.03, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
-        <Link href={`/results/${analysis._id}`}>
-          <div className="group flex items-center gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 transition-all hover:border-white/[0.1] hover:bg-white/[0.04]">
-            <div
-              className={cn(
-                "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                iconBg
-              )}
-            >
+        <div className="group flex items-center gap-4 rounded-xl border border-warm-200 bg-white px-4 py-3 transition-all hover:border-warm-300 hover:shadow-sm">
+          <Link href={`/results/${analysis._id}`} className="flex min-w-0 flex-1 items-center gap-4">
+            <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", iconBg)}>
               <SourceIcon className="h-4 w-4" />
             </div>
 
             <div className="min-w-0 flex-1">
-              <h3 className="truncate text-[14px] font-medium text-white/80 group-hover:text-white/95">
+              <h3 className="truncate text-[14px] font-medium text-warm-800 group-hover:text-warm-900">
                 {analysis.title}
               </h3>
             </div>
 
-            <div className="flex items-center gap-4 text-[12px] text-white/35">
+            <div className="flex items-center gap-4 text-[12px] text-warm-400">
               {isPending && (
-                <span className="flex items-center gap-1.5 text-[#d8b989]">
+                <span className="flex items-center gap-1.5 text-gold">
                   <Loader2 className="h-3 w-3 animate-spin" />
                   Analyzing
                 </span>
               )}
-              {isError && (
-                <span className="text-[#f97373]">Failed</span>
-              )}
+              {isError && <span className="text-danger">Failed</span>}
               {analysis.contributorCount > 0 && (
                 <span className="flex items-center gap-1">
                   <Users className="h-3 w-3" />
@@ -153,9 +143,11 @@ export function AnalysisCard({
               <span>{formatTimeAgo(analysis.updatedAt)}</span>
             </div>
 
-            <ExternalLink className="h-3.5 w-3.5 text-white/15 transition-colors group-hover:text-white/40" />
-          </div>
-        </Link>
+            <ExternalLink className="h-3.5 w-3.5 text-warm-300 transition-colors group-hover:text-warm-500" />
+          </Link>
+
+          <DeleteButton analysisId={analysis._id} />
+        </div>
       </motion.div>
     );
   }
@@ -164,70 +156,37 @@ export function AnalysisCard({
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{
-        delay: index * 0.05,
-        duration: 0.5,
-        ease: [0.22, 1, 0.36, 1],
-      }}
+      transition={{ delay: index * 0.05, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
-      <Link href={`/results/${analysis._id}`}>
-        <div className="group relative flex h-[180px] flex-col rounded-2xl border border-white/[0.06] bg-white/[0.025] p-5 transition-all hover:border-white/[0.12] hover:bg-white/[0.04] hover:shadow-[0_8px_40px_rgba(0,0,0,0.3)]">
-          {/* Top row: icon + menu */}
-          <div className="flex items-start justify-between">
-            <div
-              className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-xl",
-                iconBg
-              )}
-            >
-              <SourceIcon className="h-5 w-5" />
-            </div>
-
-            <div className="relative">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setMenuOpen((v) => !v);
-                }}
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-white/20 transition-colors hover:bg-white/[0.06] hover:text-white/50"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </button>
-              {menuOpen && (
-                <ContextMenu
-                  analysisId={analysis._id}
-                  onClose={() => setMenuOpen(false)}
-                />
-              )}
-            </div>
+      <div className="group relative flex h-[180px] flex-col rounded-2xl border border-warm-200 bg-white p-5 transition-all hover:border-warm-300 hover:shadow-md">
+        <div className="flex items-start justify-between">
+          <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl", iconBg)}>
+            <SourceIcon className="h-5 w-5" />
           </div>
 
-          {/* Title */}
-          <h3 className="mt-4 truncate text-[15px] font-medium text-white/85 group-hover:text-white">
+          <DeleteButton analysisId={analysis._id} />
+        </div>
+
+        <Link href={`/results/${analysis._id}`} className="flex min-w-0 flex-1 flex-col">
+          <h3 className="mt-4 truncate text-[15px] font-medium text-warm-800 group-hover:text-warm-900">
             {analysis.title}
           </h3>
 
-          {/* Status */}
           {isPending && (
             <div className="mt-2 flex items-center gap-1.5">
-              <Loader2 className="h-3 w-3 animate-spin text-[#d8b989]" />
-              <span className="text-[12px] text-[#d8b989]/70">
-                Analyzing...
-              </span>
+              <Loader2 className="h-3 w-3 animate-spin text-gold" />
+              <span className="text-[12px] text-gold/70">Analyzing...</span>
             </div>
           )}
           {isError && (
-            <p className="mt-2 truncate text-[12px] text-[#f97373]/70">
+            <p className="mt-2 truncate text-[12px] text-danger/70">
               {analysis.errorMessage || "Analysis failed"}
             </p>
           )}
 
-          {/* Spacer */}
           <div className="flex-1" />
 
-          {/* Bottom row: contributor count + time */}
-          <div className="flex items-center justify-between text-[12px] text-white/30">
+          <div className="flex items-center justify-between text-[12px] text-warm-400">
             <div className="flex items-center gap-1.5">
               <Users className="h-3.5 w-3.5" />
               <span>
@@ -238,8 +197,8 @@ export function AnalysisCard({
             </div>
             <span>{formatTimeAgo(analysis.updatedAt)}</span>
           </div>
-        </div>
-      </Link>
+        </Link>
+      </div>
     </motion.div>
   );
 }

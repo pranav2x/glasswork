@@ -3,7 +3,8 @@
 import { v } from "convex/values";
 import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
-import { getAuthUserId } from "@convex-dev/auth/server";
+import { googleFetch } from "./googleApi";
+import DiffMatchPatch from "diff-match-patch";
 import {
   computeFairShareScores,
   recencyWeightedSum,
@@ -23,20 +24,47 @@ interface GoogleFileMetadata {
   name: string;
 }
 
-/**
- * Analyzes a Google Doc by fetching its revision history from the Drive API.
- *
- * Scoring:
- *   - Counts revisions per user
- *   - Applies recency weighting (newer revisions count more)
- *   - Normalizes to 0–100 Fair Share Score
- *   - Assigns tiers: carry / solid / ghost
- */
+const MAX_REVISIONS_TO_DIFF = 50;
+
+async function exportRevisionText(
+  ctx: any,
+  userId: any,
+  user: any,
+  fileId: string,
+  revisionId: string
+): Promise<string | null> {
+  try {
+    const res = await googleFetch(
+      ctx,
+      userId,
+      user,
+      `https://www.googleapis.com/drive/v3/files/${fileId}/revisions/${revisionId}?alt=media`
+    );
+    if (!res.ok) return null;
+    return await res.text();
+  } catch {
+    return null;
+  }
+}
+
+function countDiffChars(oldText: string, newText: string): { added: number; removed: number } {
+  const dmp = new DiffMatchPatch();
+  const diffs = dmp.diff_main(oldText, newText);
+  dmp.diff_cleanupSemantic(diffs);
+
+  let added = 0;
+  let removed = 0;
+  for (const [op, text] of diffs) {
+    if (op === 1) added += text.length;
+    else if (op === -1) removed += text.length;
+  }
+  return { added, removed };
+}
+
 export const analyzeGoogleDoc = internalAction({
   args: { analysisId: v.id("analyses") },
   handler: async (ctx, args) => {
     try {
-      // Get the analysis record
       const analysis = await ctx.runQuery(
         internal.analyses.getAnalysisInternal as any,
         { analysisId: args.analysisId }
@@ -46,26 +74,26 @@ export const analyzeGoogleDoc = internalAction({
         throw new Error("Analysis is not a Google Doc type");
       }
 
-      // Get the user's Google access token
-      const userId = await getAuthUserId(ctx);
-      if (!userId) throw new Error("Not authenticated");
+      // Use the userId stored on the analysis record.
+      // getAuthUserId() does not work inside scheduled actions (no HTTP auth context).
+      const userId = analysis.userId;
 
       const user = await ctx.runQuery(internal.users.getUserInternal as any, {
         userId,
       });
       if (!user?.googleAccessToken) {
         throw new Error(
-          "No Google access token found. Please re-authenticate with Google."
+          "No Google access token found. Please sign out and sign back in with Google to re-authorize access."
         );
       }
 
-      const accessToken = user.googleAccessToken;
       const fileId = analysis.sourceId;
 
-      // Fetch doc metadata for the title
-      const metaRes = await fetch(
-        `https://www.googleapis.com/drive/v3/files/${fileId}?fields=name`,
-        { headers: { Authorization: `Bearer ${accessToken}` } }
+      const metaRes = await googleFetch(
+        ctx,
+        userId,
+        user,
+        `https://www.googleapis.com/drive/v3/files/${fileId}?fields=name`
       );
 
       if (!metaRes.ok) {
@@ -75,15 +103,16 @@ export const analyzeGoogleDoc = internalAction({
 
       const metadata: GoogleFileMetadata = await metaRes.json();
 
-      // Fetch revision history
-      const revisionsRes = await fetch(
+      const revisionsRes = await googleFetch(
+        ctx,
+        userId,
+        user,
         `https://www.googleapis.com/drive/v3/files/${fileId}/revisions?` +
           new URLSearchParams({
             fields:
               "revisions(id,modifiedTime,lastModifyingUser(displayName,emailAddress))",
             pageSize: "1000",
-          }),
-        { headers: { Authorization: `Bearer ${accessToken}` } }
+          })
       );
 
       if (!revisionsRes.ok) {
@@ -98,7 +127,6 @@ export const analyzeGoogleDoc = internalAction({
       const revisions = revisionsData.revisions || [];
 
       if (revisions.length === 0) {
-        // No revisions found — mark ready with no contributors
         await ctx.runMutation(internal.analyses.updateAnalysisStatus, {
           analysisId: args.analysisId,
           status: "ready",
@@ -111,49 +139,101 @@ export const analyzeGoogleDoc = internalAction({
         return;
       }
 
-      // Aggregate revisions per user
+      // Aggregate revisions per user with optional character-level diffing
       const userRevisions = new Map<
         string,
-        { name: string; email: string; timestamps: number[] }
+        {
+          name: string;
+          email: string;
+          timestamps: number[];
+          revisionCount: number;
+          charsAdded: number;
+          charsRemoved: number;
+        }
       >();
 
-      for (const rev of revisions) {
-        const user = rev.lastModifyingUser;
-        if (!user) continue;
+      // Take last N revisions for diffing (to stay within time limits)
+      const revisionsForDiff = revisions.slice(-MAX_REVISIONS_TO_DIFF);
+      let previousText = "";
+      let isDiffingEnabled = true;
 
-        const key = user.emailAddress || user.displayName || "Unknown";
-        const name = user.displayName || user.emailAddress || "Unknown";
+      // Try to get the text of the first revision as baseline
+      if (revisionsForDiff.length > 1) {
+        const baseText = await exportRevisionText(
+          ctx, userId, user, fileId, revisionsForDiff[0].id
+        );
+        if (baseText !== null) {
+          previousText = baseText;
+        } else {
+          isDiffingEnabled = false;
+        }
+      }
+
+      for (let i = 0; i < revisions.length; i++) {
+        const rev = revisions[i];
+        const revUser = rev.lastModifyingUser;
+        if (!revUser) continue;
+
+        const key = revUser.emailAddress || revUser.displayName || "Unknown";
+        const name = revUser.displayName || revUser.emailAddress || "Unknown";
 
         if (!userRevisions.has(key)) {
           userRevisions.set(key, {
             name,
-            email: user.emailAddress || "",
+            email: revUser.emailAddress || "",
             timestamps: [],
+            revisionCount: 0,
+            charsAdded: 0,
+            charsRemoved: 0,
           });
         }
-        userRevisions
-          .get(key)!
-          .timestamps.push(new Date(rev.modifiedTime).getTime());
+
+        const entry = userRevisions.get(key)!;
+        entry.revisionCount++;
+        entry.timestamps.push(new Date(rev.modifiedTime).getTime());
+
+        // Diff only for the tail revisions we're analyzing
+        const diffIdx = i - (revisions.length - revisionsForDiff.length);
+        if (isDiffingEnabled && diffIdx > 0 && diffIdx < revisionsForDiff.length) {
+          const currentText = await exportRevisionText(
+            ctx, userId, user, fileId, rev.id
+          );
+          if (currentText !== null) {
+            const { added, removed } = countDiffChars(previousText, currentText);
+            entry.charsAdded += added;
+            entry.charsRemoved += removed;
+            previousText = currentText;
+          }
+        }
       }
 
-      // Build contribution inputs with recency-weighted scoring
       const contributions: ContributionInput[] = [];
       for (const [, data] of Array.from(userRevisions)) {
+        const hasCharData = data.charsAdded > 0 || data.charsRemoved > 0;
+        const metric = hasCharData
+          ? data.charsAdded + data.charsRemoved * 0.3
+          : recencyWeightedSum(data.timestamps);
+
         contributions.push({
           name: data.name,
           emailOrHandle: data.email || undefined,
-          metric: recencyWeightedSum(data.timestamps),
+          metric,
           timestamps: data.timestamps,
           rawStats: {
-            revisions: data.timestamps.length,
+            revisions: data.revisionCount,
+            ...(hasCharData
+              ? {
+                  charsAdded: data.charsAdded,
+                  charsRemoved: data.charsRemoved,
+                  wordsAdded: Math.round(data.charsAdded / 5),
+                }
+              : {}),
           },
         });
       }
 
-      // Compute Fair Share Scores
       const scored = computeFairShareScores(contributions);
 
-      // Write results to DB
       await ctx.runMutation(internal.analyses.writeContributors, {
         analysisId: args.analysisId,
         contributors: scored,

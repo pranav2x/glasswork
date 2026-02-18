@@ -11,8 +11,8 @@ const GlassPanel = forwardRef<HTMLDivElement, GlassPanelProps>(
       <div
         ref={ref}
         className={cn(
-          "glass-surface",
-          hoverable && "glass-surface-hover",
+          "rounded-2xl border border-warm-200 bg-white",
+          hoverable && "transition-all duration-200 hover:-translate-y-0.5 hover:border-warm-300 hover:shadow-md",
           className
         )}
         {...props}

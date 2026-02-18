@@ -81,13 +81,10 @@ export default function WorkspacePage() {
   if (isAuthLoading) {
     return (
       <div className="space-y-8">
-        <Skeleton className="h-10 w-48 rounded-lg bg-white/[0.06]" />
+        <Skeleton className="h-10 w-48 rounded-lg bg-warm-200" />
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton
-              key={i}
-              className="h-[180px] rounded-2xl bg-white/[0.04]"
-            />
+            <Skeleton key={i} className="h-[180px] rounded-2xl bg-warm-100" />
           ))}
         </div>
       </div>
@@ -97,29 +94,26 @@ export default function WorkspacePage() {
   return (
     <>
       <div className="space-y-6">
-        {/* Page heading */}
         <div className="hero-fade-in">
-          <h1 className="text-[28px] font-semibold tracking-tight text-white/90">
+          <h1 className="text-[28px] font-semibold tracking-tight text-warm-900">
             Analyses
           </h1>
         </div>
 
-        {/* Toolbar: filters + search + view toggle */}
+        {/* Toolbar */}
         <div
           className="hero-fade-in flex flex-wrap items-center justify-between gap-3"
           style={{ animationDelay: "0.06s" }}
         >
-          {/* Left controls */}
           <div className="flex items-center gap-2">
-            {/* Filter dropdown */}
             <div className="relative" ref={filterRef}>
               <button
                 onClick={() => setIsFilterOpen((v) => !v)}
                 className={cn(
                   "flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[13px] font-medium transition-all",
                   isFilterOpen || activeFilter !== "all"
-                    ? "border-[#d8b989]/20 bg-[#d8b989]/[0.06] text-[#d8b989]"
-                    : "border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-white/[0.12] hover:text-white/80"
+                    ? "border-gold/30 bg-gold/5 text-gold-dark"
+                    : "border-warm-300 bg-white text-warm-600 hover:border-warm-400 hover:text-warm-800"
                 )}
               >
                 <SlidersHorizontal className="h-3.5 w-3.5" />
@@ -128,7 +122,7 @@ export default function WorkspacePage() {
               </button>
 
               {isFilterOpen && (
-                <div className="absolute left-0 top-10 z-40 min-w-[180px] overflow-hidden rounded-xl border border-white/[0.08] bg-[#0c0c12]/95 py-1 shadow-2xl backdrop-blur-xl">
+                <div className="absolute left-0 top-10 z-40 min-w-[180px] overflow-hidden rounded-xl border border-warm-200 bg-white py-1 shadow-lg">
                   {filterOptions.map((opt) => (
                     <button
                       key={opt.value}
@@ -139,8 +133,8 @@ export default function WorkspacePage() {
                       className={cn(
                         "flex w-full items-center px-4 py-2.5 text-left text-[13px] transition-colors",
                         activeFilter === opt.value
-                          ? "bg-[#d8b989]/[0.06] text-[#d8b989]"
-                          : "text-white/60 hover:bg-white/[0.04] hover:text-white/80"
+                          ? "bg-gold/5 text-gold-dark"
+                          : "text-warm-600 hover:bg-warm-50 hover:text-warm-800"
                       )}
                     >
                       {opt.label}
@@ -151,26 +145,26 @@ export default function WorkspacePage() {
             </div>
           </div>
 
-          {/* Right controls */}
           <div className="flex items-center gap-2">
-            {/* Search */}
             <div className="relative" ref={searchRef}>
               {isSearchOpen ? (
-                <div className="flex items-center gap-2 rounded-lg border border-white/[0.1] bg-white/[0.03] px-3 py-1.5">
-                  <Search className="h-3.5 w-3.5 text-white/40" />
+                <div className="flex items-center gap-2 rounded-lg border border-warm-300 bg-white px-3 py-1.5">
+                  <Search className="h-3.5 w-3.5 text-warm-400" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search analyses..."
                     autoFocus
-                    className="w-40 bg-transparent text-[13px] text-white/80 placeholder:text-white/25 focus:outline-none"
+                    data-search-input
+                    className="w-40 bg-transparent text-[13px] text-warm-800 placeholder:text-warm-400 focus:outline-none"
                   />
                 </div>
               ) : (
                 <button
+                  data-search-trigger
                   onClick={() => setIsSearchOpen(true)}
-                  className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-[13px] text-white/50 transition-colors hover:border-white/[0.12] hover:text-white/70"
+                  className="flex items-center gap-2 rounded-lg border border-warm-300 bg-white px-3 py-1.5 text-[13px] text-warm-500 transition-colors hover:border-warm-400 hover:text-warm-700"
                 >
                   <Search className="h-3.5 w-3.5" />
                   Find
@@ -178,15 +172,14 @@ export default function WorkspacePage() {
               )}
             </div>
 
-            {/* View mode toggle */}
-            <div className="flex items-center rounded-lg border border-white/[0.08] bg-white/[0.03]">
+            <div className="flex items-center rounded-lg border border-warm-300 bg-white">
               <button
                 onClick={() => setViewMode("card")}
                 className={cn(
                   "flex items-center gap-1.5 rounded-l-lg px-3 py-1.5 text-[13px] transition-colors",
                   viewMode === "card"
-                    ? "bg-white/[0.06] text-white/80"
-                    : "text-white/35 hover:text-white/60"
+                    ? "bg-warm-100 text-warm-800"
+                    : "text-warm-400 hover:text-warm-600"
                 )}
               >
                 <LayoutGrid className="h-3.5 w-3.5" />
@@ -197,8 +190,8 @@ export default function WorkspacePage() {
                 className={cn(
                   "flex items-center gap-1.5 rounded-r-lg px-3 py-1.5 text-[13px] transition-colors",
                   viewMode === "list"
-                    ? "bg-white/[0.06] text-white/80"
-                    : "text-white/35 hover:text-white/60"
+                    ? "bg-warm-100 text-warm-800"
+                    : "text-warm-400 hover:text-warm-600"
                 )}
               >
                 <List className="h-3.5 w-3.5" />
@@ -221,10 +214,8 @@ export default function WorkspacePage() {
               <Skeleton
                 key={i}
                 className={cn(
-                  "bg-white/[0.04]",
-                  viewMode === "card"
-                    ? "h-[180px] rounded-2xl"
-                    : "h-16 rounded-xl"
+                  "bg-warm-100",
+                  viewMode === "card" ? "h-[180px] rounded-2xl" : "h-16 rounded-xl"
                 )}
               />
             ))}
@@ -235,13 +226,13 @@ export default function WorkspacePage() {
             style={{ animationDelay: "0.12s" }}
           >
             <div className="max-w-sm text-center">
-              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/[0.06] bg-white/[0.03]">
-                <LayoutGrid className="h-7 w-7 text-white/20" />
+              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-warm-200 bg-warm-50">
+                <LayoutGrid className="h-7 w-7 text-warm-300" />
               </div>
-              <h2 className="text-[18px] font-semibold text-white/80">
+              <h2 className="text-[18px] font-semibold text-warm-800">
                 {searchQuery ? "No matches found" : "No analyses yet"}
               </h2>
-              <p className="mt-2 text-[14px] leading-relaxed text-white/40">
+              <p className="mt-2 text-[14px] leading-relaxed text-warm-500">
                 {searchQuery
                   ? "Try a different search term."
                   : "Paste a Google Doc link or a GitHub repo to see who did the work."}
@@ -249,7 +240,7 @@ export default function WorkspacePage() {
               {!searchQuery && (
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="mt-5 inline-flex items-center gap-2 rounded-xl bg-gradient-to-b from-[#d8b989] to-[#b89a6a] px-5 py-2.5 text-[13px] font-medium text-[#1a1a1a] shadow-[0_2px_12px_rgba(216,185,137,0.25)] transition-all hover:shadow-[0_4px_20px_rgba(216,185,137,0.35)]"
+                  className="mt-5 inline-flex items-center gap-2 rounded-xl bg-warm-800 px-5 py-2.5 text-[13px] font-medium text-white shadow-sm transition-all hover:bg-warm-900 hover:shadow-md"
                 >
                   <Plus className="h-4 w-4" />
                   New analysis
@@ -260,41 +251,28 @@ export default function WorkspacePage() {
         ) : viewMode === "card" ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredAnalyses.map((analysis, i) => (
-              <AnalysisCard
-                key={analysis._id}
-                analysis={analysis}
-                index={i}
-                variant="card"
-              />
+              <AnalysisCard key={analysis._id} analysis={analysis} index={i} variant="card" />
             ))}
           </div>
         ) : (
           <div className="space-y-2">
             {filteredAnalyses.map((analysis, i) => (
-              <AnalysisCard
-                key={analysis._id}
-                analysis={analysis}
-                index={i}
-                variant="list"
-              />
+              <AnalysisCard key={analysis._id} analysis={analysis} index={i} variant="list" />
             ))}
           </div>
         )}
       </div>
 
-      {/* FAB - New analysis */}
+      {/* FAB */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-8 right-8 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#d8b989] to-[#b89a6a] shadow-[0_4px_24px_rgba(216,185,137,0.35)] transition-all hover:scale-105 hover:shadow-[0_8px_32px_rgba(216,185,137,0.45)] active:scale-95"
+        className="fixed bottom-8 right-8 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-warm-800 shadow-lg transition-all hover:scale-105 hover:bg-warm-900 hover:shadow-xl active:scale-95"
         aria-label="New analysis"
       >
-        <Plus className="h-6 w-6 text-[#1a1a1a]" strokeWidth={2.5} />
+        <Plus className="h-6 w-6 text-white" strokeWidth={2.5} />
       </button>
 
-      <NewAnalysisModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
+      <NewAnalysisModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   );
 }

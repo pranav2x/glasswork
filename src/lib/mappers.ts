@@ -6,15 +6,12 @@ import type {
   SourceType,
 } from "./types";
 
-/**
- * Maps a Convex contributor document to the UI Contributor interface.
- * This keeps the existing components working unchanged.
- */
 export function mapConvexContributor(
   doc: {
     _id: string;
     name: string;
     emailOrHandle?: string;
+    avatarUrl?: string;
     score: number;
     tier: "carry" | "solid" | "ghost";
     rawStats: Record<string, number>;
@@ -28,6 +25,8 @@ export function mapConvexContributor(
           revisions: doc.rawStats?.revisions ?? 0,
           wordsAdded: doc.rawStats?.wordsAdded ?? 0,
           wordsDeleted: doc.rawStats?.wordsDeleted ?? 0,
+          charsAdded: doc.rawStats?.charsAdded,
+          charsRemoved: doc.rawStats?.charsRemoved,
         }
       : {
           commits: doc.rawStats?.commits ?? 0,
@@ -39,6 +38,7 @@ export function mapConvexContributor(
   return {
     id: doc._id,
     name: doc.name,
+    avatarUrl: doc.avatarUrl,
     email: source === "doc" ? doc.emailOrHandle : undefined,
     handle: source === "repo" ? doc.emailOrHandle : undefined,
     source,
@@ -49,9 +49,6 @@ export function mapConvexContributor(
   };
 }
 
-/**
- * Maps a Convex analysis + contributors to the UI AnalysisResult interface.
- */
 export function mapConvexAnalysis(
   analysis: {
     sourceType: "google_doc" | "github_repo";
@@ -62,6 +59,7 @@ export function mapConvexAnalysis(
     _id: string;
     name: string;
     emailOrHandle?: string;
+    avatarUrl?: string;
     score: number;
     tier: "carry" | "solid" | "ghost";
     rawStats: Record<string, number>;

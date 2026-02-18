@@ -14,43 +14,89 @@ interface GitHubContributorStats {
     avatar_url: string;
   };
   total: number;
-  weeks: Array<{
-    w: number;
-    a: number;
-    d: number;
-    c: number;
-  }>;
+  weeks: Array<{ w: number; a: number; d: number; c: number }>;
 }
 
 interface GitHubCommit {
   sha: string;
   commit: {
-    author: {
-      name: string;
-      email: string;
-      date: string;
-    };
+    author: { name: string; email: string; date: string };
     message: string;
   };
-  author?: {
-    login: string;
-  };
+  author?: { login: string };
 }
 
-/**
- * Analyzes a GitHub repo by fetching contributor statistics from the REST API.
- *
- * Primary: GET /repos/{owner}/{repo}/stats/contributors (additions/deletions/commits)
- * Fallback: GET /repos/{owner}/{repo}/commits (if stats returns 202)
- *
- * Scoring metric: commitCount + (additions * 0.3)
- * Normalizes to 0–100, assigns tiers.
- */
+interface GitHubRepo {
+  name: string;
+  full_name: string;
+}
+
+const GITHUB_HEADERS: Record<string, string> = {
+  Accept: "application/vnd.github.v3+json",
+  "User-Agent": "Glasswork-App",
+};
+
+function parseCoAuthors(message: string): Array<{ name: string; email: string }> {
+  const coAuthors: Array<{ name: string; email: string }> = [];
+  const regex = /Co-authored-by:\s*(.+?)\s*<(.+?)>/gi;
+  let match;
+  while ((match = regex.exec(message)) !== null) {
+    coAuthors.push({ name: match[1].trim(), email: match[2].trim() });
+  }
+  return coAuthors;
+}
+
+async function pollForStats(
+  ownerRepo: string,
+  maxRetries = 5,
+  delayMs = 2000
+): Promise<GitHubContributorStats[] | null> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const res = await fetch(
+      `https://api.github.com/repos/${ownerRepo}/stats/contributors`,
+      { headers: GITHUB_HEADERS }
+    );
+
+    if (res.status === 200) {
+      return await res.json();
+    }
+    if (res.status === 403) {
+      throw new Error("GitHub API rate limit exceeded. Try again in a few minutes.");
+    }
+    if (res.status === 404) {
+      throw new Error(
+        `Repository "${ownerRepo}" not found. Make sure it's public and the format is owner/repo.`
+      );
+    }
+    if (res.status === 202 && attempt < maxRetries) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+      continue;
+    }
+
+    return null;
+  }
+  return null;
+}
+
+async function fetchRepoName(ownerRepo: string): Promise<string> {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${ownerRepo}`, {
+      headers: GITHUB_HEADERS,
+    });
+    if (res.ok) {
+      const data: GitHubRepo = await res.json();
+      return data.name;
+    }
+  } catch {
+    // fall through
+  }
+  return ownerRepo;
+}
+
 export const analyzeGitHubRepo = internalAction({
   args: { analysisId: v.id("analyses") },
   handler: async (ctx, args) => {
     try {
-      // Get the analysis record using a direct DB read through runQuery
       const analysis = await ctx.runQuery(
         internal.analyses.getAnalysisInternal as any,
         { analysisId: args.analysisId }
@@ -61,65 +107,42 @@ export const analyzeGitHubRepo = internalAction({
       }
 
       const ownerRepo = analysis.sourceId;
-      const headers: Record<string, string> = {
-        Accept: "application/vnd.github.v3+json",
-        "User-Agent": "Glasswork-App",
-      };
+      const repoName = await fetchRepoName(ownerRepo);
 
-      // Try stats/contributors endpoint first (richer data)
-      let useStatsFallback = false;
-      let statsData: GitHubContributorStats[] = [];
-
-      const statsRes = await fetch(
-        `https://api.github.com/repos/${ownerRepo}/stats/contributors`,
-        { headers }
-      );
-
-      if (statsRes.status === 200) {
-        statsData = await statsRes.json();
-      } else if (statsRes.status === 202) {
-        // GitHub is computing stats — wait briefly and retry once
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        const retryRes = await fetch(
-          `https://api.github.com/repos/${ownerRepo}/stats/contributors`,
-          { headers }
-        );
-        if (retryRes.status === 200) {
-          statsData = await retryRes.json();
-        } else {
-          useStatsFallback = true;
-        }
-      } else if (statsRes.status === 403) {
-        throw new Error(
-          "GitHub API rate limit exceeded. Try again in a few minutes."
-        );
-      } else if (statsRes.status === 404) {
-        throw new Error(
-          `Repository "${ownerRepo}" not found. Make sure it's public and the format is owner/repo.`
-        );
-      } else {
-        useStatsFallback = true;
-      }
+      const statsData = await pollForStats(ownerRepo);
 
       let contributions: ContributionInput[];
 
-      if (!useStatsFallback && statsData.length > 0) {
-        // Use the rich stats data
+      if (statsData && statsData.length > 0) {
+        const coAuthorCredits = new Map<string, number>();
+
+        // Fetch recent commits to extract co-authored-by tags
+        try {
+          const commitsRes = await fetch(
+            `https://api.github.com/repos/${ownerRepo}/commits?per_page=100`,
+            { headers: GITHUB_HEADERS }
+          );
+          if (commitsRes.ok) {
+            const commits: GitHubCommit[] = await commitsRes.json();
+            for (const commit of commits) {
+              const coAuthors = parseCoAuthors(commit.commit.message);
+              for (const ca of coAuthors) {
+                const key = ca.email.toLowerCase();
+                coAuthorCredits.set(key, (coAuthorCredits.get(key) || 0) + 1);
+              }
+            }
+          }
+        } catch {
+          // co-author parsing is best-effort
+        }
+
         contributions = statsData.map((contributor) => {
-          const totalAdditions = contributor.weeks.reduce(
-            (sum, w) => sum + w.a,
-            0
-          );
-          const totalDeletions = contributor.weeks.reduce(
-            (sum, w) => sum + w.d,
-            0
-          );
+          const totalAdditions = contributor.weeks.reduce((sum, w) => sum + w.a, 0);
+          const totalDeletions = contributor.weeks.reduce((sum, w) => sum + w.d, 0);
           const commitCount = contributor.total;
 
-          // Scoring: commits + additions * 0.3
           const metric = commitCount + totalAdditions * 0.3;
 
-          // Extract weekly timestamps for heatmap (use weeks with activity)
           const timestamps = contributor.weeks
             .filter((w) => w.c > 0)
             .map((w) => w.w * 1000);
@@ -127,6 +150,7 @@ export const analyzeGitHubRepo = internalAction({
           return {
             name: contributor.author.login,
             emailOrHandle: `@${contributor.author.login}`,
+            avatarUrl: contributor.author.avatar_url,
             metric,
             timestamps,
             rawStats: {
@@ -145,7 +169,7 @@ export const analyzeGitHubRepo = internalAction({
         while (page <= maxPages) {
           const commitsRes = await fetch(
             `https://api.github.com/repos/${ownerRepo}/commits?per_page=100&page=${page}`,
-            { headers }
+            { headers: GITHUB_HEADERS }
           );
 
           if (!commitsRes.ok) {
@@ -159,7 +183,6 @@ export const analyzeGitHubRepo = internalAction({
 
           const commits: GitHubCommit[] = await commitsRes.json();
           if (commits.length === 0) break;
-
           allCommits.push(...commits);
           if (commits.length < 100) break;
           page++;
@@ -169,6 +192,7 @@ export const analyzeGitHubRepo = internalAction({
           await ctx.runMutation(internal.analyses.updateAnalysisStatus, {
             analysisId: args.analysisId,
             status: "ready",
+            title: repoName,
           });
           await ctx.runMutation(internal.analyses.writeContributors, {
             analysisId: args.analysisId,
@@ -177,39 +201,37 @@ export const analyzeGitHubRepo = internalAction({
           return;
         }
 
-        // Aggregate commits per author
         const authorMap = new Map<
           string,
-          {
-            name: string;
-            handle: string;
-            commitCount: number;
-            timestamps: number[];
-          }
+          { name: string; handle: string; commitCount: number; timestamps: number[] }
         >();
 
         for (const commit of allCommits) {
-          const login =
-            commit.author?.login ||
-            commit.commit.author.name ||
-            "Unknown";
+          const login = commit.author?.login || commit.commit.author.name || "Unknown";
           const name = commit.commit.author.name || login;
 
           if (!authorMap.has(login)) {
-            authorMap.set(login, {
-              name,
-              handle: commit.author?.login ? `@${commit.author.login}` : "",
-              commitCount: 0,
-              timestamps: [],
-            });
+            authorMap.set(login, { name, handle: commit.author?.login ? `@${commit.author.login}` : "", commitCount: 0, timestamps: [] });
           }
 
           const entry = authorMap.get(login)!;
           entry.commitCount++;
           if (commit.commit.author.date) {
-            entry.timestamps.push(
-              new Date(commit.commit.author.date).getTime()
-            );
+            entry.timestamps.push(new Date(commit.commit.author.date).getTime());
+          }
+
+          // Count co-authored-by credits
+          const coAuthors = parseCoAuthors(commit.commit.message);
+          for (const ca of coAuthors) {
+            const caKey = ca.name;
+            if (!authorMap.has(caKey)) {
+              authorMap.set(caKey, { name: ca.name, handle: "", commitCount: 0, timestamps: [] });
+            }
+            const caEntry = authorMap.get(caKey)!;
+            caEntry.commitCount += 0.5;
+            if (commit.commit.author.date) {
+              caEntry.timestamps.push(new Date(commit.commit.author.date).getTime());
+            }
           }
         }
 
@@ -218,9 +240,7 @@ export const analyzeGitHubRepo = internalAction({
           emailOrHandle: author.handle || undefined,
           metric: author.commitCount,
           timestamps: author.timestamps,
-          rawStats: {
-            commits: author.commitCount,
-          },
+          rawStats: { commits: Math.round(author.commitCount) },
         }));
       }
 
@@ -228,6 +248,7 @@ export const analyzeGitHubRepo = internalAction({
         await ctx.runMutation(internal.analyses.updateAnalysisStatus, {
           analysisId: args.analysisId,
           status: "ready",
+          title: repoName,
         });
         await ctx.runMutation(internal.analyses.writeContributors, {
           analysisId: args.analysisId,
@@ -236,10 +257,8 @@ export const analyzeGitHubRepo = internalAction({
         return;
       }
 
-      // Compute Fair Share Scores
       const scored = computeFairShareScores(contributions);
 
-      // Write results
       await ctx.runMutation(internal.analyses.writeContributors, {
         analysisId: args.analysisId,
         contributors: scored,
@@ -248,6 +267,7 @@ export const analyzeGitHubRepo = internalAction({
       await ctx.runMutation(internal.analyses.updateAnalysisStatus, {
         analysisId: args.analysisId,
         status: "ready",
+        title: repoName,
       });
     } catch (error) {
       const message =

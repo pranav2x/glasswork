@@ -3,14 +3,9 @@ import { v } from "convex/values";
 import { authTables } from "@convex-dev/auth/server";
 
 export default defineSchema({
-  // authTables defines: users, authSessions, authAccounts, authVerificationCodes,
-  // authVerifiers, authRateLimits. We extend users below with our own fields.
   ...authTables,
 
-  // Extend the authTables users table — must include ALL fields from authTables.users
-  // plus our additional fields. This overrides authTables.users.
   users: defineTable({
-    // Required by @convex-dev/auth
     name: v.optional(v.string()),
     image: v.optional(v.string()),
     email: v.optional(v.string()),
@@ -18,7 +13,6 @@ export default defineSchema({
     phone: v.optional(v.string()),
     phoneVerificationTime: v.optional(v.number()),
     isAnonymous: v.optional(v.boolean()),
-    // Our custom additions for Google API access
     googleAccessToken: v.optional(v.string()),
     googleRefreshToken: v.optional(v.string()),
   })
@@ -46,9 +40,16 @@ export default defineSchema({
     analysisId: v.id("analyses"),
     name: v.string(),
     emailOrHandle: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
     score: v.number(),
     tier: v.union(v.literal("carry"), v.literal("solid"), v.literal("ghost")),
     rawStats: v.any(),
     heatmapData: v.array(v.number()),
+    heatmapBySource: v.optional(
+      v.object({
+        github: v.array(v.number()),
+        docs: v.array(v.number()),
+      })
+    ),
   }).index("by_analysisId", ["analysisId"]),
 });

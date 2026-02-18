@@ -1,5 +1,5 @@
 interface ContributionBarProps {
-  score: number; // 0–100
+  score: number;
   segments?: number;
 }
 
@@ -12,7 +12,7 @@ export function ContributionBar({ score, segments = 16 }: ContributionBarProps) 
         <div
           key={i}
           className={`h-2.5 w-1.5 rounded-sm transition-opacity ${
-            i < filled ? "bg-current opacity-70" : "bg-white/10"
+            i < filled ? "bg-current opacity-70" : "bg-warm-200"
           }`}
         />
       ))}
