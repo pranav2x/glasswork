@@ -14,9 +14,9 @@ interface ContributorCardProps {
 }
 
 const tierConfig = {
-  carry: { label: "THE CARRY", color: "text-carry", bg: "bg-carry/10 border-carry/20" },
-  solid: { label: "SOLID", color: "text-solid", bg: "bg-solid/10 border-solid/20" },
-  ghost: { label: "GHOST", color: "text-ghost", bg: "bg-ghost/10 border-ghost/20" },
+  carry: { label: "THE CARRY", color: "text-carry", bg: "bg-carry/10 border-carry/20", accent: "bg-carry/15" },
+  solid: { label: "SOLID", color: "text-solid", bg: "bg-solid/10 border-solid/20", accent: "bg-solid/15" },
+  ghost: { label: "GHOST", color: "text-ghost", bg: "bg-ghost/10 border-ghost/20", accent: "bg-ghost/15" },
 };
 
 function getInitials(name: string): string {
@@ -70,10 +70,10 @@ export function ContributorCard({ contributor, index }: ContributorCardProps) {
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              "flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold",
+              "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold",
               source === "doc"
-                ? "border border-docs-accent/30 bg-docs-accent/10 text-docs-accent"
-                : "border border-repo-accent/30 bg-repo-accent/10 text-repo-accent"
+                ? "bg-brand/[0.12] text-brand"
+                : "bg-repo-accent/[0.12] text-repo-accent"
             )}
           >
             {getInitials(name)}
@@ -143,7 +143,7 @@ export function ContributorCard({ contributor, index }: ContributorCardProps) {
             <div className="text-warm-800">
               <AnimatedScore value={fairShareScore} tier={tier} />
             </div>
-            <p className={cn("mt-1 text-[10px] font-semibold uppercase tracking-micro", tierInfo.color)}>
+            <p className={cn("mt-1.5 text-[11px] font-bold uppercase tracking-micro", tierInfo.color)}>
               {tierInfo.label}
             </p>
           </div>

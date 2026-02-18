@@ -7,7 +7,7 @@ interface LiquidHeatmapProps {
   docsData?: number[];
 }
 
-const SEED_HEIGHTS = [18, 22, 16, 20, 24, 17, 21, 19, 23, 15];
+const SEED_HEIGHTS = [24, 30, 20, 28, 34, 22, 29, 26, 32, 19];
 
 /**
  * RGB multi-channel heatmap:
@@ -58,7 +58,7 @@ export function LiquidHeatmap({ mode, data, githubData, docsData }: LiquidHeatma
         return (
           <div
             key={i}
-            className="w-[7px] rounded-sm transition-all duration-300"
+            className="w-[8px] rounded-t-md transition-all duration-300"
             style={{
               height: `${height}px`,
               backgroundColor: color,

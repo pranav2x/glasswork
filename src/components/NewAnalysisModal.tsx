@@ -126,7 +126,7 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-warm-900/20 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-lg rounded-2xl border border-warm-200 bg-white p-6 shadow-xl">
+      <div className="relative w-full max-w-lg rounded-2xl border border-warm-200/60 bg-white p-6 shadow-layered-lg">
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-warm-400 transition-colors hover:text-warm-600"
@@ -153,7 +153,7 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
           >
             Google Doc
             {activeTab === "doc" && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gold" />
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-brand" />
             )}
           </button>
           <button
@@ -165,7 +165,7 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
           >
             GitHub Repo
             {activeTab === "repo" && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gold" />
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-brand" />
             )}
           </button>
         </div>

@@ -49,7 +49,7 @@ function AccountMenu() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-warm-300 bg-warm-100 transition-all hover:border-gold/40 hover:ring-2 hover:ring-gold/10 focus:outline-none"
+        className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-brand/20 bg-brand/[0.08] transition-all hover:border-brand/40 hover:ring-2 hover:ring-brand/10 focus:outline-none"
         aria-label="Account menu"
       >
         {user?.image ? (
@@ -62,14 +62,14 @@ function AccountMenu() {
             referrerPolicy="no-referrer"
           />
         ) : (
-          <span className="text-[11px] font-semibold text-warm-600">
+          <span className="text-[11px] font-semibold text-brand">
             {getInitials(user?.name)}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-11 z-50 min-w-[200px] overflow-hidden rounded-xl border border-warm-300 bg-white shadow-lg">
+        <div className="absolute right-0 top-11 z-50 min-w-[200px] overflow-hidden rounded-xl border border-warm-200/60 bg-white shadow-layered-lg">
           <div className="border-b border-warm-200 px-4 py-3">
             <p className="truncate text-[13px] font-medium text-warm-800">
               {user?.name ?? "Signed in"}
@@ -126,7 +126,7 @@ function SettingsPopover() {
         onClick={() => setOpen((v) => !v)}
         className={`flex h-10 w-10 items-center justify-center rounded-lg transition-all ${
           open
-            ? "bg-gold/10 text-gold-dark"
+            ? "bg-brand/[0.1] text-brand"
             : "text-warm-400 hover:bg-warm-100 hover:text-warm-600"
         }`}
         title="Settings"
@@ -135,10 +135,10 @@ function SettingsPopover() {
       </button>
 
       {open && (
-        <div className="absolute bottom-0 left-[52px] z-50 min-w-[200px] overflow-hidden rounded-xl border border-warm-200 bg-white shadow-lg">
+        <div className="absolute bottom-0 left-[52px] z-50 min-w-[200px] overflow-hidden rounded-xl border border-warm-200/60 bg-white shadow-layered-lg">
           {user && (
             <div className="flex items-center gap-2.5 border-b border-warm-100 px-4 py-3">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold/10 text-[11px] font-semibold text-gold-dark">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand/[0.1] text-[11px] font-semibold text-brand">
                 {user.name?.charAt(0).toUpperCase() ?? <User className="h-3.5 w-3.5" />}
               </div>
               <div className="min-w-0">
@@ -187,7 +187,7 @@ function Sidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col items-center border-r border-warm-300 bg-white">
+    <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col items-center border-r border-warm-200/60 bg-white shadow-[1px_0_8px_rgba(0,0,0,0.03)]">
       <div className="flex h-14 items-center justify-center">
         <Link href="/app">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-gold to-gold-dark shadow-sm">
@@ -211,7 +211,7 @@ function Sidebar() {
           <button
             className={`flex h-10 w-10 items-center justify-center rounded-lg transition-all ${
               pathname === "/app" || pathname.startsWith("/results")
-                ? "bg-gold/10 text-gold-dark"
+                ? "bg-brand/[0.1] text-brand"
                 : "text-warm-400 hover:bg-warm-100 hover:text-warm-600"
             }`}
             title="Analyses"
@@ -231,7 +231,7 @@ function DashboardTopBar() {
   const { isAuthenticated } = useConvexAuth();
 
   return (
-    <header className="sticky top-0 z-20 border-b border-warm-300 bg-white/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-20 border-b border-warm-200/60 bg-white/80 shadow-[0_1px_4px_rgba(0,0,0,0.03)] backdrop-blur-xl">
       <div className="flex h-14 items-center justify-between px-6">
         <div className="flex items-center gap-3">
           <Link href="/app" className="flex items-center gap-2 transition-opacity hover:opacity-70">

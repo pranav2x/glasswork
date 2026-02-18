@@ -123,15 +123,28 @@ export default function LandingPage() {
 
         <button
           onClick={handleGetStarted}
-          className="rounded-lg border border-warm-800 bg-warm-800 px-4 py-2 text-[13px] font-medium text-white transition-all hover:bg-warm-900"
+          className="rounded-lg bg-warm-900 px-4 py-2 text-[13px] font-semibold text-white shadow-sm transition-all hover:bg-warm-800 hover:shadow-md"
         >
           {isAuthenticated ? "Go to workspace" : "Get started free"}
         </button>
       </nav>
 
       {/* Hero */}
-      <section className="mx-auto max-w-3xl px-6 pb-16 pt-20 text-center">
+      <section className="relative mx-auto max-w-3xl px-6 pb-16 pt-20 text-center">
+        {/* Radial gradient glow anchoring the hero */}
+        <div
+          className="pointer-events-none absolute left-1/2 top-16 -translate-x-1/2"
+          aria-hidden="true"
+          style={{
+            width: "640px",
+            height: "420px",
+            background: "radial-gradient(ellipse at center, rgba(124,107,255,0.08) 0%, rgba(201,169,110,0.06) 40%, rgba(45,164,78,0.04) 65%, transparent 85%)",
+            filter: "blur(60px)",
+          }}
+        />
+
         <motion.div
+          className="relative"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -170,20 +183,20 @@ export default function LandingPage() {
             </span>
           </h1>
 
-          <p className="mx-auto mt-6 max-w-lg text-[17px] leading-relaxed text-warm-500">
+          <p className="mx-auto mt-6 max-w-lg text-[17px] leading-relaxed text-warm-600">
             Paste a Google Doc or GitHub repo. Glasswork analyzes revision history and commit data to reveal exactly who contributed.
           </p>
         </motion.div>
 
         <motion.div
-          className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
+          className="relative mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
         >
           <button
             onClick={handleGetStarted}
-            className="rounded-xl bg-warm-800 px-8 py-3.5 text-[15px] font-medium text-white shadow-sm transition-all hover:bg-warm-900 hover:shadow-md"
+            className="rounded-xl bg-warm-800 px-8 py-3.5 text-[15px] font-medium text-white shadow-layered transition-all hover:bg-warm-900 hover:shadow-layered-md"
           >
             {isAuthenticated ? "Go to workspace" : "Try for free"}
           </button>
@@ -191,13 +204,13 @@ export default function LandingPage() {
 
         {/* Quick repo input */}
         <motion.div
-          className="mx-auto mt-8 max-w-md"
+          className="relative mx-auto mt-8 max-w-md"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="flex items-center gap-2 rounded-xl border border-warm-300 bg-white p-1.5 shadow-sm transition-all focus-within:border-gold/40 focus-within:ring-2 focus-within:ring-gold/10">
-            <Github className="ml-3 h-4 w-4 shrink-0 text-warm-400" />
+          <div className="flex items-center gap-2 rounded-2xl border border-warm-200/60 bg-white p-2 shadow-layered transition-all focus-within:border-brand/30 focus-within:ring-2 focus-within:ring-brand/10">
+            <Github className="ml-3 h-4.5 w-4.5 shrink-0 text-warm-400" />
             <input
               type="text"
               placeholder="owner/repo — e.g. facebook/react"
@@ -207,12 +220,12 @@ export default function LandingPage() {
                 setError(null);
               }}
               onKeyDown={(e) => e.key === "Enter" && handleRepoAnalyze()}
-              className="min-w-0 flex-1 bg-transparent py-2 text-[14px] text-warm-800 placeholder:text-warm-400 focus:outline-none"
+              className="min-w-0 flex-1 bg-transparent py-2.5 text-[15px] text-warm-800 placeholder:text-warm-400 focus:outline-none"
             />
             <button
               onClick={handleRepoAnalyze}
               disabled={isSubmitting || !repoInput.trim()}
-              className="shrink-0 rounded-lg bg-warm-800 px-4 py-2 text-[13px] font-medium text-white transition-all hover:bg-warm-900 disabled:opacity-40"
+              className="shrink-0 rounded-xl bg-warm-900 px-5 py-2.5 text-[14px] font-semibold text-white shadow-sm transition-all hover:bg-warm-800 hover:shadow-md disabled:opacity-30"
             >
               {isSubmitting ? "Analyzing..." : "Analyze"}
             </button>
@@ -220,14 +233,14 @@ export default function LandingPage() {
           {error && (
             <p className="mt-2 text-[12px] text-danger">{error}</p>
           )}
-          <p className="mt-2 text-[12px] text-warm-400">
+          <p className="mt-3 text-[12px] text-warm-500">
             Public repos only. No tokens required.
           </p>
         </motion.div>
       </section>
 
       {/* Integration Carousel */}
-      <section className="overflow-hidden border-y border-warm-200 bg-warm-50 py-8">
+      <section className="overflow-hidden border-y border-warm-200/60 bg-white/60 py-8">
         <div className="relative">
           <div className="flex animate-scroll-left items-center gap-16 whitespace-nowrap">
             {[...integrations, ...integrations].map((integration, i) => (
@@ -255,7 +268,7 @@ export default function LandingPage() {
           <h2 className="font-display text-3xl font-semibold tracking-display text-warm-900 sm:text-4xl">
             Everything you need in one place
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-[16px] text-warm-500">
+          <p className="mx-auto mt-4 max-w-lg text-[16px] text-warm-600">
             From revision diffs to commit graphs, Glasswork turns boring version history into clear contribution data.
           </p>
         </motion.div>
@@ -264,19 +277,19 @@ export default function LandingPage() {
           {features.map((feature, i) => (
             <motion.div
               key={feature.title}
-              className="group rounded-2xl border border-warm-200 bg-white p-8 transition-all hover:border-warm-300 hover:shadow-md"
+              className="group rounded-2xl border border-warm-200/60 bg-white p-8 shadow-layered transition-all hover:shadow-layered-md"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
             >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-warm-100 text-warm-600 transition-colors group-hover:bg-gold/10 group-hover:text-gold-dark">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-brand/[0.08] text-brand transition-colors group-hover:bg-brand/[0.14] group-hover:text-brand-dark">
                 <feature.icon className="h-5 w-5" strokeWidth={1.5} />
               </div>
               <h3 className="text-[17px] font-semibold text-warm-800">
                 {feature.title}
               </h3>
-              <p className="mt-2 text-[14px] leading-relaxed text-warm-500">
+              <p className="mt-2 text-[14px] leading-relaxed text-warm-600">
                 {feature.description}
               </p>
             </motion.div>
@@ -285,17 +298,17 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="border-t border-warm-200 bg-warm-50 py-24">
+      <section className="border-t border-warm-200/60 bg-white/60 py-24">
         <div className="mx-auto max-w-2xl px-6 text-center">
           <h2 className="font-display text-3xl font-semibold tracking-display text-warm-900">
             Your grades deserve transparency
           </h2>
-          <p className="mx-auto mt-4 max-w-md text-[16px] text-warm-500">
+          <p className="mx-auto mt-4 max-w-md text-[16px] text-warm-600">
             Stop letting freeloaders take credit. See the data, share the proof.
           </p>
           <button
             onClick={handleGetStarted}
-            className="mt-8 rounded-xl bg-warm-800 px-8 py-3.5 text-[15px] font-medium text-white shadow-sm transition-all hover:bg-warm-900 hover:shadow-md"
+            className="mt-8 rounded-xl bg-warm-900 px-8 py-3.5 text-[15px] font-semibold text-white shadow-layered transition-all hover:bg-warm-800 hover:shadow-layered-md"
           >
             {isAuthenticated ? "Go to workspace" : "Get started free"}
           </button>
@@ -303,7 +316,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-warm-200 px-6 py-6">
+      <footer className="border-t border-warm-200/60 px-6 py-6">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <div className="flex items-center gap-2">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-warm-400">

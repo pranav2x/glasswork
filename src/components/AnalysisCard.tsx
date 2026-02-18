@@ -114,7 +114,7 @@ export function AnalysisCard({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.03, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
-        <div className="group flex items-center gap-4 rounded-xl border border-warm-200 bg-white px-4 py-3 transition-all hover:border-warm-300 hover:shadow-sm">
+        <div className="group flex items-center gap-4 rounded-xl border border-warm-200/40 bg-white px-4 py-3 shadow-layered transition-all hover:shadow-layered-md">
           <Link href={`/results/${analysis._id}`} className="flex min-w-0 flex-1 items-center gap-4">
             <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-lg", iconBg)}>
               <SourceIcon className="h-4 w-4" />
@@ -126,9 +126,9 @@ export function AnalysisCard({
               </h3>
             </div>
 
-            <div className="flex items-center gap-4 text-[12px] text-warm-400">
+            <div className="flex items-center gap-4 text-[12px] text-warm-500">
               {isPending && (
-                <span className="flex items-center gap-1.5 text-gold">
+                <span className="flex items-center gap-1.5 text-brand">
                   <Loader2 className="h-3 w-3 animate-spin" />
                   Analyzing
                 </span>
@@ -143,7 +143,7 @@ export function AnalysisCard({
               <span>{formatTimeAgo(analysis.updatedAt)}</span>
             </div>
 
-            <ExternalLink className="h-3.5 w-3.5 text-warm-300 transition-colors group-hover:text-warm-500" />
+            <ExternalLink className="h-3.5 w-3.5 text-warm-300 transition-colors group-hover:text-brand" />
           </Link>
 
           <DeleteButton analysisId={analysis._id} />
@@ -158,7 +158,7 @@ export function AnalysisCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="group relative flex h-[180px] flex-col rounded-2xl border border-warm-200 bg-white p-5 transition-all hover:border-warm-300 hover:shadow-md">
+      <div className="group relative flex h-[180px] flex-col rounded-2xl border border-warm-200/40 bg-white p-5 shadow-layered transition-all hover:shadow-layered-md">
         <div className="flex items-start justify-between">
           <div className={cn("flex h-10 w-10 items-center justify-center rounded-xl", iconBg)}>
             <SourceIcon className="h-5 w-5" />
@@ -174,8 +174,8 @@ export function AnalysisCard({
 
           {isPending && (
             <div className="mt-2 flex items-center gap-1.5">
-              <Loader2 className="h-3 w-3 animate-spin text-gold" />
-              <span className="text-[12px] text-gold/70">Analyzing...</span>
+              <Loader2 className="h-3 w-3 animate-spin text-brand" />
+              <span className="text-[12px] text-brand/70">Analyzing...</span>
             </div>
           )}
           {isError && (
@@ -186,7 +186,7 @@ export function AnalysisCard({
 
           <div className="flex-1" />
 
-          <div className="flex items-center justify-between text-[12px] text-warm-400">
+          <div className="flex items-center justify-between text-[12px] text-warm-500">
             <div className="flex items-center gap-1.5">
               <Users className="h-3.5 w-3.5" />
               <span>

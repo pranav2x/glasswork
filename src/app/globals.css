@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 40 20% 98%;
+    --background: 210 20% 98%;
     --foreground: 30 10% 10%;
     --card: 0 0% 100%;
     --card-foreground: 30 10% 10%;
@@ -12,11 +12,11 @@
     --popover-foreground: 30 10% 10%;
     --primary: 36 44% 60%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 40 10% 95%;
+    --secondary: 210 10% 96%;
     --secondary-foreground: 30 10% 20%;
-    --muted: 40 10% 95%;
+    --muted: 210 10% 96%;
     --muted-foreground: 30 6% 45%;
-    --accent: 40 10% 95%;
+    --accent: 210 10% 96%;
     --accent-foreground: 30 10% 20%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
@@ -32,7 +32,7 @@
   }
 
   body {
-    background: #FAFAF8;
+    background: #F9FAFB;
     color: #1A1815;
     font-family: var(--font-body), system-ui, sans-serif;
   }
@@ -42,7 +42,7 @@
   }
 
   ::selection {
-    background: rgba(201, 169, 110, 0.2);
+    background: rgba(124, 107, 255, 0.15);
     color: #1A1815;
   }
 }
