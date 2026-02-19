@@ -224,6 +224,182 @@ export const writeContributors = internalMutation({
 });
 
 /**
+ * Aggregated dashboard stats for the current user.
+ * Returns analyses, status counts, score distribution, top contributors,
+ * and monthly activity — all in one reactive query.
+ */
+export const getDashboardStats = query({
+  args: {
+    timeFilter: v.optional(
+      v.union(v.literal("today"), v.literal("week"), v.literal("month"))
+    ),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    const empty = {
+      analyses: [],
+      statusCounts: { ready: 0, pending: 0, error: 0 },
+      scoreDistribution: { excellent: 0, good: 0, fair: 0, needsWork: 0, minimal: 0 },
+      totalContributors: 0,
+      topContributors: [] as {
+        name: string;
+        emailOrHandle?: string;
+        avatarUrl?: string;
+        score: number;
+        tier: "carry" | "solid" | "ghost";
+        analysisCount: number;
+        firstAnalysisId: Id<"analyses">;
+      }[],
+      activityByMonth: [] as { month: string; docsCount: number; reposCount: number }[],
+    };
+
+    if (!userId) return empty;
+
+    // 1. Fetch all analyses for user
+    let allAnalyses = await ctx.db
+      .query("analyses")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect();
+
+    // 2. Apply time filter
+    if (args.timeFilter === "today") {
+      const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+      allAnalyses = allAnalyses.filter((a) => a.createdAt >= cutoff);
+    } else if (args.timeFilter === "week") {
+      const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      allAnalyses = allAnalyses.filter((a) => a.createdAt >= cutoff);
+    }
+    // "month" or undefined = no filter (show all)
+
+    allAnalyses.sort((a, b) => b.updatedAt - a.updatedAt);
+
+    // 3. Fetch contributors for each analysis
+    const allContributors: {
+      contributor: Doc<"contributors">;
+      analysisId: Id<"analyses">;
+    }[] = [];
+
+    const analysesWithMeta = await Promise.all(
+      allAnalyses.map(async (analysis) => {
+        const contributors = await ctx.db
+          .query("contributors")
+          .withIndex("by_analysisId", (q) => q.eq("analysisId", analysis._id))
+          .collect();
+
+        for (const c of contributors) {
+          allContributors.push({ contributor: c, analysisId: analysis._id });
+        }
+
+        const topContributor =
+          contributors.length > 0
+            ? contributors.reduce((top, c) => (c.score > top.score ? c : top))
+            : null;
+
+        return {
+          _id: analysis._id,
+          sourceType: analysis.sourceType,
+          title: analysis.title,
+          status: analysis.status,
+          createdAt: analysis.createdAt,
+          updatedAt: analysis.updatedAt,
+          topContributor: topContributor
+            ? { name: topContributor.name, score: topContributor.score, tier: topContributor.tier }
+            : null,
+          contributorCount: contributors.length,
+        };
+      })
+    );
+
+    // 4. Status counts
+    const statusCounts = { ready: 0, pending: 0, error: 0 };
+    for (const a of allAnalyses) {
+      statusCounts[a.status]++;
+    }
+
+    // 5. Score distribution
+    const scoreDistribution = { excellent: 0, good: 0, fair: 0, needsWork: 0, minimal: 0 };
+    for (const { contributor } of allContributors) {
+      const s = contributor.score;
+      if (s >= 80) scoreDistribution.excellent++;
+      else if (s >= 60) scoreDistribution.good++;
+      else if (s >= 40) scoreDistribution.fair++;
+      else if (s >= 20) scoreDistribution.needsWork++;
+      else scoreDistribution.minimal++;
+    }
+
+    // 6. Top contributors (grouped by name + handle)
+    const contributorMap = new Map<
+      string,
+      {
+        name: string;
+        emailOrHandle?: string;
+        avatarUrl?: string;
+        score: number;
+        tier: "carry" | "solid" | "ghost";
+        analysisCount: number;
+        firstAnalysisId: Id<"analyses">;
+      }
+    >();
+
+    for (const { contributor, analysisId } of allContributors) {
+      const key = `${contributor.name}|${contributor.emailOrHandle ?? ""}`;
+      const existing = contributorMap.get(key);
+      if (!existing || contributor.score > existing.score) {
+        contributorMap.set(key, {
+          name: contributor.name,
+          emailOrHandle: contributor.emailOrHandle,
+          avatarUrl: contributor.avatarUrl,
+          score: contributor.score,
+          tier: contributor.tier,
+          analysisCount: (existing?.analysisCount ?? 0) + (existing ? 0 : 1),
+          firstAnalysisId: existing?.firstAnalysisId ?? analysisId,
+        });
+        if (existing) {
+          contributorMap.get(key)!.analysisCount = existing.analysisCount + 1;
+        }
+      } else {
+        existing.analysisCount++;
+      }
+    }
+
+    const topContributors = Array.from(contributorMap.values())
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
+
+    // 7. Activity by month (last 7 months)
+    const now = new Date();
+    const activityByMonth: { month: string; docsCount: number; reposCount: number }[] = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthLabel = d.toLocaleString("default", { month: "short" });
+      const monthStart = d.getTime();
+      const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime();
+
+      activityByMonth.push({
+        month: monthLabel,
+        docsCount: allAnalyses.filter(
+          (a) => a.sourceType === "google_doc" && a.createdAt >= monthStart && a.createdAt < monthEnd
+        ).length,
+        reposCount: allAnalyses.filter(
+          (a) => a.sourceType === "github_repo" && a.createdAt >= monthStart && a.createdAt < monthEnd
+        ).length,
+      });
+    }
+
+    return {
+      analyses: analysesWithMeta,
+      statusCounts,
+      scoreDistribution,
+      totalContributors: allContributors.length,
+      topContributors,
+      activityByMonth,
+    };
+  },
+});
+
+/**
  * Deletes an analysis and all its contributors.
  */
 export const deleteAnalysis = mutation({

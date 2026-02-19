@@ -12,14 +12,22 @@ interface DonutSegment {
   label: string;
 }
 
-const DONUT_SEGMENTS: DonutSegment[] = [
-  { value: 32, color: "#4A96D9", label: "Completed" },
-  { value: 14, color: "#F5A623", label: "In Progress" },
-  { value: 54, color: "#EBEBEB", label: "Not Started" },
-];
+interface DonutChartProps {
+  segments: DonutSegment[];
+}
 
-export function DonutChart() {
-  const total = DONUT_SEGMENTS.reduce((sum, s) => sum + s.value, 0);
+export function DonutChart({ segments }: DonutChartProps) {
+  const total = segments.reduce((sum, s) => sum + s.value, 0);
+
+  if (total === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-8">
+        <div className="h-[140px] w-[140px] rounded-full border-[11px] border-warm-100" />
+        <p className="mt-3 text-[12px] font-medium text-warm-400">No analyses yet</p>
+      </div>
+    );
+  }
+
   const radius = 35;
   const circumference = 2 * Math.PI * radius;
 
@@ -28,7 +36,7 @@ export function DonutChart() {
   return (
     <div className="flex flex-col items-center">
       <svg viewBox="0 0 100 100" className="h-[140px] w-[140px]">
-        {DONUT_SEGMENTS.map((seg, i) => {
+        {segments.map((seg, i) => {
           const pct = seg.value / total;
           const dashLength = pct * circumference;
           const gapLength = circumference - dashLength;
@@ -54,7 +62,7 @@ export function DonutChart() {
       </svg>
 
       <div className="mt-3 flex items-center gap-5">
-        {DONUT_SEGMENTS.filter((s) => s.label !== "Not Started").map((seg, i) => (
+        {segments.map((seg, i) => (
           <div key={i} className="flex items-center gap-1.5">
             <span
               className="h-2 w-2 rounded-full"
@@ -66,9 +74,6 @@ export function DonutChart() {
           </div>
         ))}
       </div>
-      <p className="mt-1 text-[11px] text-warm-400">
-        Not Started: {DONUT_SEGMENTS[2].value}
-      </p>
     </div>
   );
 }
@@ -77,11 +82,24 @@ export function DonutChart() {
    Activity Line Chart
    ──────────────────────────────────────── */
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
-const DOCS_DATA = [120, 180, 150, 240, 195, 280, 245];
-const REPOS_DATA = [80, 100, 130, 110, 160, 130, 170];
+interface ActivityChartProps {
+  months: string[];
+  docsData: number[];
+  reposData: number[];
+}
 
-export function ActivityChart() {
+export function ActivityChart({ months, docsData, reposData }: ActivityChartProps) {
+  const docsTotal = docsData.reduce((s, v) => s + v, 0);
+  const reposTotal = reposData.reduce((s, v) => s + v, 0);
+
+  if (docsTotal === 0 && reposTotal === 0) {
+    return (
+      <div className="flex items-center justify-center py-10">
+        <p className="text-[12px] font-medium text-warm-400">No activity yet</p>
+      </div>
+    );
+  }
+
   const width = 320;
   const height = 140;
   const padL = 8;
@@ -91,18 +109,18 @@ export function ActivityChart() {
 
   const chartW = width - padL - padR;
   const chartH = height - padT - padB;
-  const maxVal = Math.max(...DOCS_DATA, ...REPOS_DATA) * 1.1;
+  const maxVal = Math.max(...docsData, ...reposData, 1) * 1.1;
 
-  const getX = (i: number) => padL + (i / (MONTHS.length - 1)) * chartW;
+  const getX = (i: number) => padL + (i / Math.max(months.length - 1, 1)) * chartW;
   const getY = (v: number) => padT + chartH - (v / maxVal) * chartH;
 
-  const docsPoints = DOCS_DATA.map((v, i) => `${getX(i)},${getY(v)}`).join(" ");
-  const reposPoints = REPOS_DATA.map((v, i) => `${getX(i)},${getY(v)}`).join(" ");
+  const docsPoints = docsData.map((v, i) => `${getX(i)},${getY(v)}`).join(" ");
+  const reposPoints = reposData.map((v, i) => `${getX(i)},${getY(v)}`).join(" ");
 
   const areaPath = [
-    `M${getX(0)},${getY(DOCS_DATA[0])}`,
-    ...DOCS_DATA.map((v, i) => `L${getX(i)},${getY(v)}`),
-    `L${getX(DOCS_DATA.length - 1)},${padT + chartH}`,
+    `M${getX(0)},${getY(docsData[0])}`,
+    ...docsData.map((v, i) => `L${getX(i)},${getY(v)}`),
+    `L${getX(docsData.length - 1)},${padT + chartH}`,
     `L${getX(0)},${padT + chartH}`,
     "Z",
   ].join(" ");
@@ -113,13 +131,13 @@ export function ActivityChart() {
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-brand" />
           <span className="text-[10px] font-medium text-warm-500">
-            Docs: 24,600
+            Docs: {docsTotal.toLocaleString()}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-[#F5A623]" />
           <span className="text-[10px] font-medium text-warm-500">
-            Repos: 13,290
+            Repos: {reposTotal.toLocaleString()}
           </span>
         </div>
       </div>
@@ -165,10 +183,10 @@ export function ActivityChart() {
           strokeLinejoin="round"
         />
 
-        {DOCS_DATA.map((v, i) => (
+        {docsData.map((v, i) => (
           <circle key={`d-${i}`} cx={getX(i)} cy={getY(v)} r="2.5" fill="#6C63FF" />
         ))}
-        {REPOS_DATA.map((v, i) => (
+        {reposData.map((v, i) => (
           <circle
             key={`r-${i}`}
             cx={getX(i)}
@@ -178,7 +196,7 @@ export function ActivityChart() {
           />
         ))}
 
-        {MONTHS.map((m, i) => (
+        {months.map((m, i) => (
           <text
             key={i}
             x={getX(i)}

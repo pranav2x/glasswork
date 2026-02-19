@@ -235,11 +235,7 @@ function UserAvatar() {
 
 /* ─── Top Bar ─── */
 
-const TIME_FILTERS = ["Today", "This Week", "This Month", "Reports"] as const;
-
 function DashboardTopBar() {
-  const [activeFilter, setActiveFilter] = useState<string>("This Month");
-
   return (
     <header className="sticky top-0 z-20 bg-white/70 backdrop-blur-xl">
       <div className="flex h-14 items-center justify-between px-6">
@@ -255,24 +251,6 @@ function DashboardTopBar() {
             studio
           </span>
         </Link>
-
-        {/* Center: Time filter pills */}
-        <div className="hidden items-center gap-1 rounded-full border border-warm-200 bg-white p-1 shadow-sm md:flex">
-          {TIME_FILTERS.map((filter) => (
-            <button
-              key={filter}
-              onClick={() => setActiveFilter(filter)}
-              className={cn(
-                "rounded-full px-4 py-1.5 text-[12px] font-semibold transition-all duration-200",
-                activeFilter === filter
-                  ? "bg-warm-900 text-white shadow-sm"
-                  : "text-warm-500 hover:text-warm-700 hover:bg-warm-50"
-              )}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
 
         {/* Right: Icon actions + Avatar */}
         <div className="flex items-center gap-1">
