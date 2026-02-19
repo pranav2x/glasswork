@@ -235,6 +235,38 @@ button:hover .fab-icon {
   animation: ripple 0.5s ease-out;
 }
 
+/* Dashboard bar animation */
+@keyframes barGrow {
+  from {
+    width: 0;
+  }
+}
+
+.animate-bar-grow {
+  animation: barGrow 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Donut segment animation */
+@keyframes donutDraw {
+  from {
+    stroke-dashoffset: 220;
+  }
+}
+
+.animate-donut-draw {
+  animation: donutDraw 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Subtle pulse for active elements */
+@keyframes subtlePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-subtle-pulse {
+  animation: subtlePulse 2s ease-in-out infinite;
+}
+
 /* Floating card hover animations */
 @keyframes float-card-1 {
   0%, 100% { transform: rotate(-6deg) translateY(0); }
