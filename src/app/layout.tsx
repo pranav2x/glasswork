@@ -1,20 +1,28 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { DM_Sans, DM_Serif_Display, Caveat } from "next/font/google";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { AppShell } from "@/components/AppShell";
 import "./globals.css";
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap",
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const fraunces = Fraunces({
+const dmSerifDisplay = DM_Serif_Display({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
+  weight: "400",
+});
+
+const caveat = Caveat({
+  subsets: ["latin"],
+  variable: "--font-hand",
+  display: "swap",
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
@@ -31,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${fraunces.variable} font-body antialiased`}
+        className={`${dmSans.variable} ${dmSerifDisplay.variable} ${caveat.variable} font-body antialiased grain-overlay`}
       >
         <ConvexClientProvider>
           <AppShell>{children}</AppShell>
