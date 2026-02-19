@@ -9,12 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ["var(--font-display)", "serif"],
+        display: ["var(--font-display)", "sans-serif"],
         body: ["var(--font-body)", "sans-serif"],
         hand: ["var(--font-hand)", "cursive"],
       },
       colors: {
-        surface: "#F7F7F8",
+        surface: "#FFFFFF",
         warm: {
           50: "#FAFAFA",
           100: "#F5F5F5",

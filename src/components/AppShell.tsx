@@ -167,7 +167,12 @@ function Sidebar() {
       <div className="flex h-14 items-center justify-center">
         <Link href="/app">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-warm-900 shadow-sm transition-transform duration-200 hover:scale-105">
-            <span className="text-[11px] font-bold text-white tracking-tight">G</span>
+            <div className="grid h-4 w-4 grid-cols-2 gap-[2px]">
+              <div className="h-1.5 w-1.5 rounded-[2px] bg-brand" />
+              <div className="h-1.5 w-1.5 rounded-[2px] bg-white" />
+              <div className="h-1.5 w-1.5 rounded-[2px] bg-white" />
+              <div className="h-1.5 w-1.5 rounded-[2px] bg-white" />
+            </div>
           </div>
         </Link>
       </div>
@@ -288,20 +293,6 @@ function DashboardTopBar() {
   );
 }
 
-/* ─── Warm Gradient Background ─── */
-
-function WarmGradient() {
-  return (
-    <div
-      className="pointer-events-none fixed left-0 top-0 z-0 h-screen w-[280px]"
-      style={{
-        background:
-          "linear-gradient(to right, rgba(255,226,194,0.45) 0%, rgba(252,182,159,0.2) 40%, transparent 100%)",
-      }}
-    />
-  );
-}
-
 /* ─── App Shell ─── */
 
 export function AppShell({ children }: AppShellProps) {
@@ -313,8 +304,7 @@ export function AppShell({ children }: AppShellProps) {
 
   if (isWorkspace && isAuthenticated) {
     return (
-      <div className="relative min-h-screen bg-surface grain-overlay">
-        <WarmGradient />
+      <div className="relative min-h-screen bg-white grain-overlay">
         <Sidebar />
         <div className="relative z-10 pl-[56px]">
           <DashboardTopBar />

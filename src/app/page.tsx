@@ -80,27 +80,29 @@ export default function LandingPage() {
             </span>
           </Link>
 
-          <div className="hidden items-center gap-8 md:flex">
-            <a href="#features" className="text-[14px] font-medium text-warm-500 transition-colors hover:text-warm-900">
+          <div className="hidden items-center gap-1 rounded-full border border-warm-200 bg-warm-50/50 p-1 md:flex">
+            <a href="#features" className="rounded-full px-4 py-1.5 text-[13px] font-semibold text-warm-600 transition-all hover:bg-white hover:text-warm-900 hover:shadow-sm">
               Features
             </a>
-            <a href="#integrations" className="text-[14px] font-medium text-warm-500 transition-colors hover:text-warm-900">
+            <a href="#integrations" className="rounded-full px-4 py-1.5 text-[13px] font-semibold text-warm-600 transition-all hover:bg-white hover:text-warm-900 hover:shadow-sm">
               Integrations
             </a>
           </div>
 
           <div className="flex items-center gap-5">
-            <button
-              onClick={handleGetStarted}
-              className="hidden text-[14px] font-medium text-warm-600 transition-colors hover:text-warm-900 sm:block"
-            >
-              {isAuthenticated ? "Dashboard" : "Sign in"}
-            </button>
+            {!isAuthenticated && (
+              <button
+                onClick={handleGetStarted}
+                className="hidden text-[14px] font-medium text-warm-600 transition-colors hover:text-warm-900 sm:block"
+              >
+                Sign in
+              </button>
+            )}
             <button
               onClick={handleGetStarted}
               className="rounded-xl border border-warm-300 bg-white px-5 py-2 text-[13px] font-semibold text-warm-900 shadow-sm transition-all duration-200 hover:border-warm-400 hover:shadow-md active:scale-[0.97]"
             >
-              {isAuthenticated ? "Go to workspace" : "Get started"}
+              {isAuthenticated ? "Dashboard" : "Get started"}
             </button>
           </div>
         </div>
@@ -138,7 +140,7 @@ export default function LandingPage() {
 
           {/* Headline */}
           <motion.h1
-            className="font-display text-[3rem] font-normal leading-[1.1] tracking-display text-warm-900 sm:text-[3.75rem] md:text-[4.5rem]"
+            className="font-display text-[3rem] font-extrabold leading-[1.08] tracking-tight text-warm-900 sm:text-[3.75rem] md:text-[4.5rem]"
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
@@ -150,7 +152,7 @@ export default function LandingPage() {
 
           {/* Subtitle */}
           <motion.p
-            className="mx-auto mt-6 max-w-lg text-[17px] leading-relaxed text-warm-500"
+            className="mx-auto mt-6 max-w-lg text-[18px] leading-relaxed text-warm-600"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
@@ -353,81 +355,191 @@ export default function LandingPage() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="font-display text-3xl font-normal tracking-display text-warm-900 sm:text-4xl">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-warm-900 sm:text-4xl">
             Everything you need to see the truth
           </h2>
-          <p className="mx-auto mt-4 max-w-lg text-[16px] text-warm-500">
+          <p className="mx-auto mt-4 max-w-lg text-[16px] text-warm-600">
             From revision diffs to commit graphs, Glasswork turns boring version history into clear contribution data.
           </p>
         </motion.div>
 
-        <div className="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {([
-            {
-              Icon: BarChart3,
-              title: "Fair Share Scores",
-              description: "Normalized 0-200 scores that show exactly who carried, who contributed, and who ghosted.",
-              accent: "#D4A017",
-            },
-            {
-              Icon: Activity,
-              title: "Contribution Heatmap",
-              description: "Color-coded activity timeline — cyan for code, magenta for docs. Days with both glow purple.",
-              accent: "#6C63FF",
-            },
-            {
-              Icon: GitCompare,
-              title: "Revision Forensics",
-              description: "Character-level diffing on Google Docs. We count the words, not just the edits.",
-              accent: "#2DA44E",
-            },
-            {
-              Icon: Github,
-              title: "GitHub Deep Dive",
-              description: "Commits, additions, deletions, and co-authored-by credit. Squash-proof analysis.",
-              accent: "#181717",
-            },
-          ] as const).map((feature, i) => (
-            <motion.div
-              key={feature.title}
-              className="group relative rounded-2xl border border-warm-200/60 bg-white p-7 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-              style={{ borderTopWidth: "2px", borderTopColor: feature.accent }}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-            >
-              <div
-                className="mb-5 flex h-9 w-9 items-center justify-center rounded-xl"
-                style={{ backgroundColor: `${feature.accent}10` }}
-              >
-                <feature.Icon className="h-[18px] w-[18px]" style={{ color: feature.accent }} strokeWidth={1.8} />
+        <div className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Fair Share Scores — tall card */}
+          <motion.div
+            className="group relative overflow-hidden rounded-2xl border border-warm-100 bg-white p-6 transition-all duration-300 hover:shadow-card-hover sm:row-span-2"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="mb-5 rounded-xl bg-warm-50 p-5">
+              <div className="space-y-3">
+                {[
+                  { name: "Alex C.", score: 172, pct: "86%", color: "#D4A017" },
+                  { name: "Sarah K.", score: 118, pct: "59%", color: "#2DA44E" },
+                  { name: "Mike T.", score: 34, pct: "17%", color: "#E53935" },
+                ].map((person) => (
+                  <div key={person.name} className="flex items-center gap-2.5">
+                    <div
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold"
+                      style={{ backgroundColor: `${person.color}15`, color: person.color }}
+                    >
+                      {person.name[0]}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[12px] font-medium text-warm-700">{person.name}</span>
+                        <span className="text-[11px] font-bold" style={{ color: person.color }}>{person.score}</span>
+                      </div>
+                      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-warm-100">
+                        <div className="h-full rounded-full" style={{ width: person.pct, backgroundColor: person.color }} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <h3 className="text-[17px] font-bold tracking-tight text-warm-900">
-                {feature.title}
-              </h3>
-              <p className="mt-2.5 text-[14px] leading-relaxed text-warm-500">
-                {feature.description}
-              </p>
-            </motion.div>
-          ))}
+            </div>
+            <BarChart3 className="mb-3 h-5 w-5 text-[#D4A017]" strokeWidth={1.5} />
+            <h3 className="text-[16px] font-bold tracking-tight text-warm-900">
+              Fair Share Scores
+            </h3>
+            <p className="mt-2 text-[13px] leading-relaxed text-warm-500">
+              Normalized 0-200 scores that show exactly who carried, who contributed, and who ghosted.
+            </p>
+          </motion.div>
+
+          {/* Contribution Heatmap */}
+          <motion.div
+            className="group relative overflow-hidden rounded-2xl border border-warm-100 bg-white p-6 transition-all duration-300 hover:shadow-card-hover"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <div className="mb-5 rounded-xl bg-warm-50 p-4">
+              <div className="grid grid-cols-7 gap-1">
+                {[
+                  0,1,2,0,3,1,0,
+                  1,2,3,2,1,0,1,
+                  2,3,2,1,3,2,0,
+                  0,1,3,2,1,1,2,
+                  1,0,2,3,2,0,1,
+                ].map((level, i) => (
+                  <div
+                    key={i}
+                    className="aspect-square rounded-[3px]"
+                    style={{
+                      backgroundColor: [
+                        "#F5F5F5",
+                        "rgba(108,99,255,0.2)",
+                        "rgba(108,99,255,0.45)",
+                        "rgba(108,99,255,0.75)",
+                      ][level],
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+            <Activity className="mb-3 h-5 w-5 text-brand" strokeWidth={1.5} />
+            <h3 className="text-[16px] font-bold tracking-tight text-warm-900">
+              Contribution Heatmap
+            </h3>
+            <p className="mt-2 text-[13px] leading-relaxed text-warm-500">
+              Color-coded activity timeline — cyan for code, magenta for docs. Days with both glow purple.
+            </p>
+          </motion.div>
+
+          {/* Revision Forensics */}
+          <motion.div
+            className="group relative overflow-hidden rounded-2xl border border-warm-100 bg-white p-6 transition-all duration-300 hover:shadow-card-hover"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <div className="mb-5 space-y-1.5 rounded-xl bg-warm-50 p-4 font-mono text-[11px]">
+              <div className="flex items-center gap-2 text-warm-400">
+                <span className="w-4 text-right text-[10px]">14</span>
+                <span className="text-warm-300">│</span>
+                <span>The results were analyzed...</span>
+              </div>
+              <div className="flex items-center gap-2 rounded bg-[#2DA44E]/10 text-[#2DA44E]">
+                <span className="w-4 text-right text-[10px]">15</span>
+                <span className="text-[#2DA44E]/40">│</span>
+                <span>+ and the data confirms a clear</span>
+              </div>
+              <div className="flex items-center gap-2 rounded bg-[#E53935]/10 text-[#E53935]">
+                <span className="w-4 text-right text-[10px]">16</span>
+                <span className="text-[#E53935]/40">│</span>
+                <span>- preliminary findings suggest</span>
+              </div>
+              <div className="flex items-center gap-2 text-warm-400">
+                <span className="w-4 text-right text-[10px]">17</span>
+                <span className="text-warm-300">│</span>
+                <span>trend in contribution...</span>
+              </div>
+            </div>
+            <GitCompare className="mb-3 h-5 w-5 text-[#2DA44E]" strokeWidth={1.5} />
+            <h3 className="text-[16px] font-bold tracking-tight text-warm-900">
+              Revision Forensics
+            </h3>
+            <p className="mt-2 text-[13px] leading-relaxed text-warm-500">
+              Character-level diffing on Google Docs. We count the words, not just the edits.
+            </p>
+          </motion.div>
+
+          {/* GitHub Deep Dive — wide card */}
+          <motion.div
+            className="group relative overflow-hidden rounded-2xl border border-warm-100 bg-white p-6 transition-all duration-300 hover:shadow-card-hover sm:col-span-2"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <div className="mb-5 flex items-center gap-4 rounded-xl bg-warm-50 p-4">
+              {[
+                { hash: "a3f2c1d", msg: "feat: add scoring engine", time: "2h ago", color: "#2DA44E" },
+                { hash: "b7e4a9f", msg: "fix: normalize edge cases", time: "5h ago", color: "#D4A017" },
+                { hash: "c1d8b3e", msg: "refactor: split analyzer", time: "1d ago", color: "#6C63FF" },
+              ].map((commit, i) => (
+                <div key={commit.hash} className="flex flex-1 items-start gap-3">
+                  {i > 0 && <div className="mt-2 h-px w-4 bg-warm-200" />}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full" style={{ backgroundColor: commit.color }} />
+                      <code className="text-[11px] font-semibold text-warm-700">{commit.hash}</code>
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-warm-500">{commit.msg}</p>
+                    <p className="text-[10px] text-warm-400">{commit.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Github className="mb-3 h-5 w-5 text-warm-900" strokeWidth={1.5} />
+            <h3 className="text-[16px] font-bold tracking-tight text-warm-900">
+              GitHub Deep Dive
+            </h3>
+            <p className="mt-2 text-[13px] leading-relaxed text-warm-500">
+              Commits, additions, deletions, and co-authored-by credit. Squash-proof analysis.
+            </p>
+          </motion.div>
         </div>
       </section>
 
       {/* ── Integrations marquee ── */}
       <section id="integrations" className="overflow-hidden py-16">
         <div className="mx-auto max-w-5xl px-6 text-center">
-          <h2 className="font-display text-2xl font-normal tracking-display text-warm-900 sm:text-3xl">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-warm-900 sm:text-3xl">
             Integrations & more coming
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-[15px] text-warm-500">
+          <p className="mx-auto mt-3 max-w-md text-[15px] text-warm-600">
             Google Docs and GitHub today. Notion, Linear, Figma, and more on the way.
           </p>
         </div>
 
         <div className="relative mt-12">
-          <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-24 bg-gradient-to-r from-surface to-transparent" />
-          <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-gradient-to-l from-surface to-transparent" />
+          <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-24 bg-gradient-to-r from-white to-transparent" />
+          <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-gradient-to-l from-white to-transparent" />
 
           <div className="animate-marquee flex items-center whitespace-nowrap" style={{ width: "max-content" }}>
             {Array.from({ length: 4 }, (_, setIndex) =>
@@ -519,12 +631,12 @@ export default function LandingPage() {
       </section>
 
       {/* ── Final CTA ── */}
-      <section className="border-t border-warm-200/50 bg-white/60 py-24">
+      <section className="border-t border-warm-200/50 bg-white py-24">
         <div className="mx-auto max-w-2xl px-6 text-center">
-          <h2 className="font-display text-3xl font-normal tracking-display text-warm-900 sm:text-4xl">
+          <h2 className="font-display text-3xl font-bold tracking-tight text-warm-900 sm:text-4xl">
             Your grades deserve transparency
           </h2>
-          <p className="mx-auto mt-4 max-w-md text-[16px] text-warm-500">
+          <p className="mx-auto mt-4 max-w-md text-[16px] text-warm-600">
             Stop letting freeloaders take credit. See the data, share the proof.
           </p>
           <button
@@ -538,7 +650,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-warm-200/50 px-6 py-6">
+      <footer className="border-t border-warm-200/50 bg-white px-6 py-6">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="grid h-4 w-4 grid-cols-2 gap-[2px]">
