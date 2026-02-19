@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { cn } from "@/lib/utils";
+import { useClickOutside } from "@/hooks/useClickOutside";
+import { formatTimeAgo } from "@/lib/formatters";
 import {
   FileText,
   Github,
@@ -36,18 +37,6 @@ interface AnalysisCardProps {
   variant?: "card" | "list";
 }
 
-function formatTimeAgo(timestamp: number): string {
-  const diff = Date.now() - timestamp;
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return "Just now";
-  if (minutes < 60) return `${minutes} min ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(timestamp).toLocaleDateString();
-}
-
 function CardMenu({ analysisId }: { analysisId: string }) {
   const deleteAnalysis = useMutation(api.analyses.deleteAnalysis);
   const [open, setOpen] = useState(false);
@@ -55,16 +44,11 @@ function CardMenu({ analysisId }: { analysisId: string }) {
   const [deleting, setDeleting] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-        setConfirming(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+  const close = useCallback(() => {
+    setOpen(false);
+    setConfirming(false);
   }, []);
+  useClickOutside(ref, close);
 
   async function handleDelete(e: React.MouseEvent) {
     e.preventDefault();

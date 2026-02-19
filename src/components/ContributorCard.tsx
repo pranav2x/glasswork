@@ -2,10 +2,10 @@
 
 import { motion, useSpring, useMotionValue, useTransform } from "framer-motion";
 import { useEffect } from "react";
-import { GlassPanel } from "@/components/GlassPanel";
 import { LiquidHeatmap } from "@/components/LiquidHeatmap";
 import { Badge } from "@/components/ui/badge";
 import type { Contributor, DocStats, RepoStats } from "@/lib/types";
+import { getInitials } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
 interface ContributorCardProps {
@@ -14,19 +14,25 @@ interface ContributorCardProps {
 }
 
 const tierConfig = {
-  carry: { label: "THE CARRY", color: "text-carry", bg: "bg-carry/10 border-carry/20", accent: "bg-carry/15" },
-  solid: { label: "SOLID", color: "text-solid", bg: "bg-solid/10 border-solid/20", accent: "bg-solid/15" },
-  ghost: { label: "GHOST", color: "text-ghost", bg: "bg-ghost/10 border-ghost/20", accent: "bg-ghost/15" },
+  carry: {
+    label: "THE CARRY",
+    color: "text-amber-700",
+    bg: "bg-amber-50 border-amber-200 text-amber-700",
+    accent: "bg-amber-100",
+  },
+  solid: {
+    label: "SOLID",
+    color: "text-emerald-700",
+    bg: "bg-emerald-50 border-emerald-200 text-emerald-700",
+    accent: "bg-emerald-100",
+  },
+  ghost: {
+    label: "GHOST",
+    color: "text-red-600",
+    bg: "bg-red-50 border-red-200 text-red-600",
+    accent: "bg-red-100",
+  },
 };
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
 
 function isDocStats(stats: DocStats | RepoStats): stats is DocStats {
   return "revisions" in stats;
@@ -43,7 +49,7 @@ function AnimatedScore({ value, tier }: { value: number; tier: string }) {
 
   return (
     <motion.span className={cn(
-      "font-display text-4xl font-semibold tracking-display",
+      "font-display text-5xl font-normal tracking-display text-warm-900",
       tier === "ghost" && "animate-glitch"
     )}>
       {display}
@@ -66,41 +72,43 @@ export function ContributorCard({ contributor, index }: ContributorCardProps) {
         ease: [0.22, 1, 0.36, 1],
       }}
     >
-      <GlassPanel hoverable className="flex flex-col gap-5 p-6">
+      <div className="group flex flex-col gap-5 rounded-2xl border border-warm-200 bg-white p-6 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
+        {/* Avatar + Name */}
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold",
+              "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[13px] font-bold",
               source === "doc"
-                ? "bg-brand/[0.12] text-brand"
-                : "bg-repo-accent/[0.12] text-repo-accent"
+                ? "bg-brand/[0.1] text-brand"
+                : "bg-repo-accent/[0.1] text-repo-accent"
             )}
           >
             {getInitials(name)}
           </div>
           <div className="min-w-0">
-            <p className="truncate text-[15px] font-medium text-warm-800">
+            <p className="truncate text-[15px] font-semibold text-warm-900">
               {name}
             </p>
-            <p className="truncate text-[12px] text-warm-400">
+            <p className="truncate text-[12px] text-warm-500">
               {email || handle || ""}
             </p>
           </div>
         </div>
 
+        {/* Stat badges */}
         <div className="flex flex-wrap gap-2">
           {isDocStats(stats) ? (
             <>
               <Badge
                 variant="outline"
-                className="border-docs-accent/20 bg-docs-accent/[0.06] text-[11px] text-docs-accent"
+                className="border-brand/20 bg-brand-light text-[11px] font-medium text-brand"
               >
                 {stats.revisions} revisions
               </Badge>
               {stats.charsAdded !== undefined && stats.charsAdded > 0 && (
                 <Badge
                   variant="outline"
-                  className="border-docs-accent/20 bg-docs-accent/[0.06] text-[11px] text-docs-accent"
+                  className="border-brand/20 bg-brand-light text-[11px] font-medium text-brand"
                 >
                   +{stats.charsAdded.toLocaleString()} chars
                 </Badge>
@@ -108,7 +116,7 @@ export function ContributorCard({ contributor, index }: ContributorCardProps) {
               {stats.wordsAdded > 0 && (
                 <Badge
                   variant="outline"
-                  className="border-docs-accent/20 bg-docs-accent/[0.06] text-[11px] text-docs-accent"
+                  className="border-brand/20 bg-brand-light text-[11px] font-medium text-brand"
                 >
                   ~{stats.wordsAdded.toLocaleString()} words
                 </Badge>
@@ -118,19 +126,19 @@ export function ContributorCard({ contributor, index }: ContributorCardProps) {
             <>
               <Badge
                 variant="outline"
-                className="border-repo-accent/20 bg-repo-accent/[0.06] text-[11px] text-repo-accent"
+                className="border-repo-accent/20 bg-emerald-50 text-[11px] font-medium text-repo-accent"
               >
                 {stats.commits} commits
               </Badge>
               <Badge
                 variant="outline"
-                className="border-repo-accent/20 bg-repo-accent/[0.06] text-[11px] text-repo-accent"
+                className="border-repo-accent/20 bg-emerald-50 text-[11px] font-medium text-repo-accent"
               >
                 +{stats.linesAdded.toLocaleString()}
               </Badge>
               <Badge
                 variant="outline"
-                className="border-repo-accent/20 bg-repo-accent/[0.06] text-[11px] text-repo-accent"
+                className="border-repo-accent/20 bg-emerald-50 text-[11px] font-medium text-repo-accent"
               >
                 &minus;{stats.linesDeleted.toLocaleString()}
               </Badge>
@@ -138,18 +146,22 @@ export function ContributorCard({ contributor, index }: ContributorCardProps) {
           )}
         </div>
 
+        {/* Score + Tier + Heatmap */}
         <div className="flex items-end justify-between">
           <div>
-            <div className="text-warm-800">
-              <AnimatedScore value={fairShareScore} tier={tier} />
+            <AnimatedScore value={fairShareScore} tier={tier} />
+            <div className="mt-2">
+              <span className={cn(
+                "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-micro",
+                tierInfo.bg
+              )}>
+                {tierInfo.label}
+              </span>
             </div>
-            <p className={cn("mt-1.5 text-[11px] font-bold uppercase tracking-micro", tierInfo.color)}>
-              {tierInfo.label}
-            </p>
           </div>
           <LiquidHeatmap mode={source} data={heatmapData} />
         </div>
-      </GlassPanel>
+      </div>
     </motion.div>
   );
 }

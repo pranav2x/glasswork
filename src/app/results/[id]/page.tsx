@@ -42,7 +42,7 @@ export default function ResultsPage() {
       <div className="mx-auto max-w-6xl py-8">
         <div className="flex justify-center pt-16">
           <GlassPanel className="max-w-md p-10 text-center">
-            <h2 className="font-display text-2xl font-semibold tracking-display text-warm-800">
+            <h2 className="font-display text-2xl font-normal tracking-display text-warm-900">
               Analysis not found
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-warm-500">
@@ -80,7 +80,7 @@ export default function ResultsPage() {
             >
               {isDoc ? "Google Doc" : "GitHub Repo"}
             </Badge>
-            <span className="text-[15px] font-semibold text-warm-800">
+            <span className="text-[15px] font-semibold text-warm-900">
               {data.title}
             </span>
           </div>
@@ -114,7 +114,7 @@ export default function ResultsPage() {
                 />
               </svg>
             </div>
-            <h2 className="font-display text-xl font-semibold tracking-display text-warm-800">
+            <h2 className="font-display text-xl font-normal tracking-display text-warm-900">
               Analysis failed
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-danger/70">
@@ -130,7 +130,7 @@ export default function ResultsPage() {
       {data.status === "ready" && data.contributors.length === 0 && (
         <div className="flex justify-center pt-8">
           <GlassPanel className="max-w-md p-10 text-center">
-            <h2 className="font-display text-2xl font-semibold tracking-display text-warm-800">
+            <h2 className="font-display text-2xl font-normal tracking-display text-warm-900">
               No contributors found
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-warm-500">

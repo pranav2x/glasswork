@@ -1,3 +1,0 @@
-# Supabase Expert
-
-Comprehensive Supabase expert with access to 2,616 official documentation files covering PostgreSQL database, authentication, real-time subscriptions, storage, edge functions, vector embeddings, and all platform features. Invoke when user mentions Supabase, PostgreSQL, database, auth, real-time, storage, edge functions, backend-as-a-service, or pgvector.

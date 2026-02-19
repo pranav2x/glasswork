@@ -117,18 +117,18 @@
   animation: underlineDraw 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both;
 }
 
-/* Seamless infinite marquee */
+/* Seamless infinite marquee — translates by one set (25% for 4 duplicated sets) */
 @keyframes marquee {
   0% {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-25%);
   }
 }
 
 .animate-marquee {
-  animation: marquee 35s linear infinite;
+  animation: marquee 30s linear infinite;
 }
 
 .animate-marquee:hover {

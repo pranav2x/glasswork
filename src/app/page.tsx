@@ -7,7 +7,7 @@ import { useConvexAuth, useMutation } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { motion } from "framer-motion";
 import { api } from "../../convex/_generated/api";
-import { Github, BarChart3, GitCompare, Activity, FileText, Users, Clock, ArrowRight, Share2 } from "lucide-react";
+import { Github, BarChart3, GitCompare, Activity, Clock, ArrowRight } from "lucide-react";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -83,9 +83,6 @@ export default function LandingPage() {
           <div className="hidden items-center gap-8 md:flex">
             <a href="#features" className="text-[14px] font-medium text-warm-500 transition-colors hover:text-warm-900">
               Features
-            </a>
-            <a href="#how-it-works" className="text-[14px] font-medium text-warm-500 transition-colors hover:text-warm-900">
-              How it works
             </a>
             <a href="#integrations" className="text-[14px] font-medium text-warm-500 transition-colors hover:text-warm-900">
               Integrations
@@ -364,113 +361,56 @@ export default function LandingPage() {
           </p>
         </motion.div>
 
-        <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {[
+        <div className="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2">
+          {([
             {
-              icon: BarChart3,
+              Icon: BarChart3,
               title: "Fair Share Scores",
-              description: "Normalized 0–200 scores that show exactly who carried, who contributed, and who ghosted.",
+              description: "Normalized 0-200 scores that show exactly who carried, who contributed, and who ghosted.",
+              accent: "#D4A017",
             },
             {
-              icon: Activity,
+              Icon: Activity,
               title: "Contribution Heatmap",
               description: "Color-coded activity timeline — cyan for code, magenta for docs. Days with both glow purple.",
+              accent: "#6C63FF",
             },
             {
-              icon: GitCompare,
+              Icon: GitCompare,
               title: "Revision Forensics",
               description: "Character-level diffing on Google Docs. We count the words, not just the edits.",
+              accent: "#2DA44E",
             },
             {
-              icon: Github,
+              Icon: Github,
               title: "GitHub Deep Dive",
               description: "Commits, additions, deletions, and co-authored-by credit. Squash-proof analysis.",
+              accent: "#181717",
             },
-          ].map((feature, i) => (
+          ] as const).map((feature, i) => (
             <motion.div
               key={feature.title}
-              className="group rounded-2xl border border-warm-200 bg-white p-8 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover"
-              initial={{ opacity: 0, y: 20 }}
+              className="group relative rounded-2xl border border-warm-200/60 bg-white p-7 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+              style={{ borderTopWidth: "2px", borderTopColor: feature.accent }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
             >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-brand/[0.08] text-brand transition-colors group-hover:bg-brand/[0.14]">
-                <feature.icon className="h-5 w-5" strokeWidth={1.5} />
+              <div
+                className="mb-5 flex h-9 w-9 items-center justify-center rounded-xl"
+                style={{ backgroundColor: `${feature.accent}10` }}
+              >
+                <feature.Icon className="h-[18px] w-[18px]" style={{ color: feature.accent }} strokeWidth={1.8} />
               </div>
-              <h3 className="text-[17px] font-semibold text-warm-900">
+              <h3 className="text-[17px] font-bold tracking-tight text-warm-900">
                 {feature.title}
               </h3>
-              <p className="mt-2 text-[14px] leading-relaxed text-warm-500">
+              <p className="mt-2.5 text-[14px] leading-relaxed text-warm-500">
                 {feature.description}
               </p>
             </motion.div>
           ))}
-        </div>
-      </section>
-
-      {/* ── How it works ── */}
-      <section id="how-it-works" className="border-y border-warm-200/50 bg-white/60 py-24">
-        <div className="mx-auto max-w-5xl px-6">
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="font-display text-3xl font-normal tracking-display text-warm-900 sm:text-4xl">
-              Three steps. Full transparency.
-            </h2>
-            <p className="mx-auto mt-4 max-w-lg text-[16px] text-warm-500">
-              Get from link to leaderboard in under a minute.
-            </p>
-          </motion.div>
-
-          <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
-            {[
-              {
-                step: "01",
-                icon: FileText,
-                title: "Paste a link",
-                description: "Drop a Google Doc URL or GitHub repo. We handle the rest.",
-              },
-              {
-                step: "02",
-                icon: Users,
-                title: "See contributors",
-                description: "Revision history and commit data, broken down by person with fair scores.",
-              },
-              {
-                step: "03",
-                icon: Share2,
-                title: "Share the proof",
-                description: "One-click shareable link with ranked contributions and heatmaps.",
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={item.step}
-                className="relative text-center"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.15 }}
-              >
-                <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/[0.08]">
-                  <item.icon className="h-6 w-6 text-brand" strokeWidth={1.5} />
-                </div>
-                <span className="mb-2 block text-[12px] font-semibold tracking-micro text-brand uppercase">
-                  Step {item.step}
-                </span>
-                <h3 className="text-[18px] font-semibold text-warm-900">
-                  {item.title}
-                </h3>
-                <p className="mx-auto mt-2 max-w-[240px] text-[14px] leading-relaxed text-warm-500">
-                  {item.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -489,40 +429,91 @@ export default function LandingPage() {
           <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-24 bg-gradient-to-r from-surface to-transparent" />
           <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-gradient-to-l from-surface to-transparent" />
 
-          <div className="animate-marquee flex items-center gap-14 whitespace-nowrap" style={{ width: "max-content" }}>
-            {[
-              { name: "Google Docs", supported: true },
-              { name: "GitHub", supported: true },
-              { name: "Notion", supported: false },
-              { name: "Confluence", supported: false },
-              { name: "Linear", supported: false },
-              { name: "Jira", supported: false },
-              { name: "Figma", supported: false },
-              { name: "Google Docs", supported: true },
-              { name: "GitHub", supported: true },
-              { name: "Notion", supported: false },
-              { name: "Confluence", supported: false },
-              { name: "Linear", supported: false },
-              { name: "Jira", supported: false },
-              { name: "Figma", supported: false },
-            ].map((item, i) => (
-              <div
-                key={`${item.name}-${i}`}
-                className={`flex shrink-0 items-center gap-2.5 ${item.supported ? "text-warm-900" : "text-warm-400"}`}
-              >
-                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${item.supported ? "bg-brand/10" : "bg-warm-100"}`}>
-                  <span className="text-[12px] font-bold">{item.name.charAt(0)}</span>
-                </div>
-                <span className={`text-[15px] font-semibold ${item.supported ? "text-warm-900" : "text-warm-400"}`}>
-                  {item.name}
-                </span>
-                {!item.supported && (
-                  <span className="rounded-full bg-warm-100 px-2 py-0.5 text-[10px] font-medium text-warm-400">
-                    soon
+          <div className="animate-marquee flex items-center whitespace-nowrap" style={{ width: "max-content" }}>
+            {Array.from({ length: 4 }, (_, setIndex) =>
+              [
+                {
+                  name: "Google Docs",
+                  logo: (
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" fill="#4285F4" fillOpacity="0.12" stroke="#4285F4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M14 2v6h6M8 13h8M8 17h8M8 9h2" stroke="#4285F4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  ),
+                },
+                {
+                  name: "GitHub",
+                  logo: (
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="#181717">
+                      <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                    </svg>
+                  ),
+                },
+                {
+                  name: "Notion",
+                  logo: (
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                      <path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L18.09 2.17c-.466-.373-.84-.653-1.772-.56l-12.79.933c-.466.047-.56.28-.373.466l1.304 1.199zm.793 3.172v13.85c0 .746.373 1.026 1.212.98l14.523-.84c.84-.046.933-.56.933-1.166V6.54c0-.606-.233-.933-.746-.886l-15.177.84c-.56.046-.746.326-.746.886zm14.337.7c.093.42 0 .84-.42.888l-.7.14v10.264c-.606.327-1.166.514-1.633.514-.746 0-.933-.234-1.493-.934l-4.572-7.186v6.952l1.446.327s0 .84-1.166.84l-3.218.186c-.093-.186 0-.653.327-.726l.84-.233V8.62l-1.166-.093c-.093-.42.14-1.026.793-1.073l3.451-.233 4.759 7.28V8.247l-1.213-.14c-.093-.513.28-.886.746-.933l3.219-.186z" fill="#000"/>
+                    </svg>
+                  ),
+                },
+                {
+                  name: "Confluence",
+                  logo: (
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                      <path d="M.87 18.257c-.248.382-.53.875-.763 1.245a.764.764 0 0 0 .255 1.04l4.965 3.054a.764.764 0 0 0 1.058-.26c.199-.332.49-.842.743-1.217 2.078-3.13 4.175-2.778 7.972-1.074l3.943 1.737a.764.764 0 0 0 1-.41l2.205-5.247a.764.764 0 0 0-.39-1.004l-3.907-1.722c-7.892-3.5-14.2-2.098-17.08 3.858z" fill="#1868DB"/>
+                      <path d="M23.13 5.743c.249-.382.53-.875.764-1.245a.764.764 0 0 0-.256-1.04L18.673.404a.764.764 0 0 0-1.058.26c-.2.332-.49.842-.743 1.217C14.794 5.01 12.697 4.66 8.9 2.955L4.957 1.218a.764.764 0 0 0-1 .41L1.752 6.875a.764.764 0 0 0 .39 1.004l3.907 1.722c7.892 3.5 14.2 2.098 17.08-3.858z" fill="#1868DB"/>
+                    </svg>
+                  ),
+                },
+                {
+                  name: "Linear",
+                  logo: (
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                      <path d="M1.224 12.545a.342.342 0 0 1 0-.39l.188-.263a10.967 10.967 0 0 1 10.696-4.836.342.342 0 0 1 .2.567L3.44 16.492a.342.342 0 0 1-.488-.005A10.893 10.893 0 0 1 1.224 12.545z" fill="#5E6AD2"/>
+                      <path d="M4.342 18.276a.342.342 0 0 1-.01-.495l9.94-9.94a.342.342 0 0 1 .567.2 10.967 10.967 0 0 1-4.837 10.696l-.263.188a.342.342 0 0 1-.39 0 10.96 10.96 0 0 1-5.007-4.649z" fill="#5E6AD2"/>
+                      <path d="M12.545 22.776a.342.342 0 0 1-.39 0 10.892 10.892 0 0 1-3.942-3.941.342.342 0 0 1 .043-.41l8.32-8.32a.342.342 0 0 1 .568.192c.57 3.295-.465 6.776-3.097 9.47a11.066 11.066 0 0 1-1.502 1.009z" fill="#5E6AD2"/>
+                      <path d="M18.835 16.488a.342.342 0 0 1-.494-.01 10.893 10.893 0 0 1-.774-.89.342.342 0 0 1 .024-.443l3.413-3.413a.342.342 0 0 1 .568.192 10.9 10.9 0 0 1-2.737 4.564z" fill="#5E6AD2"/>
+                      <path d="M22.776 11.455a.342.342 0 0 1 0 .39c-.118.164-.22.318-.318.463a.342.342 0 0 1-.533.05l-1.438-1.439a.342.342 0 0 1 .192-.568 10.9 10.9 0 0 1 2.097 1.104z" fill="#5E6AD2"/>
+                    </svg>
+                  ),
+                },
+                {
+                  name: "Jira",
+                  logo: (
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                      <path d="M11.571 11.513H0a5.218 5.218 0 0 0 5.232 5.215h2.13v2.057A5.215 5.215 0 0 0 12.575 24V12.518a1.005 1.005 0 0 0-1.005-1.005z" fill="#2684FF"/>
+                      <path d="M17.11 5.953H5.539a5.218 5.218 0 0 0 5.231 5.214h2.13v2.058a5.218 5.218 0 0 0 5.214 5.215V6.958a1.005 1.005 0 0 0-1.005-1.005z" fill="#2684FF" fillOpacity="0.85"/>
+                      <path d="M22.648.394H11.077a5.218 5.218 0 0 0 5.231 5.214h2.13v2.058A5.218 5.218 0 0 0 23.652 12.88V1.399a1.005 1.005 0 0 0-1.005-1.005z" fill="#2684FF" fillOpacity="0.7"/>
+                    </svg>
+                  ),
+                },
+                {
+                  name: "Figma",
+                  logo: (
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none">
+                      <path d="M8 24c2.208 0 4-1.792 4-4v-4H8c-2.208 0-4 1.792-4 4s1.792 4 4 4z" fill="#0ACF83"/>
+                      <path d="M4 12c0-2.208 1.792-4 4-4h4v8H8c-2.208 0-4-1.792-4-4z" fill="#A259FF"/>
+                      <path d="M4 4c0-2.208 1.792-4 4-4h4v8H8C5.792 8 4 6.208 4 4z" fill="#F24E1E"/>
+                      <path d="M12 0h4c2.208 0 4 1.792 4 4s-1.792 4-4 4h-4V0z" fill="#FF7262"/>
+                      <path d="M20 12c0 2.208-1.792 4-4 4s-4-1.792-4-4 1.792-4 4-4 4 1.792 4 4z" fill="#1ABCFE"/>
+                    </svg>
+                  ),
+                },
+              ].map((item, i) => (
+                <div
+                  key={`${item.name}-${setIndex}-${i}`}
+                  className="mx-7 flex shrink-0 items-center gap-2.5"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-warm-50">
+                    {item.logo}
+                  </div>
+                  <span className="text-[15px] font-semibold text-warm-900">
+                    {item.name}
                   </span>
-                )}
-              </div>
-            ))}
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>

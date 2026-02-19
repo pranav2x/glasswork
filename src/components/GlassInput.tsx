@@ -10,9 +10,9 @@ const GlassInput = forwardRef<HTMLInputElement, GlassInputProps>(
         type={type}
         ref={ref}
         className={cn(
-          "flex h-12 w-full rounded-xl border border-warm-300 bg-white px-4 py-3 text-sm text-warm-800",
+          "flex h-12 w-full rounded-xl border border-warm-200 bg-white px-4 py-3 text-sm text-warm-900",
           "placeholder:text-warm-400",
-          "transition-all hover:border-warm-400 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/10",
+          "transition-all duration-200 hover:border-warm-300 focus:border-brand/40 focus:outline-none focus:ring-2 focus:ring-brand/10",
           "disabled:cursor-not-allowed disabled:opacity-40",
           className
         )}
