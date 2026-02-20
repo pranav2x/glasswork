@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useConvexAuth, useQuery } from "convex/react";
+import { Suspense, useState, useEffect, useRef, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useConvexAuth, useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { NewAnalysisModal } from "@/components/NewAnalysisModal";
 import { GlassPanel } from "@/components/GlassPanel";
@@ -22,10 +22,14 @@ import {
   FileText,
   GitBranch,
   Calendar,
+  Trash2,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getInitials, formatTimeAgo } from "@/lib/formatters";
+import { Id } from "../../../convex/_generated/dataModel";
 
 /* ─── Sub-components ─── */
 
@@ -73,14 +77,63 @@ const TIME_FILTERS = [
 
 /* ─── Main Dashboard ─── */
 
-export default function DashboardPage() {
+export default function DashboardPageWrapper() {
+  return (
+    <Suspense>
+      <DashboardPage />
+    </Suspense>
+  );
+}
+
+function DashboardPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTaskFilter, setActiveTaskFilter] = useState<"docs" | "repos">("docs");
   const [activeTimeFilter, setActiveTimeFilter] = useState<"today" | "week" | "month">("month");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedAnalysisId, setSelectedAnalysisId] = useState<Id<"analyses"> | null>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const deleteAnalysisMutation = useMutation(api.analyses.deleteAnalysis);
 
   const dashboardData = useQuery(api.analyses.getDashboardStats, { timeFilter: activeTimeFilter });
+
+  // Fetch selected analysis detail when one is selected
+  const selectedAnalysis = useQuery(
+    api.analyses.getAnalysis,
+    selectedAnalysisId ? { analysisId: selectedAnalysisId } : "skip"
+  );
+
+  const handleDeleteAnalysis = useCallback(
+    async (analysisId: Id<"analyses">, title: string) => {
+      if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return;
+      try {
+        await deleteAnalysisMutation({ analysisId });
+        toast.success("Analysis deleted");
+      } catch {
+        toast.error("Failed to delete analysis");
+      }
+    },
+    [deleteAnalysisMutation]
+  );
+
+  // Listen for sidebar search focus event
+  const handleFocusSearch = useCallback(() => {
+    searchInputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("glasswork:focus-search", handleFocusSearch);
+    return () => window.removeEventListener("glasswork:focus-search", handleFocusSearch);
+  }, [handleFocusSearch]);
+
+  // Auto-focus search if ?search=1
+  useEffect(() => {
+    if (searchParams.get("search") === "1") {
+      searchInputRef.current?.focus();
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
@@ -104,26 +157,59 @@ export default function DashboardPage() {
   // Derive all widget data from the query
   const { analyses, statusCounts, scoreDistribution, totalContributors, topContributors, activityByMonth } = dashboardData;
 
-  const filteredAnalyses = analyses.filter((a) =>
-    activeTaskFilter === "docs"
-      ? a.sourceType === "google_doc"
-      : a.sourceType === "github_repo"
-  );
+  const query = searchQuery.toLowerCase().trim();
+  const isViewingAnalysis = selectedAnalysisId !== null && selectedAnalysis?.status === "ready";
+  const selectedContributors = isViewingAnalysis ? (selectedAnalysis.contributors ?? []) : [];
 
-  const donutSegments = [
-    { value: statusCounts.ready, color: "#4A96D9", label: "Completed" },
-    { value: statusCounts.pending, color: "#F5A623", label: "In Progress" },
-    { value: statusCounts.error, color: "#E53935", label: "Failed" },
-  ];
+  const filteredAnalyses = analyses.filter((a) => {
+    const matchesType =
+      activeTaskFilter === "docs"
+        ? a.sourceType === "google_doc"
+        : a.sourceType === "github_repo";
+    if (!matchesType) return false;
+    if (!query) return true;
+    return (
+      a.title.toLowerCase().includes(query) ||
+      a.topContributor?.name.toLowerCase().includes(query)
+    );
+  });
+
+  // --- Donut chart: aggregate or per-analysis ---
+  const donutSegments = isViewingAnalysis
+    ? [
+        { value: selectedContributors.filter((c) => c.tier === "carry").length, color: "#D4A017", label: "Carry" },
+        { value: selectedContributors.filter((c) => c.tier === "solid").length, color: "#2DA44E", label: "Solid" },
+        { value: selectedContributors.filter((c) => c.tier === "ghost").length, color: "#E53935", label: "Ghost" },
+      ]
+    : [
+        { value: statusCounts.ready, color: "#4A96D9", label: "Completed" },
+        { value: statusCounts.pending, color: "#F5A623", label: "In Progress" },
+        { value: statusCounts.error, color: "#E53935", label: "Failed" },
+      ];
+
+  // --- Score distribution: aggregate or per-analysis ---
+  const perAnalysisContributorCount = selectedContributors.length;
+  const perAnalysisScoreDist = isViewingAnalysis
+    ? {
+        excellent: selectedContributors.filter((c) => c.score >= 150).length,
+        good: selectedContributors.filter((c) => c.score >= 100 && c.score < 150).length,
+        fair: selectedContributors.filter((c) => c.score >= 60 && c.score < 100).length,
+        needsWork: selectedContributors.filter((c) => c.score >= 30 && c.score < 60).length,
+        minimal: selectedContributors.filter((c) => c.score < 30).length,
+      }
+    : scoreDistribution;
+
+  const effectiveTotal = isViewingAnalysis ? perAnalysisContributorCount : totalContributors;
 
   const scoreBars = [
-    { label: "Excellent", count: scoreDistribution.excellent, total: "Score 80–100", percentage: totalContributors > 0 ? Math.round((scoreDistribution.excellent / totalContributors) * 100) : 0, color: "#2DA44E" },
-    { label: "Good", count: scoreDistribution.good, total: "Score 60–79", percentage: totalContributors > 0 ? Math.round((scoreDistribution.good / totalContributors) * 100) : 0, color: "#4A96D9" },
-    { label: "Fair", count: scoreDistribution.fair, total: "Score 40–59", percentage: totalContributors > 0 ? Math.round((scoreDistribution.fair / totalContributors) * 100) : 0, color: "#9B6FE3" },
-    { label: "Needs Work", count: scoreDistribution.needsWork, total: "Score 20–39", percentage: totalContributors > 0 ? Math.round((scoreDistribution.needsWork / totalContributors) * 100) : 0, color: "#E53935" },
-    { label: "Minimal", count: scoreDistribution.minimal, total: "Score 0–19", percentage: totalContributors > 0 ? Math.round((scoreDistribution.minimal / totalContributors) * 100) : 0, color: "#F5A623" },
+    { label: "Excellent", count: perAnalysisScoreDist.excellent, total: "Score 150–200", percentage: effectiveTotal > 0 ? Math.round((perAnalysisScoreDist.excellent / effectiveTotal) * 100) : 0, color: "#2DA44E" },
+    { label: "Good", count: perAnalysisScoreDist.good, total: "Score 100–149", percentage: effectiveTotal > 0 ? Math.round((perAnalysisScoreDist.good / effectiveTotal) * 100) : 0, color: "#4A96D9" },
+    { label: "Fair", count: perAnalysisScoreDist.fair, total: "Score 60–99", percentage: effectiveTotal > 0 ? Math.round((perAnalysisScoreDist.fair / effectiveTotal) * 100) : 0, color: "#9B6FE3" },
+    { label: "Needs Work", count: perAnalysisScoreDist.needsWork, total: "Score 30–59", percentage: effectiveTotal > 0 ? Math.round((perAnalysisScoreDist.needsWork / effectiveTotal) * 100) : 0, color: "#E53935" },
+    { label: "Minimal", count: perAnalysisScoreDist.minimal, total: "Score 0–29", percentage: effectiveTotal > 0 ? Math.round((perAnalysisScoreDist.minimal / effectiveTotal) * 100) : 0, color: "#F5A623" },
   ];
 
+  // --- Activity: aggregate or per-analysis contributor scores ---
   const months = activityByMonth.map((m) => m.month);
   const docsActivityData = activityByMonth.map((m) => m.docsCount);
   const reposActivityData = activityByMonth.map((m) => m.reposCount);
@@ -141,13 +227,30 @@ export default function DashboardPage() {
       analysisId: a._id,
     }));
 
-  const topContributorCards = topContributors.slice(0, 3).map((c) => ({
-    name: c.name,
-    message: `Score: ${c.score} across ${c.analysisCount} ${c.analysisCount === 1 ? "analysis" : "analyses"}`,
-    initials: getInitials(c.name),
-    color: c.tier === "carry" ? "#F5A623" : c.tier === "solid" ? "#2DA44E" : "#E53935",
-    firstAnalysisId: c.firstAnalysisId,
-  }));
+  // --- Top contributors: aggregate or per-analysis ---
+  const topContributorCards = isViewingAnalysis
+    ? selectedContributors
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5)
+        .map((c) => ({
+          name: c.name,
+          message: `Score: ${c.score} · ${c.tier}`,
+          initials: getInitials(c.name),
+          color: c.tier === "carry" ? "#F5A623" : c.tier === "solid" ? "#2DA44E" : "#E53935",
+          avatarUrl: c.avatarUrl,
+          firstAnalysisId: selectedAnalysisId!,
+        }))
+    : topContributors
+        .filter((c) => !query || c.name.toLowerCase().includes(query))
+        .slice(0, 3)
+        .map((c) => ({
+          name: c.name,
+          message: `Score: ${c.score} across ${c.analysisCount} ${c.analysisCount === 1 ? "analysis" : "analyses"}`,
+          initials: getInitials(c.name),
+          color: c.tier === "carry" ? "#F5A623" : c.tier === "solid" ? "#2DA44E" : "#E53935",
+          avatarUrl: c.avatarUrl,
+          firstAnalysisId: c.firstAnalysisId,
+        }));
 
   const isEmpty = analyses.length === 0;
 
@@ -191,7 +294,10 @@ export default function DashboardPage() {
             >
               <Search className="h-4 w-4 text-warm-400" />
               <input
+                ref={searchInputRef}
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search analyses, contributors..."
                 className="w-52 bg-transparent text-[13px] text-warm-700 placeholder:text-warm-400 focus:outline-none"
               />
@@ -278,29 +384,53 @@ export default function DashboardPage() {
                     filteredAnalyses.map((item, i) => (
                       <div
                         key={item._id}
-                        onClick={() => item.status === "ready" ? router.push(`/results/${item._id}`) : undefined}
-                        className={item.status === "ready" ? "cursor-pointer" : ""}
+                        className="group/item relative"
                       >
-                        <AnalysisItem
-                          icon={
-                            item.sourceType === "google_doc" ? (
-                              <DocIcon color="#6C63FF" />
-                            ) : (
-                              <RepoIcon color="#2DA44E" />
-                            )
-                          }
-                          iconBg={item.sourceType === "google_doc" ? "#EEF0FF" : "#F0FDF4"}
-                          title={item.title}
-                          description={
-                            item.status === "pending"
-                              ? "Analyzing..."
-                              : item.status === "error"
-                                ? "Analysis failed"
-                                : `${item.contributorCount} contributors`
-                          }
-                          isComplete={item.status === "ready"}
-                          delay={0.1 + i * 0.04}
-                        />
+                        <div
+                          onClick={() => {
+                            if (item.status !== "ready") return;
+                            setSelectedAnalysisId(
+                              selectedAnalysisId === item._id ? null : item._id
+                            );
+                          }}
+                          className={cn(
+                            "rounded-xl transition-all",
+                            item.status === "ready" && "cursor-pointer",
+                            selectedAnalysisId === item._id &&
+                              "bg-brand/5 ring-1 ring-brand/20"
+                          )}
+                        >
+                          <AnalysisItem
+                            icon={
+                              item.sourceType === "google_doc" ? (
+                                <DocIcon color="#6C63FF" />
+                              ) : (
+                                <RepoIcon color="#2DA44E" />
+                              )
+                            }
+                            iconBg={item.sourceType === "google_doc" ? "#EEF0FF" : "#F0FDF4"}
+                            title={item.title}
+                            description={
+                              item.status === "pending"
+                                ? "Analyzing..."
+                                : item.status === "error"
+                                  ? "Analysis failed"
+                                  : `${item.contributorCount} contributors`
+                            }
+                            isComplete={item.status === "ready"}
+                            delay={0.1 + i * 0.04}
+                          />
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteAnalysis(item._id, item.title);
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-lg text-warm-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover/item:opacity-100"
+                          aria-label={`Delete ${item.title}`}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+                        </button>
                       </div>
                     ))
                   )}
@@ -311,16 +441,26 @@ export default function DashboardPage() {
             {/* ──── Column 2: Analysis Overview (Donut Chart) ──── */}
             <GlassPanel
               hoverable
-              className="hero-fade-in"
+              className={cn("hero-fade-in", isViewingAnalysis && "ring-1 ring-brand/10")}
               style={{ animationDelay: "0.12s" }}
             >
               <div className="p-5">
                 <CardHeader
-                  title="Analysis Overview"
+                  title={isViewingAnalysis ? "Tier Breakdown" : "Analysis Overview"}
                   actions={
-                    <IconAction>
-                      <ArrowUpRight className="h-3.5 w-3.5" />
-                    </IconAction>
+                    isViewingAnalysis ? (
+                      <button
+                        onClick={() => setSelectedAnalysisId(null)}
+                        className="flex h-7 items-center gap-1.5 rounded-lg bg-brand/10 px-2.5 text-[11px] font-medium text-brand transition-colors hover:bg-brand/20"
+                      >
+                        <span className="max-w-[100px] truncate">{selectedAnalysis?.title}</span>
+                        <X className="h-3 w-3" />
+                      </button>
+                    ) : (
+                      <IconAction>
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                      </IconAction>
+                    )
                   }
                 />
                 <div className="mt-4">
@@ -329,33 +469,103 @@ export default function DashboardPage() {
               </div>
             </GlassPanel>
 
-            {/* ──── Column 3: Contribution Activity (Line Chart) ──── */}
+            {/* ──── Column 3: Contribution Activity / Top Scores ──── */}
             <GlassPanel
               hoverable
-              className="hero-fade-in"
+              className={cn("hero-fade-in", isViewingAnalysis && "ring-1 ring-brand/10")}
               style={{ animationDelay: "0.16s" }}
             >
               <div className="p-5">
-                <CardHeader
-                  title="Contribution Activity"
-                  actions={
-                    <>
-                      <IconAction>
-                        <SlidersHorizontal className="h-3.5 w-3.5" />
-                      </IconAction>
-                      <IconAction>
-                        <ArrowUpRight className="h-3.5 w-3.5" />
-                      </IconAction>
-                    </>
-                  }
-                />
-                <div className="mt-3">
-                  <ActivityChart
-                    months={months}
-                    docsData={docsActivityData}
-                    reposData={reposActivityData}
-                  />
-                </div>
+                {isViewingAnalysis ? (
+                  <>
+                    <CardHeader
+                      title="Top Scores"
+                      actions={
+                        <button
+                          onClick={() => router.push(`/results/${selectedAnalysisId}`)}
+                          className="flex h-7 items-center gap-1 rounded-lg bg-warm-100 px-2.5 text-[11px] font-medium text-warm-600 transition-colors hover:bg-warm-200"
+                        >
+                          Full view
+                          <ArrowUpRight className="h-3 w-3" />
+                        </button>
+                      }
+                    />
+                    <div className="mt-4 space-y-2.5">
+                      {selectedContributors.length === 0 ? (
+                        <p className="py-6 text-center text-[12px] text-warm-400">No contributors</p>
+                      ) : (
+                        selectedContributors
+                          .sort((a, b) => b.score - a.score)
+                          .slice(0, 6)
+                          .map((c, i) => (
+                            <div key={c.name} className="flex items-center gap-2.5">
+                              <span className="w-4 text-right text-[10px] font-semibold text-warm-400">
+                                {i + 1}
+                              </span>
+                              <div
+                                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white"
+                                style={{
+                                  backgroundColor:
+                                    c.tier === "carry" ? "#D4A017" : c.tier === "solid" ? "#2DA44E" : "#E53935",
+                                }}
+                              >
+                                {getInitials(c.name)}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center justify-between">
+                                  <span className="truncate text-[12px] font-medium text-warm-700">
+                                    {c.name}
+                                  </span>
+                                  <span
+                                    className="ml-2 text-[11px] font-bold"
+                                    style={{
+                                      color:
+                                        c.tier === "carry" ? "#D4A017" : c.tier === "solid" ? "#2DA44E" : "#E53935",
+                                    }}
+                                  >
+                                    {c.score}
+                                  </span>
+                                </div>
+                                <div className="mt-0.5 h-1 w-full overflow-hidden rounded-full bg-warm-100">
+                                  <div
+                                    className="h-full rounded-full transition-all duration-500"
+                                    style={{
+                                      width: `${Math.min(100, (c.score / 200) * 100)}%`,
+                                      backgroundColor:
+                                        c.tier === "carry" ? "#D4A017" : c.tier === "solid" ? "#2DA44E" : "#E53935",
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <CardHeader
+                      title="Contribution Activity"
+                      actions={
+                        <>
+                          <IconAction>
+                            <SlidersHorizontal className="h-3.5 w-3.5" />
+                          </IconAction>
+                          <IconAction>
+                            <ArrowUpRight className="h-3.5 w-3.5" />
+                          </IconAction>
+                        </>
+                      }
+                    />
+                    <div className="mt-3">
+                      <ActivityChart
+                        months={months}
+                        docsData={docsActivityData}
+                        reposData={reposActivityData}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             </GlassPanel>
 
@@ -414,10 +624,10 @@ export default function DashboardPage() {
               </GlassPanel>
 
               {/* Top Contributors */}
-              <GlassPanel>
+              <GlassPanel className={cn(isViewingAnalysis && "ring-1 ring-brand/10")}>
                 <div className="p-5">
                   <CardHeader
-                    title="Top Contributors"
+                    title={isViewingAnalysis ? "Contributors" : "Top Contributors"}
                     actions={
                       <IconAction>
                         <SlidersHorizontal className="h-3.5 w-3.5" />
@@ -441,6 +651,7 @@ export default function DashboardPage() {
                             message={c.message}
                             avatarColor={c.color}
                             initials={c.initials}
+                            avatarUrl={c.avatarUrl}
                           />
                         </div>
                       ))
@@ -452,12 +663,12 @@ export default function DashboardPage() {
 
             {/* ──── Row 2, Columns 2-3: Score Distribution ──── */}
             <GlassPanel
-              className="hero-fade-in lg:col-span-2 xl:col-span-2"
+              className={cn("hero-fade-in lg:col-span-2 xl:col-span-2", isViewingAnalysis && "ring-1 ring-brand/10")}
               style={{ animationDelay: "0.24s" }}
             >
               <div className="p-5">
                 <CardHeader
-                  title="Score Distribution"
+                  title={isViewingAnalysis ? `Score Distribution — ${selectedAnalysis?.title ?? ""}` : "Score Distribution"}
                   actions={
                     <IconAction>
                       <SlidersHorizontal className="h-3.5 w-3.5" />
@@ -465,7 +676,7 @@ export default function DashboardPage() {
                   }
                 />
                 <div className="mt-4 space-y-4">
-                  {totalContributors === 0 ? (
+                  {effectiveTotal === 0 ? (
                     <p className="py-6 text-center text-[12px] text-warm-400">
                       No contributor scores yet
                     </p>

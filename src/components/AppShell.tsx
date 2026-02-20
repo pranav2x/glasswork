@@ -10,6 +10,7 @@ import { api } from "../../convex/_generated/api";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { getInitials } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import {
   Search,
   Smile,
@@ -165,7 +166,7 @@ function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col items-center bg-transparent">
       <div className="flex h-14 items-center justify-center">
-        <Link href="/app">
+        <Link href="/" title="Back to home">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-warm-900 shadow-sm transition-transform duration-200 hover:scale-105">
             <div className="grid h-4 w-4 grid-cols-2 gap-[2px]">
               <div className="h-1.5 w-1.5 rounded-[2px] bg-brand" />
@@ -179,18 +180,42 @@ function Sidebar() {
 
       <nav className="mt-2 flex flex-1 flex-col items-center gap-1">
         <SidebarIcon icon={Search} label="Search" onClick={handleSearch} />
-        <SidebarIcon icon={Smile} label="Feedback" />
-        <SidebarIcon icon={Layers} label="Collections" />
+        <SidebarIcon
+          icon={Smile}
+          label="Feedback"
+          onClick={() => toast("Feedback — coming soon")}
+        />
+        <SidebarIcon
+          icon={Layers}
+          label="Collections"
+          onClick={() => toast("Collections — coming soon")}
+        />
         <SidebarIcon
           icon={LayoutGrid}
           label="Analyses"
           href="/app"
           isActive={isAnalysesActive}
         />
-        <SidebarIcon icon={Circle} label="Projects" />
-        <SidebarIcon icon={SlidersHorizontal} label="Workflows" />
-        <SidebarIcon icon={Link2} label="Connections" />
-        <SidebarIcon icon={Layers} label="Integrations" />
+        <SidebarIcon
+          icon={Circle}
+          label="Projects"
+          onClick={() => toast("Projects — coming soon")}
+        />
+        <SidebarIcon
+          icon={SlidersHorizontal}
+          label="Workflows"
+          onClick={() => toast("Workflows — coming soon")}
+        />
+        <SidebarIcon
+          icon={Link2}
+          label="Connections"
+          onClick={() => toast("Connections — coming soon")}
+        />
+        <SidebarIcon
+          icon={Layers}
+          label="Integrations"
+          onClick={() => toast("Integrations — coming soon")}
+        />
       </nav>
 
       <div className="mb-4">
@@ -254,14 +279,38 @@ function DashboardTopBar() {
 
         {/* Right: Icon actions + Avatar */}
         <div className="flex items-center gap-1">
-          {[Mail, Bell, HelpCircle, Settings].map((Icon, i) => (
-            <button
-              key={i}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-colors hover:bg-warm-100 hover:text-warm-600"
-            >
-              <Icon className="h-4 w-4" strokeWidth={1.5} />
-            </button>
-          ))}
+          <button
+            onClick={() => toast("No new messages")}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-colors hover:bg-warm-100 hover:text-warm-600"
+            aria-label="Messages"
+          >
+            <Mail className="h-4 w-4" strokeWidth={1.5} />
+          </button>
+          <button
+            onClick={() => toast("No new notifications")}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-colors hover:bg-warm-100 hover:text-warm-600"
+            aria-label="Notifications"
+          >
+            <Bell className="h-4 w-4" strokeWidth={1.5} />
+          </button>
+          <button
+            onClick={() =>
+              toast("Help center — coming soon")
+            }
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-colors hover:bg-warm-100 hover:text-warm-600"
+            aria-label="Help"
+          >
+            <HelpCircle className="h-4 w-4" strokeWidth={1.5} />
+          </button>
+          <button
+            onClick={() =>
+              toast("Settings — coming soon")
+            }
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-colors hover:bg-warm-100 hover:text-warm-600"
+            aria-label="Settings"
+          >
+            <Settings className="h-4 w-4" strokeWidth={1.5} />
+          </button>
           <div className="ml-3 border-l border-warm-200 pl-4">
             <UserAvatar />
           </div>

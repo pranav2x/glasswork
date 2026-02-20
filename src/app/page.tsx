@@ -363,10 +363,10 @@ export default function LandingPage() {
           </p>
         </motion.div>
 
-        <div className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Fair Share Scores — tall card */}
+        <div className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {/* Fair Share Scores */}
           <motion.div
-            className="group relative overflow-hidden rounded-2xl border border-warm-100 bg-white p-6 transition-all duration-300 hover:shadow-card-hover sm:row-span-2"
+            className="group relative overflow-hidden rounded-2xl border border-warm-100 bg-white p-6 transition-all duration-300 hover:shadow-card-hover"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -490,7 +490,7 @@ export default function LandingPage() {
 
           {/* GitHub Deep Dive — wide card */}
           <motion.div
-            className="group relative overflow-hidden rounded-2xl border border-warm-100 bg-white p-6 transition-all duration-300 hover:shadow-card-hover sm:col-span-2"
+            className="group relative overflow-hidden rounded-2xl border border-warm-100 bg-white p-6 transition-all duration-300 hover:shadow-card-hover"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}

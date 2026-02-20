@@ -317,14 +317,14 @@ export const getDashboardStats = query({
       statusCounts[a.status]++;
     }
 
-    // 5. Score distribution
+    // 5. Score distribution (based on Fair Share Score — 100 = fair share, capped at 200)
     const scoreDistribution = { excellent: 0, good: 0, fair: 0, needsWork: 0, minimal: 0 };
     for (const { contributor } of allContributors) {
       const s = contributor.score;
-      if (s >= 80) scoreDistribution.excellent++;
-      else if (s >= 60) scoreDistribution.good++;
-      else if (s >= 40) scoreDistribution.fair++;
-      else if (s >= 20) scoreDistribution.needsWork++;
+      if (s >= 150) scoreDistribution.excellent++;
+      else if (s >= 100) scoreDistribution.good++;
+      else if (s >= 60) scoreDistribution.fair++;
+      else if (s >= 30) scoreDistribution.needsWork++;
       else scoreDistribution.minimal++;
     }
 

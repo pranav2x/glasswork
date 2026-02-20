@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Inter, Caveat } from "next/font/google";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { AppShell } from "@/components/AppShell";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -43,6 +44,15 @@ export default function RootLayout({
       >
         <ConvexClientProvider>
           <AppShell>{children}</AppShell>
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              style: {
+                fontFamily: "var(--font-body)",
+                fontSize: "13px",
+              },
+            }}
+          />
         </ConvexClientProvider>
       </body>
     </html>

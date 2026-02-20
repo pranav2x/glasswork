@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 /* ────────────────────────────────────────
@@ -384,6 +385,7 @@ interface ContributorTicketProps {
   message: string;
   avatarColor: string;
   initials: string;
+  avatarUrl?: string;
 }
 
 export function ContributorTicket({
@@ -391,15 +393,27 @@ export function ContributorTicket({
   message,
   avatarColor,
   initials,
+  avatarUrl,
 }: ContributorTicketProps) {
   return (
     <div className="rounded-xl border border-warm-100 p-3.5 transition-colors hover:border-warm-200 hover:bg-warm-50/50">
       <div className="flex items-start gap-3">
         <div
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white"
-          style={{ backgroundColor: avatarColor }}
+          className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full text-[11px] font-bold text-white"
+          style={{ backgroundColor: avatarUrl ? "transparent" : avatarColor }}
         >
-          {initials}
+          {avatarUrl ? (
+            <Image
+              src={avatarUrl}
+              alt={name}
+              width={36}
+              height={36}
+              className="h-full w-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            initials
+          )}
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-[13px] font-semibold text-warm-800">{name}</p>

@@ -20,13 +20,16 @@ export interface ScoredContributor {
 /**
  * Fair Share Score: 100 = exactly your fair share (1/N of total work).
  * > 100 = overcontributor, < 100 = undercontributor.
+ * Capped at 200 for readable display.
  *
- * Score = (Your Contribution / (Total Team Contribution / Team Size)) * 100
+ * Score = min(200, (Your Contribution / (Total / N)) * 100)
  *
- * Tiers:
- *   >= 120 → carry (gold)
- *   50-119 → solid (green)
- *   < 50   → ghost (red)
+ * Tiers (percentile-based):
+ *   Top 25%    → carry (gold)
+ *   Middle 50% → solid (green)
+ *   Bottom 25% → ghost (red)
+ *
+ * For solo contributors, tier defaults to "solid".
  */
 export function computeFairShareScores(
   contributions: ContributionInput[]
@@ -49,19 +52,41 @@ export function computeFairShareScores(
 
   const fairShare = totalMetric / contributions.length;
 
-  return contributions.map((c) => {
-    const score = Math.round((c.metric / fairShare) * 100);
-    const tier: "carry" | "solid" | "ghost" =
-      score >= 120 ? "carry" : score >= 50 ? "solid" : "ghost";
+  // Calculate raw scores and sort by score descending for percentile ranking
+  const scored = contributions.map((c) => ({
+    ...c,
+    score: Math.min(200, Math.round((c.metric / fairShare) * 100)),
+    heatmapData: generateHeatmapData(c.timestamps),
+  }));
+
+  scored.sort((a, b) => b.score - a.score);
+
+  const n = scored.length;
+
+  return scored.map((c, rank) => {
+    let tier: "carry" | "solid" | "ghost";
+
+    if (n === 1) {
+      tier = "solid";
+    } else {
+      const percentile = rank / (n - 1); // 0 = top, 1 = bottom
+      if (percentile <= 0.25) {
+        tier = "carry";
+      } else if (percentile >= 0.75) {
+        tier = "ghost";
+      } else {
+        tier = "solid";
+      }
+    }
 
     return {
       name: c.name,
       emailOrHandle: c.emailOrHandle,
       avatarUrl: c.avatarUrl,
-      score,
+      score: c.score,
       tier,
       rawStats: c.rawStats,
-      heatmapData: generateHeatmapData(c.timestamps),
+      heatmapData: c.heatmapData,
     };
   });
 }
