@@ -12,6 +12,7 @@ import type * as analyses from "../analyses.js";
 import type * as analyzeGitHubRepo from "../analyzeGitHubRepo.js";
 import type * as analyzeGoogleDoc from "../analyzeGoogleDoc.js";
 import type * as auth from "../auth.js";
+import type * as generateSummary from "../generateSummary.js";
 import type * as googleApi from "../googleApi.js";
 import type * as googleDrive from "../googleDrive.js";
 import type * as http from "../http.js";
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   analyzeGitHubRepo: typeof analyzeGitHubRepo;
   analyzeGoogleDoc: typeof analyzeGoogleDoc;
   auth: typeof auth;
+  generateSummary: typeof generateSummary;
   googleApi: typeof googleApi;
   googleDrive: typeof googleDrive;
   http: typeof http;

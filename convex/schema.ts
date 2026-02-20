@@ -30,6 +30,7 @@ export default defineSchema({
       v.literal("error")
     ),
     errorMessage: v.optional(v.string()),
+    summary: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

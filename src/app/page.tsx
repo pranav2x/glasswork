@@ -8,6 +8,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { motion } from "framer-motion";
 import { api } from "../../convex/_generated/api";
 import { Github, BarChart3, GitCompare, Activity, Clock, ArrowRight } from "lucide-react";
+import { TypewriterPlaceholder } from "@/components/TypewriterPlaceholder";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function LandingPage() {
   const [repoInput, setRepoInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [inputFocused, setInputFocused] = useState(false);
 
   const handleGetStarted = useCallback(async () => {
     if (isAuthenticated) {
@@ -135,12 +137,14 @@ export default function LandingPage() {
 
           {/* Headline */}
           <h1
-            className="font-display text-[3rem] font-extrabold leading-[1.08] tracking-tight text-warm-900 sm:text-[3.75rem] md:text-[4.5rem] animate-fade-up"
-            style={{ animationDelay: "0.1s" }}
+            className="font-display font-normal italic text-[3rem] leading-[1.08] tracking-tight text-warm-900 sm:text-[3.75rem] md:text-[4.5rem] animate-fade-up"
           >
-            See who contributed
+            Who actually did
             <br />
-            <span className="text-brand">to every project</span>
+            <span className="relative text-brand">
+              the work?
+              <span className="absolute -bottom-1 left-0 h-[3px] w-full rounded-full bg-brand/30 underline-draw" />
+            </span>
           </h1>
 
           {/* Subtitle */}
@@ -148,7 +152,7 @@ export default function LandingPage() {
             className="mx-auto mt-6 max-w-lg text-[18px] leading-relaxed text-warm-600 animate-fade-up"
             style={{ animationDelay: "0.25s" }}
           >
-            Analyze Google Docs and GitHub repos to reveal exactly who did the work. Fair Share Scores for every teammate.
+            Analyze GitHub repos and Google Docs. Every teammate gets a Fair Share Score — instantly see who&apos;s locked in and who&apos;s not.
           </p>
 
           {/* CTA */}
@@ -165,19 +169,33 @@ export default function LandingPage() {
 
             {/* Quick repo input */}
             <div className="mx-auto mt-4 w-full max-w-md">
-              <div className="flex items-center gap-2 rounded-2xl border border-warm-200 bg-white p-2 shadow-layered transition-all focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10">
+              <div className="relative flex items-center gap-2 rounded-2xl border border-warm-200 bg-white p-2 shadow-layered transition-all focus-within:border-brand/40 focus-within:ring-2 focus-within:ring-brand/10">
                 <Github className="ml-3 h-4 w-4 shrink-0 text-warm-400" />
-                <input
-                  type="text"
-                  placeholder="owner/repo — e.g. facebook/react"
-                  value={repoInput}
-                  onChange={(e) => {
-                    setRepoInput(e.target.value);
-                    setError(null);
-                  }}
-                  onKeyDown={(e) => e.key === "Enter" && handleRepoAnalyze()}
-                  className="min-w-0 flex-1 bg-transparent py-2.5 text-[15px] text-warm-900 placeholder:text-warm-400 focus:outline-none"
-                />
+                <div className="relative min-w-0 flex-1">
+                  <input
+                    type="text"
+                    placeholder=""
+                    value={repoInput}
+                    onChange={(e) => {
+                      setRepoInput(e.target.value);
+                      setError(null);
+                    }}
+                    onFocus={() => setInputFocused(true)}
+                    onBlur={() => setInputFocused(false)}
+                    onKeyDown={(e) => e.key === "Enter" && handleRepoAnalyze()}
+                    className="relative z-10 w-full bg-transparent py-2.5 text-[15px] text-warm-900 placeholder:text-warm-400 focus:outline-none"
+                  />
+                  {!repoInput && !inputFocused && (
+                    <div className="pointer-events-none absolute inset-0 flex items-center text-[15px]">
+                      <TypewriterPlaceholder isVisible={!repoInput && !inputFocused} />
+                    </div>
+                  )}
+                  {!repoInput && inputFocused && (
+                    <div className="pointer-events-none absolute inset-0 flex items-center text-[15px] text-warm-400">
+                      owner/repo — e.g. facebook/react
+                    </div>
+                  )}
+                </div>
                 <button
                   onClick={handleRepoAnalyze}
                   disabled={isSubmitting || !repoInput.trim()}
@@ -192,6 +210,42 @@ export default function LandingPage() {
               <p className="mt-2 text-[12px] text-warm-400">
                 Public repos only. No tokens required.
               </p>
+
+              {/* Quick demo button */}
+              <button
+                onClick={() => {
+                  setRepoInput("facebook/react");
+                  void (async () => {
+                    const trimmed = "facebook/react";
+                    if (!isAuthenticated) {
+                      try {
+                        await signIn("google", { redirectTo: "/app" });
+                      } catch (err) {
+                        console.error("Sign in failed:", err);
+                      }
+                      return;
+                    }
+                    setIsSubmitting(true);
+                    setError(null);
+                    try {
+                      const analysisId = await createAnalysis({
+                        sourceType: "github_repo",
+                        sourceId: trimmed,
+                        title: trimmed,
+                      });
+                      router.push(`/results/${analysisId}`);
+                    } catch (err) {
+                      setError(err instanceof Error ? err.message : "Failed to create analysis");
+                    } finally {
+                      setIsSubmitting(false);
+                    }
+                  })();
+                }}
+                disabled={isSubmitting}
+                className="mt-2 rounded-xl bg-warm-100 px-4 py-2 text-[13px] font-medium text-warm-700 transition-all duration-200 hover:bg-warm-200 hover:text-warm-900 active:scale-[0.97] disabled:opacity-50"
+              >
+                Try with facebook/react &rarr;
+              </button>
             </div>
           </div>
         </div>
@@ -210,8 +264,8 @@ export default function LandingPage() {
             <p className="font-hand text-[15px] leading-snug text-warm-700">
               Track every edit,<br />
               every commit.<br />
-              See who carried<br />
-              the project.
+              See who&apos;s locked in<br />
+              and who&apos;s not.
             </p>
           </div>
           <div className="absolute -bottom-4 -left-2">
@@ -393,7 +447,7 @@ export default function LandingPage() {
               Fair Share Scores
             </h3>
             <p className="mt-2 text-[13px] leading-relaxed text-warm-500">
-              Normalized 0-200 scores that show exactly who carried, who contributed, and who ghosted.
+              Normalized 0-200 scores that show exactly who&apos;s locked in, who&apos;s solid, and who&apos;s not.
             </p>
           </motion.div>
 
@@ -622,12 +676,12 @@ export default function LandingPage() {
       {/* ── Final CTA ── */}
       <section className="border-t border-warm-200/50 bg-white py-24">
         <div className="mx-auto max-w-2xl px-6 text-center">
-          <h2 className="font-display text-3xl font-bold tracking-tight text-warm-900 sm:text-4xl">
-            Your grades deserve transparency
-          </h2>
-          <p className="mx-auto mt-4 max-w-md text-[16px] text-warm-600">
-            Stop letting freeloaders take credit. See the data, share the proof.
-          </p>
+        <h2 className="font-display text-3xl tracking-tight text-warm-900 sm:text-4xl">
+            Your grades deserve 
+          <br />
+          <span className="text-brand">transparency</span>
+        </h2>
+
           <button
             onClick={handleGetStarted}
             className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-brand px-8 py-3.5 text-[15px] font-semibold text-white shadow-layered transition-all duration-200 hover:scale-[1.03] hover:shadow-layered-md active:scale-[0.97]"
@@ -651,7 +705,7 @@ export default function LandingPage() {
             <span className="text-[13px] font-medium text-warm-500">Glasswork</span>
           </div>
           <p className="text-[12px] text-warm-400">
-            Built by a 16-year-old tired of carrying group projects.
+            Built by a 16-year-old who was always locked in.
           </p>
         </div>
       </footer>

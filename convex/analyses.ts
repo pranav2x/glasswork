@@ -15,6 +15,19 @@ export const getAnalysisInternal = internalQuery({
 });
 
 /**
+ * Internal query to get contributors for an analysis (used by actions).
+ */
+export const getContributorsInternal = internalQuery({
+  args: { analysisId: v.id("analyses") },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("contributors")
+      .withIndex("by_analysisId", (q) => q.eq("analysisId", args.analysisId))
+      .collect();
+  },
+});
+
+/**
  * Lists analyses for the current user, ordered by updatedAt desc.
  * Optionally filtered by sourceType.
  * Includes the top contributor (highest score) for each analysis.
@@ -220,6 +233,21 @@ export const writeContributors = internalMutation({
         heatmapData: c.heatmapData,
       });
     }
+  },
+});
+
+/**
+ * Internal mutation to save the AI-generated summary.
+ */
+export const updateSummary = internalMutation({
+  args: {
+    analysisId: v.id("analyses"),
+    summary: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.analysisId, {
+      summary: args.summary,
+    });
   },
 });
 

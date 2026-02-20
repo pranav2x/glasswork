@@ -15,6 +15,7 @@
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tabs": "^1.1.13",
+    "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "^1.31.7",
@@ -29,6 +30,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "@types/diff-match-patch": "^1.0.36",
     "@types/node": "^20",
     "@types/react": "^18",

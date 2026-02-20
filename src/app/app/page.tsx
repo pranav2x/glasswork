@@ -181,9 +181,9 @@ function DashboardPage() {
   // --- Donut chart: aggregate or per-analysis ---
   const donutSegments = isViewingAnalysis
     ? [
-        { value: selectedContributors.filter((c) => c.tier === "carry").length, color: "#D4A017", label: "Carry" },
+        { value: selectedContributors.filter((c) => c.tier === "carry").length, color: "#D4A017", label: "Locked In" },
         { value: selectedContributors.filter((c) => c.tier === "solid").length, color: "#2DA44E", label: "Solid" },
-        { value: selectedContributors.filter((c) => c.tier === "ghost").length, color: "#E53935", label: "Ghost" },
+        { value: selectedContributors.filter((c) => c.tier === "ghost").length, color: "#E53935", label: "Not Locked In" },
       ]
     : [
         { value: statusCounts.ready, color: "#4A96D9", label: "Completed" },

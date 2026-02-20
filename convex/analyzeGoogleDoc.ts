@@ -244,6 +244,13 @@ export const analyzeGoogleDoc = internalAction({
         status: "ready",
         title: metadata.name,
       });
+
+      // Schedule AI summary generation (non-blocking)
+      await ctx.scheduler.runAfter(
+        0,
+        internal.generateSummary.generateSummary,
+        { analysisId: args.analysisId }
+      );
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Unknown error occurred";
