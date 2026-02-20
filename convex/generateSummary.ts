@@ -63,8 +63,8 @@ Tier definitions:
 
 Write a 2-3 sentence analysis. Be direct, specific about what each notable person did (use their actual names). Mention who was LOCKED IN and who was NOT LOCKED IN using those exact phrases. Be slightly opinionated and engaging — this will be displayed prominently on the results page. Do NOT use markdown formatting.`;
 
-      // 3. Call the LLM API
-      const apiKey = process.env.OPENAI_API_KEY;
+      // 3. Call the Gemini API
+      const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) {
         // Fallback to template-based summary if no API key
         const topContributor = sorted[0];
@@ -91,29 +91,35 @@ Write a 2-3 sentence analysis. Be direct, specific about what each notable perso
         return;
       }
 
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a concise contribution analyst. Write engaging, direct summaries about team contributions. Use the tier names LOCKED IN, SOLID, and NOT LOCKED IN exactly as provided.",
+      const systemInstruction = "You are a concise contribution analyst. Write engaging, direct summaries about team contributions. Use the tier names LOCKED IN, SOLID, and NOT LOCKED IN exactly as provided.";
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            system_instruction: {
+              parts: [{ text: systemInstruction }],
             },
-            { role: "user", content: prompt },
-          ],
-          max_tokens: 200,
-          temperature: 0.7,
-        }),
-      });
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: prompt }],
+              },
+            ],
+            generationConfig: {
+              maxOutputTokens: 200,
+              temperature: 0.7,
+            },
+          }),
+        }
+      );
 
       if (!response.ok) {
-        console.error("OpenAI API error:", response.status, await response.text());
+        console.error("Gemini API error:", response.status, await response.text());
         // Fall back to template
         const topContributor = sorted[0];
         const summary = `${topContributor.name} led this ${isRepo ? "repository" : "document"} with a Fair Share Score of ${topContributor.score} — clearly LOCKED IN.`;
@@ -125,7 +131,7 @@ Write a 2-3 sentence analysis. Be direct, specific about what each notable perso
       }
 
       const data = await response.json();
-      const summary = data.choices?.[0]?.message?.content?.trim();
+      const summary = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
       if (summary) {
         await ctx.runMutation(internal.analyses.updateSummary, {
