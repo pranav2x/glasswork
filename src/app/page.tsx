@@ -124,48 +124,37 @@ export default function LandingPage() {
 
         <div className="relative z-10 text-center">
           {/* Logo icon */}
-          <motion.div
-            className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-layered"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          >
+          <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-layered animate-fade-up">
             <div className="grid h-7 w-7 grid-cols-2 gap-[3px]">
               <div className="h-3 w-3 rounded-[3px] bg-brand" />
               <div className="h-3 w-3 rounded-[3px] bg-warm-900" />
               <div className="h-3 w-3 rounded-[3px] bg-warm-900" />
               <div className="h-3 w-3 rounded-[3px] bg-warm-900" />
             </div>
-          </motion.div>
+          </div>
 
           {/* Headline */}
-          <motion.h1
-            className="font-display text-[3rem] font-extrabold leading-[1.08] tracking-tight text-warm-900 sm:text-[3.75rem] md:text-[4.5rem]"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          <h1
+            className="font-display text-[3rem] font-extrabold leading-[1.08] tracking-tight text-warm-900 sm:text-[3.75rem] md:text-[4.5rem] animate-fade-up"
+            style={{ animationDelay: "0.1s" }}
           >
             See who contributed
             <br />
             <span className="text-brand">to every project</span>
-          </motion.h1>
+          </h1>
 
           {/* Subtitle */}
-          <motion.p
-            className="mx-auto mt-6 max-w-lg text-[18px] leading-relaxed text-warm-600"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+          <p
+            className="mx-auto mt-6 max-w-lg text-[18px] leading-relaxed text-warm-600 animate-fade-up"
+            style={{ animationDelay: "0.25s" }}
           >
             Analyze Google Docs and GitHub repos to reveal exactly who did the work. Fair Share Scores for every teammate.
-          </motion.p>
+          </p>
 
           {/* CTA */}
-          <motion.div
-            className="mt-10 flex flex-col items-center gap-4"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          <div
+            className="mt-10 flex flex-col items-center gap-4 animate-fade-up"
+            style={{ animationDelay: "0.35s" }}
           >
             <button
               onClick={handleGetStarted}
@@ -204,7 +193,7 @@ export default function LandingPage() {
                 Public repos only. No tokens required.
               </p>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* ── Floating cards ── */}

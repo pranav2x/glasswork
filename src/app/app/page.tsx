@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { useConvexAuth, useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { NewAnalysisModal } from "@/components/NewAnalysisModal";
@@ -56,9 +57,11 @@ function CardHeader({
   );
 }
 
-function IconAction({ children, className }: { children: React.ReactNode; className?: string }) {
+function IconAction({ children, className, onClick, title }: { children: React.ReactNode; className?: string; onClick?: () => void; title?: string }) {
   return (
     <button
+      onClick={onClick}
+      title={title}
       className={cn(
         "flex h-7 w-7 items-center justify-center rounded-lg text-warm-400 transition-colors hover:bg-warm-100 hover:text-warm-600",
         className
@@ -94,6 +97,7 @@ function DashboardPage() {
   const [activeTimeFilter, setActiveTimeFilter] = useState<"today" | "week" | "month">("month");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedAnalysisId, setSelectedAnalysisId] = useState<Id<"analyses"> | null>(null);
+  const [scoreSortAsc, setScoreSortAsc] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const deleteAnalysisMutation = useMutation(api.analyses.deleteAnalysis);
 
@@ -228,6 +232,8 @@ function DashboardPage() {
     }));
 
   // --- Top contributors: aggregate or per-analysis ---
+  const isRepoAnalysis = selectedAnalysis?.sourceType === "github_repo";
+
   const topContributorCards = isViewingAnalysis
     ? selectedContributors
         .sort((a, b) => b.score - a.score)
@@ -239,6 +245,9 @@ function DashboardPage() {
           color: c.tier === "carry" ? "#F5A623" : c.tier === "solid" ? "#2DA44E" : "#E53935",
           avatarUrl: c.avatarUrl,
           firstAnalysisId: selectedAnalysisId!,
+          profileUrl: isRepoAnalysis && c.emailOrHandle
+            ? `https://github.com/${c.emailOrHandle}`
+            : undefined,
         }))
     : topContributors
         .filter((c) => !query || c.name.toLowerCase().includes(query))
@@ -250,6 +259,9 @@ function DashboardPage() {
           color: c.tier === "carry" ? "#F5A623" : c.tier === "solid" ? "#2DA44E" : "#E53935",
           avatarUrl: c.avatarUrl,
           firstAnalysisId: c.firstAnalysisId,
+          profileUrl: c.emailOrHandle && !c.emailOrHandle.includes("@")
+            ? `https://github.com/${c.emailOrHandle}`
+            : undefined,
         }));
 
   const isEmpty = analyses.length === 0;
@@ -261,11 +273,22 @@ function DashboardPage() {
         <div className="hero-fade-in flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-[13px] font-medium text-warm-400">
-              Monitor and analyze your contributions
+              {isViewingAnalysis
+                ? `Viewing individual ${selectedAnalysis?.sourceType === "google_doc" ? "doc" : "repo"} analysis`
+                : "Monitor and analyze your contributions"}
             </p>
             <h1 className="mt-0.5 text-[28px] font-bold tracking-tight text-warm-900">
-              Analysis Dashboard
+              {isViewingAnalysis ? selectedAnalysis?.title : "Analysis Dashboard"}
             </h1>
+            {isViewingAnalysis && (
+              <button
+                onClick={() => setSelectedAnalysisId(null)}
+                className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-[12px] font-medium text-brand transition-colors hover:bg-brand/20"
+              >
+                <X className="h-3 w-3" />
+                Back to overview
+              </button>
+            )}
           </div>
           <div className="flex items-center gap-3">
             {/* Time filter pills */}
@@ -426,7 +449,7 @@ function DashboardPage() {
                             e.stopPropagation();
                             handleDeleteAnalysis(item._id, item.title);
                           }}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-lg text-warm-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover/item:opacity-100"
+                          className="absolute right-9 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-lg text-warm-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover/item:opacity-100"
                           aria-label={`Delete ${item.title}`}
                         >
                           <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -497,48 +520,58 @@ function DashboardPage() {
                         selectedContributors
                           .sort((a, b) => b.score - a.score)
                           .slice(0, 6)
-                          .map((c, i) => (
-                            <div key={c.name} className="flex items-center gap-2.5">
-                              <span className="w-4 text-right text-[10px] font-semibold text-warm-400">
-                                {i + 1}
-                              </span>
-                              <div
-                                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white"
-                                style={{
-                                  backgroundColor:
-                                    c.tier === "carry" ? "#D4A017" : c.tier === "solid" ? "#2DA44E" : "#E53935",
-                                }}
-                              >
-                                {getInitials(c.name)}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-center justify-between">
-                                  <span className="truncate text-[12px] font-medium text-warm-700">
-                                    {c.name}
-                                  </span>
-                                  <span
-                                    className="ml-2 text-[11px] font-bold"
-                                    style={{
-                                      color:
-                                        c.tier === "carry" ? "#D4A017" : c.tier === "solid" ? "#2DA44E" : "#E53935",
-                                    }}
-                                  >
-                                    {c.score}
-                                  </span>
+                          .map((c, i) => {
+                            const rankColors = ["#D4A017", "#6C63FF", "#2DA44E", "#E88D3F", "#9B6FE3", "#4A96D9"];
+                            const barColor = rankColors[i % rankColors.length];
+                            const tierColor = c.tier === "carry" ? "#D4A017" : c.tier === "solid" ? "#2DA44E" : "#E53935";
+
+                            return (
+                              <div key={c.name} className="flex items-center gap-2.5">
+                                <span className="w-4 text-right text-[10px] font-semibold text-warm-400">
+                                  {i + 1}
+                                </span>
+                                <div
+                                  className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-[9px] font-bold text-white"
+                                  style={{ backgroundColor: c.avatarUrl ? "transparent" : barColor }}
+                                >
+                                  {c.avatarUrl ? (
+                                    <Image
+                                      src={c.avatarUrl}
+                                      alt={c.name}
+                                      width={24}
+                                      height={24}
+                                      className="h-full w-full object-cover"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                  ) : (
+                                    getInitials(c.name)
+                                  )}
                                 </div>
-                                <div className="mt-0.5 h-1 w-full overflow-hidden rounded-full bg-warm-100">
-                                  <div
-                                    className="h-full rounded-full transition-all duration-500"
-                                    style={{
-                                      width: `${Math.min(100, (c.score / 200) * 100)}%`,
-                                      backgroundColor:
-                                        c.tier === "carry" ? "#D4A017" : c.tier === "solid" ? "#2DA44E" : "#E53935",
-                                    }}
-                                  />
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <span className="truncate text-[12px] font-medium text-warm-700">
+                                      {c.name}
+                                    </span>
+                                    <span
+                                      className="ml-2 text-[11px] font-bold"
+                                      style={{ color: tierColor }}
+                                    >
+                                      {c.score}
+                                    </span>
+                                  </div>
+                                  <div className="mt-0.5 h-1 w-full overflow-hidden rounded-full bg-warm-100">
+                                    <div
+                                      className="h-full rounded-full transition-all duration-500"
+                                      style={{
+                                        width: `${Math.min(100, (c.score / 200) * 100)}%`,
+                                        backgroundColor: barColor,
+                                      }}
+                                    />
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))
+                            );
+                          })
                       )}
                     </div>
                   </>
@@ -547,14 +580,12 @@ function DashboardPage() {
                     <CardHeader
                       title="Contribution Activity"
                       actions={
-                        <>
-                          <IconAction>
-                            <SlidersHorizontal className="h-3.5 w-3.5" />
-                          </IconAction>
-                          <IconAction>
-                            <ArrowUpRight className="h-3.5 w-3.5" />
-                          </IconAction>
-                        </>
+                        <IconAction
+                          onClick={() => toast("Activity filters coming soon")}
+                          title="Filter activity"
+                        >
+                          <SlidersHorizontal className="h-3.5 w-3.5" />
+                        </IconAction>
                       }
                     />
                     <div className="mt-3">
@@ -629,7 +660,10 @@ function DashboardPage() {
                   <CardHeader
                     title={isViewingAnalysis ? "Contributors" : "Top Contributors"}
                     actions={
-                      <IconAction>
+                      <IconAction
+                        onClick={() => toast("Contributor filters coming soon")}
+                        title="Filter contributors"
+                      >
                         <SlidersHorizontal className="h-3.5 w-3.5" />
                       </IconAction>
                     }
@@ -652,6 +686,7 @@ function DashboardPage() {
                             avatarColor={c.color}
                             initials={c.initials}
                             avatarUrl={c.avatarUrl}
+                            profileUrl={c.profileUrl}
                           />
                         </div>
                       ))
@@ -670,7 +705,10 @@ function DashboardPage() {
                 <CardHeader
                   title={isViewingAnalysis ? `Score Distribution — ${selectedAnalysis?.title ?? ""}` : "Score Distribution"}
                   actions={
-                    <IconAction>
+                    <IconAction
+                      onClick={() => setScoreSortAsc((v) => !v)}
+                      title={scoreSortAsc ? "Sort: Low → High" : "Sort: High → Low"}
+                    >
                       <SlidersHorizontal className="h-3.5 w-3.5" />
                     </IconAction>
                   }
@@ -681,9 +719,9 @@ function DashboardPage() {
                       No contributor scores yet
                     </p>
                   ) : (
-                    scoreBars.map((bar, i) => (
+                    (scoreSortAsc ? [...scoreBars].reverse() : scoreBars).map((bar, i) => (
                       <ScoreBar
-                        key={i}
+                        key={bar.label}
                         label={bar.label}
                         count={bar.count}
                         total={bar.total}

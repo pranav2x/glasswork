@@ -386,6 +386,7 @@ interface ContributorTicketProps {
   avatarColor: string;
   initials: string;
   avatarUrl?: string;
+  profileUrl?: string;
 }
 
 export function ContributorTicket({
@@ -394,6 +395,7 @@ export function ContributorTicket({
   avatarColor,
   initials,
   avatarUrl,
+  profileUrl,
 }: ContributorTicketProps) {
   return (
     <div className="rounded-xl border border-warm-100 p-3.5 transition-colors hover:border-warm-200 hover:bg-warm-50/50">
@@ -423,9 +425,21 @@ export function ContributorTicket({
         </div>
       </div>
       <div className="mt-2.5 flex justify-end">
-        <button className="rounded-lg border border-warm-200 px-3 py-1 text-[11px] font-medium text-warm-500 transition-all hover:border-warm-300 hover:text-warm-700">
-          View &rsaquo;
-        </button>
+        {profileUrl ? (
+          <a
+            href={profileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="rounded-lg border border-warm-200 px-3 py-1 text-[11px] font-medium text-warm-500 transition-all hover:border-warm-300 hover:text-warm-700"
+          >
+            View &rsaquo;
+          </a>
+        ) : (
+          <button className="rounded-lg border border-warm-200 px-3 py-1 text-[11px] font-medium text-warm-500 transition-all hover:border-warm-300 hover:text-warm-700">
+            View &rsaquo;
+          </button>
+        )}
       </div>
     </div>
   );

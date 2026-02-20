@@ -162,6 +162,7 @@ function Sidebar() {
 
   const isAnalysesActive =
     pathname === "/app" || pathname.startsWith("/results");
+  const isSection = (section: string) => pathname === `/app/${section}`;
 
   return (
     <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col items-center bg-transparent">
@@ -183,12 +184,14 @@ function Sidebar() {
         <SidebarIcon
           icon={Smile}
           label="Feedback"
-          onClick={() => toast("Feedback — coming soon")}
+          href="/app/feedback"
+          isActive={isSection("feedback")}
         />
         <SidebarIcon
           icon={Layers}
           label="Collections"
-          onClick={() => toast("Collections — coming soon")}
+          href="/app/collections"
+          isActive={isSection("collections")}
         />
         <SidebarIcon
           icon={LayoutGrid}
@@ -199,22 +202,26 @@ function Sidebar() {
         <SidebarIcon
           icon={Circle}
           label="Projects"
-          onClick={() => toast("Projects — coming soon")}
+          href="/app/projects"
+          isActive={isSection("projects")}
         />
         <SidebarIcon
           icon={SlidersHorizontal}
           label="Workflows"
-          onClick={() => toast("Workflows — coming soon")}
+          href="/app/workflows"
+          isActive={isSection("workflows")}
         />
         <SidebarIcon
           icon={Link2}
           label="Connections"
-          onClick={() => toast("Connections — coming soon")}
+          href="/app/connections"
+          isActive={isSection("connections")}
         />
         <SidebarIcon
           icon={Layers}
           label="Integrations"
-          onClick={() => toast("Integrations — coming soon")}
+          href="/app/integrations"
+          isActive={isSection("integrations")}
         />
       </nav>
 
