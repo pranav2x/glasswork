@@ -111,9 +111,25 @@ export const getAnalysis = query({
 
     contributors.sort((a, b) => b.score - a.score);
 
+    // Enrich contributors missing avatarUrl with Google profile images from users table
+    const enrichedContributors = await Promise.all(
+      contributors.map(async (c) => {
+        if (!c.avatarUrl && c.emailOrHandle?.includes("@")) {
+          const matchedUser = await ctx.db
+            .query("users")
+            .withIndex("email", (q) => q.eq("email", c.emailOrHandle!))
+            .first();
+          if (matchedUser?.image) {
+            return { ...c, avatarUrl: matchedUser.image };
+          }
+        }
+        return c;
+      })
+    );
+
     return {
       ...analysis,
-      contributors,
+      contributors: enrichedContributors,
     };
   },
 });
@@ -394,6 +410,19 @@ export const getDashboardStats = query({
     const topContributors = Array.from(contributorMap.values())
       .sort((a, b) => b.score - a.score)
       .slice(0, 5);
+
+    // 6b. Enrich contributors missing avatarUrl with Google profile images from users table
+    for (const contributor of topContributors) {
+      if (!contributor.avatarUrl && contributor.emailOrHandle?.includes("@")) {
+        const matchedUser = await ctx.db
+          .query("users")
+          .withIndex("email", (q) => q.eq("email", contributor.emailOrHandle!))
+          .first();
+        if (matchedUser?.image) {
+          contributor.avatarUrl = matchedUser.image;
+        }
+      }
+    }
 
     // 7. Activity by month (last 7 months)
     const now = new Date();

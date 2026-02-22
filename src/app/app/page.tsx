@@ -269,26 +269,39 @@ function DashboardPage() {
   return (
     <>
       <div className="space-y-6">
+        {/* ─── Context Banner ─── */}
+        {isViewingAnalysis && (
+          <div className="hero-fade-in mb-2 flex items-center justify-between rounded-xl border border-warm-200 bg-warm-50 px-4 py-2.5">
+            <div className="flex items-center gap-2.5">
+              <span className="rounded-full bg-warm-900 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                {selectedAnalysis?.sourceType === "google_doc" ? "Doc" : "Repo"}
+              </span>
+              <span className="text-[13px] font-semibold text-warm-800">
+                {selectedAnalysis?.title}
+              </span>
+              <span className="text-[11px] text-warm-400">— Individual analysis</span>
+            </div>
+            <button
+              onClick={() => setSelectedAnalysisId(null)}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-warm-900 px-3 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-warm-800"
+            >
+              <X className="h-3 w-3" />
+              Back to All Analyses
+            </button>
+          </div>
+        )}
+
         {/* ─── Header ─── */}
         <div className="hero-fade-in flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-[13px] font-medium text-warm-400">
               {isViewingAnalysis
-                ? `Viewing individual ${selectedAnalysis?.sourceType === "google_doc" ? "doc" : "repo"} analysis`
-                : "Monitor and analyze your contributions"}
+                ? `Showing stats for this ${selectedAnalysis?.sourceType === "google_doc" ? "doc" : "repo"} only`
+                : "Overview of all your analyses combined"}
             </p>
             <h1 className="mt-0.5 text-[28px] font-bold tracking-tight text-warm-900">
-              {isViewingAnalysis ? selectedAnalysis?.title : "Analysis Dashboard"}
+              {isViewingAnalysis ? selectedAnalysis?.title : "All Analyses"}
             </h1>
-            {isViewingAnalysis && (
-              <button
-                onClick={() => setSelectedAnalysisId(null)}
-                className="mt-1.5 inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3 py-1 text-[12px] font-medium text-brand transition-colors hover:bg-brand/20"
-              >
-                <X className="h-3 w-3" />
-                Back to overview
-              </button>
-            )}
           </div>
           <div className="flex items-center gap-3">
             {/* Time filter pills */}
@@ -420,7 +433,7 @@ function DashboardPage() {
                             "rounded-xl transition-all",
                             item.status === "ready" && "cursor-pointer",
                             selectedAnalysisId === item._id &&
-                              "bg-brand/5 ring-1 ring-brand/20"
+                              "bg-warm-100 ring-1 ring-warm-300"
                           )}
                         >
                           <AnalysisItem
@@ -464,26 +477,16 @@ function DashboardPage() {
             {/* ──── Column 2: Analysis Overview (Donut Chart) ──── */}
             <GlassPanel
               hoverable
-              className={cn("hero-fade-in", isViewingAnalysis && "ring-1 ring-brand/10")}
+              className={cn("hero-fade-in", isViewingAnalysis && "ring-1 ring-warm-300")}
               style={{ animationDelay: "0.12s" }}
             >
               <div className="p-5">
                 <CardHeader
                   title={isViewingAnalysis ? "Tier Breakdown" : "Analysis Overview"}
                   actions={
-                    isViewingAnalysis ? (
-                      <button
-                        onClick={() => setSelectedAnalysisId(null)}
-                        className="flex h-7 items-center gap-1.5 rounded-lg bg-brand/10 px-2.5 text-[11px] font-medium text-brand transition-colors hover:bg-brand/20"
-                      >
-                        <span className="max-w-[100px] truncate">{selectedAnalysis?.title}</span>
-                        <X className="h-3 w-3" />
-                      </button>
-                    ) : (
-                      <IconAction>
-                        <ArrowUpRight className="h-3.5 w-3.5" />
-                      </IconAction>
-                    )
+                    <span className="rounded-full bg-warm-100 px-2 py-0.5 text-[10px] font-semibold text-warm-500">
+                      {isViewingAnalysis ? "This analysis" : "All analyses"}
+                    </span>
                   }
                 />
                 <div className="mt-4">
@@ -495,7 +498,7 @@ function DashboardPage() {
             {/* ──── Column 3: Contribution Activity / Top Scores ──── */}
             <GlassPanel
               hoverable
-              className={cn("hero-fade-in", isViewingAnalysis && "ring-1 ring-brand/10")}
+              className={cn("hero-fade-in", isViewingAnalysis && "ring-1 ring-warm-300")}
               style={{ animationDelay: "0.16s" }}
             >
               <div className="p-5">
@@ -580,12 +583,9 @@ function DashboardPage() {
                     <CardHeader
                       title="Contribution Activity"
                       actions={
-                        <IconAction
-                          onClick={() => toast("Activity filters coming soon")}
-                          title="Filter activity"
-                        >
-                          <SlidersHorizontal className="h-3.5 w-3.5" />
-                        </IconAction>
+                        <span className="rounded-full bg-warm-100 px-2 py-0.5 text-[10px] font-semibold text-warm-500">
+                          All analyses
+                        </span>
                       }
                     />
                     <div className="mt-3">
@@ -655,17 +655,14 @@ function DashboardPage() {
               </GlassPanel>
 
               {/* Top Contributors */}
-              <GlassPanel className={cn(isViewingAnalysis && "ring-1 ring-brand/10")}>
+              <GlassPanel className={cn(isViewingAnalysis && "ring-1 ring-warm-300")}>
                 <div className="p-5">
                   <CardHeader
                     title={isViewingAnalysis ? "Contributors" : "Top Contributors"}
                     actions={
-                      <IconAction
-                        onClick={() => toast("Contributor filters coming soon")}
-                        title="Filter contributors"
-                      >
-                        <SlidersHorizontal className="h-3.5 w-3.5" />
-                      </IconAction>
+                      <span className="rounded-full bg-warm-100 px-2 py-0.5 text-[10px] font-semibold text-warm-500">
+                        {isViewingAnalysis ? "This analysis" : "All analyses"}
+                      </span>
                     }
                   />
                   <div className="mt-4 space-y-3">
@@ -698,19 +695,24 @@ function DashboardPage() {
 
             {/* ──── Row 2, Columns 2-3: Score Distribution ──── */}
             <GlassPanel
-              className={cn("hero-fade-in lg:col-span-2 xl:col-span-2", isViewingAnalysis && "ring-1 ring-brand/10")}
+              className={cn("hero-fade-in lg:col-span-2 xl:col-span-2", isViewingAnalysis && "ring-1 ring-warm-300")}
               style={{ animationDelay: "0.24s" }}
             >
               <div className="p-5">
                 <CardHeader
-                  title={isViewingAnalysis ? `Score Distribution — ${selectedAnalysis?.title ?? ""}` : "Score Distribution"}
+                  title="Score Distribution"
                   actions={
-                    <IconAction
-                      onClick={() => setScoreSortAsc((v) => !v)}
-                      title={scoreSortAsc ? "Sort: Low → High" : "Sort: High → Low"}
-                    >
-                      <SlidersHorizontal className="h-3.5 w-3.5" />
-                    </IconAction>
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full bg-warm-100 px-2 py-0.5 text-[10px] font-semibold text-warm-500">
+                        {isViewingAnalysis ? "This analysis" : "All analyses"}
+                      </span>
+                      <IconAction
+                        onClick={() => setScoreSortAsc((v) => !v)}
+                        title={scoreSortAsc ? "Sort: Low → High" : "Sort: High → Low"}
+                      >
+                        <SlidersHorizontal className="h-3.5 w-3.5" />
+                      </IconAction>
+                    </div>
                   }
                 />
                 <div className="mt-4 space-y-4">
