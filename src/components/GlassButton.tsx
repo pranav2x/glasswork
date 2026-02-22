@@ -20,7 +20,7 @@ const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
 
     const variants = {
       primary:
-        "bg-brand text-white shadow-layered hover:bg-brand-dark hover:shadow-layered-md hover:scale-[1.02] active:scale-[0.98]",
+        "bg-warm-900 text-white shadow-layered hover:bg-warm-800 hover:shadow-layered-md hover:scale-[1.02] active:scale-[0.98]",
       secondary:
         "border border-warm-200 bg-white text-warm-700 shadow-card hover:-translate-y-0.5 hover:shadow-card-hover active:translate-y-0",
       ghost:

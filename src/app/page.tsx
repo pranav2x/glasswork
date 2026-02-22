@@ -7,7 +7,7 @@ import { useConvexAuth, useMutation } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../../convex/_generated/api";
-import { Github, Clock, ArrowRight } from "lucide-react";
+import { Github, Clock, ArrowRight, FileText } from "lucide-react";
 import { TypewriterPlaceholder } from "@/components/TypewriterPlaceholder";
 
 // Pre-seeded heatmap data (no Math.random — avoids hydration mismatch)
@@ -49,10 +49,20 @@ export default function LandingPage() {
     }
   }, [isAuthenticated, router, signIn]);
 
+  function detectInput(raw: string): { type: "google_doc" | "github_repo"; id: string } | null {
+    const trimmed = raw.trim();
+    const gdoc = trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (gdoc) return { type: "google_doc", id: gdoc[1] };
+    const ghUrl = trimmed.match(/github\.com\/([a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+)/);
+    if (ghUrl) return { type: "github_repo", id: ghUrl[1].replace(/\.git$/, "") };
+    if (/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(trimmed)) return { type: "github_repo", id: trimmed };
+    return null;
+  }
+
   const handleRepoAnalyze = useCallback(async () => {
-    const trimmed = repoInput.trim();
-    if (!/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(trimmed)) {
-      setError('Use "owner/repo" format (e.g. "facebook/react")');
+    const detected = detectInput(repoInput);
+    if (!detected) {
+      setError('Paste a Google Doc link or a GitHub repo (e.g. "facebook/react")');
       return;
     }
 
@@ -68,10 +78,11 @@ export default function LandingPage() {
     setIsSubmitting(true);
     setError(null);
     try {
+      const title = detected.type === "github_repo" ? detected.id : "Google Doc";
       const analysisId = await createAnalysis({
-        sourceType: "github_repo",
-        sourceId: trimmed,
-        title: trimmed,
+        sourceType: detected.type,
+        sourceId: detected.id,
+        title,
       });
       router.push(`/results/${analysisId}`);
     } catch (err) {
@@ -158,7 +169,11 @@ export default function LandingPage() {
             {/* Quick repo input */}
             <div className="mx-auto mt-4 w-full max-w-md">
               <div className="relative flex items-center gap-2 rounded-2xl border border-warm-200 bg-white p-2 shadow-layered transition-all focus-within:border-warm-400 focus-within:ring-2 focus-within:ring-warm-200">
-                <Github className="ml-3 h-4 w-4 shrink-0 text-warm-400" />
+                <div className="ml-3 flex shrink-0 items-center gap-1">
+                  <Github className="h-4 w-4 text-warm-400" />
+                  <span className="text-warm-300 text-[10px]">/</span>
+                  <FileText className="h-4 w-4 text-warm-400" />
+                </div>
                 <div className="relative min-w-0 flex-1">
                   <input
                     type="text"
@@ -180,7 +195,7 @@ export default function LandingPage() {
                   )}
                   {!repoInput && inputFocused && (
                     <div className="pointer-events-none absolute inset-0 flex items-center text-[15px] text-warm-400">
-                      owner/repo — e.g. facebook/react
+                      owner/repo or paste a Google Doc link
                     </div>
                   )}
                 </div>
@@ -196,7 +211,7 @@ export default function LandingPage() {
                 <p className="mt-2 text-[12px] text-danger">{error}</p>
               )}
               <p className="mt-2 text-[12px] text-warm-400">
-                Public repos only. No tokens required.
+                GitHub repos &amp; Google Docs supported.
               </p>
 
               {/* Quick demo button */}
@@ -309,10 +324,10 @@ export default function LandingPage() {
 
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-200 text-[11px] font-bold text-warm-700">A</div>
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-200 text-[11px] font-bold text-warm-700">E</div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-medium text-warm-800">Alex Chen</span>
+                    <span className="text-[12px] font-medium text-warm-800">Eddy Xu</span>
                     <span className="text-[11px] font-semibold text-warm-900">172</span>
                   </div>
                   <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-warm-100">
@@ -322,10 +337,10 @@ export default function LandingPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-200 text-[11px] font-bold text-warm-600">S</div>
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-200 text-[11px] font-bold text-warm-600">M</div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-medium text-warm-800">Sarah Kim</span>
+                    <span className="text-[12px] font-medium text-warm-800">Madhav Rapelli</span>
                     <span className="text-[11px] font-semibold text-warm-700">118</span>
                   </div>
                   <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-warm-100">
@@ -338,7 +353,7 @@ export default function LandingPage() {
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-100 text-[11px] font-bold text-warm-400">M</div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-medium text-warm-800">Mike Torres</span>
+                    <span className="text-[12px] font-medium text-warm-800">Max Lee</span>
                     <span className="text-[11px] font-semibold text-warm-400">34</span>
                   </div>
                   <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-warm-100">
@@ -533,9 +548,9 @@ export default function LandingPage() {
                     <div className="mb-5 text-[16px] font-bold text-warm-900">Analysis Results</div>
                     <div className="grid flex-1 grid-cols-3 gap-4">
                       {[
-                        { name: "Alex Chen", score: 172, tier: "LOCKED IN", pct: "86%", hm: HEATMAP_DATA.alex },
-                        { name: "Sarah Kim", score: 118, tier: "SOLID", pct: "59%", hm: HEATMAP_DATA.sarah },
-                        { name: "Mike Torres", score: 34, tier: "NOT LOCKED IN", pct: "17%", hm: HEATMAP_DATA.mike },
+                        { name: "Eddy Xu", score: 172, tier: "LOCKED IN", pct: "86%", hm: HEATMAP_DATA.alex },
+                        { name: "Madhav Rapelli", score: 118, tier: "SOLID", pct: "59%", hm: HEATMAP_DATA.sarah },
+                        { name: "Max Lee", score: 34, tier: "NOT LOCKED IN", pct: "17%", hm: HEATMAP_DATA.mike },
                       ].map((c, idx) => (
                         <div key={c.name} className="flex flex-col rounded-2xl border border-warm-200 p-4">
                           {/* Avatar */}
