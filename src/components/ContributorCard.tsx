@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 interface ContributorCardProps {
   contributor: Contributor;
   index: number;
+  maxScore?: number;
 }
 
 const tierConfig = {
@@ -58,7 +59,7 @@ function AnimatedScore({ value, tier }: { value: number; tier: string }) {
   );
 }
 
-export function ContributorCard({ contributor, index }: ContributorCardProps) {
+export function ContributorCard({ contributor, index, maxScore }: ContributorCardProps) {
   const { name, avatarUrl, email, handle, source, stats, fairShareScore, tier, heatmapData } =
     contributor;
   const tierInfo = tierConfig[tier];
@@ -74,6 +75,7 @@ export function ContributorCard({ contributor, index }: ContributorCardProps) {
 
   return (
     <motion.div
+      className="h-full"
       initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
       animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       transition={{
@@ -83,7 +85,7 @@ export function ContributorCard({ contributor, index }: ContributorCardProps) {
       }}
     >
       <div className={cn(
-        "group flex flex-col gap-5 rounded-2xl border border-warm-200 bg-white p-6 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover",
+        "group flex h-full flex-col gap-5 rounded-2xl border border-warm-200 bg-white p-6 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover",
         showGlow && "animate-golden-glow"
       )}>
         {/* Avatar + Name */}
@@ -171,7 +173,7 @@ export function ContributorCard({ contributor, index }: ContributorCardProps) {
         </div>
 
         {/* Score + Tier + Heatmap */}
-        <div className="flex items-end justify-between">
+        <div className="mt-auto flex items-end justify-between">
           <div>
             <AnimatedScore value={fairShareScore} tier={tier} />
             <motion.div
@@ -194,6 +196,16 @@ export function ContributorCard({ contributor, index }: ContributorCardProps) {
             </motion.div>
           </div>
           <LiquidHeatmap mode={source} data={heatmapData} />
+        </div>
+
+        {/* Score Progress Bar */}
+        <div className="h-1.5 overflow-hidden rounded-full bg-warm-100">
+          <motion.div
+            className="h-full rounded-full bg-warm-800"
+            initial={{ width: 0 }}
+            animate={{ width: `${Math.min(100, (fairShareScore / (maxScore ?? Math.max(fairShareScore, 100))) * 100)}%` }}
+            transition={{ delay: (index * 0.15) + 0.8, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          />
         </div>
       </div>
     </motion.div>

@@ -23,7 +23,7 @@ export function DonutChart({ segments }: DonutChartProps) {
   if (total === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8">
-        <div className="h-[140px] w-[140px] rounded-full border-[11px] border-warm-100" />
+        <div className="h-[200px] w-[200px] rounded-full border-[14px] border-warm-100" />
         <p className="mt-3 text-[12px] font-medium text-warm-400">No analyses yet</p>
       </div>
     );
@@ -36,7 +36,7 @@ export function DonutChart({ segments }: DonutChartProps) {
 
   return (
     <div className="flex flex-col items-center">
-      <svg viewBox="0 0 100 100" className="h-[140px] w-[140px]">
+      <svg viewBox="0 0 100 100" className="h-[200px] w-[200px]">
         {segments.map((seg, i) => {
           const pct = seg.value / total;
           const dashLength = pct * circumference;

@@ -11,6 +11,50 @@ import {
   type ContributionInput,
 } from "./scoring";
 
+// ─── DEMO MODE ───────────────────────────────────────────────────────────────
+// Set to true when filming. Uses the real doc title but injects fake contributors.
+// Flip back to false before shipping.
+const DEMO_MODE = true;
+
+const DEMO_CONTRIBUTORS = [
+  {
+    name: "Priya Sharma",
+    emailOrHandle: "ps847@cornell.edu",
+    score: 171,
+    tier: "carry" as const,
+    rawStats: { revisions: 89, charsAdded: 38400, wordsAdded: 6340 },
+    heatmapData: [0.1,0.2,0.3,0.5,0.6,0.7,0.8,1.0,0.9,0.8,0.7,0.9,1.0,0.8,0.7,0.6,0.8,0.9,0.7,0.5],
+  },
+  {
+    name: "Marcus Okafor",
+    emailOrHandle: "mo614@cornell.edu",
+    score: 82,
+    tier: "solid" as const,
+    rawStats: { revisions: 34, charsAdded: 14100, wordsAdded: 2310 },
+    heatmapData: [0.1,0.2,0.3,0.4,0.5,0.6,0.6,0.7,0.5,0.4,0.5,0.6,0.7,0.5,0.4,0.6,0.5,0.4,0.3,0.2],
+  },
+  {
+    name: "Darius Webb",
+    emailOrHandle: "dw392@cornell.edu",
+    score: 31,
+    tier: "ghost" as const,
+    rawStats: { revisions: 9, charsAdded: 3200, wordsAdded: 510 },
+    heatmapData: [0.0,0.0,0.1,0.2,0.0,0.0,0.3,0.0,0.1,0.0,0.0,0.0,0.2,0.0,0.0,0.0,0.3,0.0,0.0,0.0],
+  },
+  {
+    name: "Jordan Holt",
+    emailOrHandle: "jh503@cornell.edu",
+    score: 11,
+    tier: "ghost" as const,
+    rawStats: { revisions: 3, charsAdded: 740, wordsAdded: 120 },
+    heatmapData: [0.0,0.0,0.0,0.0,0.0,0.1,0.0,0.0,0.0,0.0,0.0,0.2,0.0,0.0,0.0,0.0,0.0,0.1,0.0,0.0],
+  },
+];
+
+const DEMO_SUMMARY =
+  "Priya Sharma wrote 87% of this document across 89 revisions — essentially the entire report — while her three teammates collectively contributed fewer than 700 words over the same 3-week period. Marcus Okafor pulled a modest share late in the project, but Darius Webb and Jordan Holt's heatmaps flatline for the final two weeks, suggesting they checked out entirely before the deadline.";
+// ─────────────────────────────────────────────────────────────────────────────
+
 interface GoogleRevision {
   id: string;
   modifiedTime: string;
@@ -102,6 +146,25 @@ export const analyzeGoogleDoc = internalAction({
       }
 
       const metadata: GoogleFileMetadata = await metaRes.json();
+
+      // ── Demo mode: skip real analysis, inject fake data ──
+      if (DEMO_MODE) {
+        await ctx.runMutation(internal.analyses.writeContributors, {
+          analysisId: args.analysisId,
+          contributors: DEMO_CONTRIBUTORS,
+        });
+        await ctx.runMutation(internal.analyses.updateAnalysisStatus, {
+          analysisId: args.analysisId,
+          status: "ready",
+          title: metadata.name,
+        });
+        await ctx.runMutation(internal.analyses.updateSummary, {
+          analysisId: args.analysisId,
+          summary: DEMO_SUMMARY,
+        });
+        return;
+      }
+      // ─────────────────────────────────────────────────────
 
       const revisionsRes = await googleFetch(
         ctx,

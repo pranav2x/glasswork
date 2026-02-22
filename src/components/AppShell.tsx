@@ -13,15 +13,18 @@ import { cn } from "@/lib/utils";
 import {
   Search,
   LayoutGrid,
+  BarChart3,
+  FileText,
   Settings,
   LogOut,
+  GitBranch,
 } from "lucide-react";
 
 interface AppShellProps {
   children: React.ReactNode;
 }
 
-/* ─── Settings Popover ─── */
+/* ─── Settings Popover (for collapsed sidebar) ─── */
 
 function SettingsPopover() {
   const { signOut } = useAuthActions();
@@ -33,7 +36,7 @@ function SettingsPopover() {
   useClickOutside(ref, close);
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative lg:hidden" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
         className={cn(
@@ -97,9 +100,9 @@ function SettingsPopover() {
   );
 }
 
-/* ─── Sidebar Icon ─── */
+/* ─── Sidebar Nav Item ─── */
 
-function SidebarIcon({
+function SidebarNavItem({
   icon: Icon,
   label,
   isActive,
@@ -112,28 +115,36 @@ function SidebarIcon({
   href?: string;
   onClick?: () => void;
 }) {
-  const content = (
+  const inner = (
     <button
       onClick={onClick}
       className={cn(
-        "group/icon relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200",
+        "group/icon relative flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 transition-all duration-200",
         isActive
-          ? "bg-white/80 text-warm-800 shadow-sm"
-          : "text-warm-400 hover:bg-white/60 hover:text-warm-600"
+          ? "bg-warm-200 text-warm-900"
+          : "text-warm-500 hover:bg-warm-100 hover:text-warm-700"
       )}
-      title={label}
     >
-      <Icon className="h-[18px] w-[18px]" strokeWidth={1.5} />
-      <span className="pointer-events-none absolute left-[52px] whitespace-nowrap rounded-lg bg-warm-900 px-2.5 py-1 text-[11px] font-medium text-white opacity-0 shadow-md transition-opacity group-hover/icon:opacity-100">
+      <Icon className="h-[16px] w-[16px] shrink-0" strokeWidth={1.5} />
+      <span
+        className={cn(
+          "hidden text-[11px] font-medium lg:block",
+          isActive ? "text-warm-900" : "text-warm-500"
+        )}
+      >
+        {label}
+      </span>
+      {/* Tooltip for collapsed sidebar */}
+      <span className="pointer-events-none absolute left-[44px] whitespace-nowrap rounded-lg bg-warm-900 px-2.5 py-1 text-[11px] font-medium text-white opacity-0 shadow-md transition-opacity group-hover/icon:opacity-100 lg:hidden">
         {label}
       </span>
     </button>
   );
 
   if (href) {
-    return <Link href={href}>{content}</Link>;
+    return <Link href={href}>{inner}</Link>;
   }
-  return content;
+  return inner;
 }
 
 /* ─── Sidebar ─── */
@@ -141,6 +152,7 @@ function SidebarIcon({
 function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const recentAnalyses = useQuery(api.analyses.listAnalyses, {});
 
   const handleSearch = () => {
     if (pathname !== "/app") {
@@ -152,33 +164,91 @@ function Sidebar() {
 
   const isAnalysesActive =
     pathname === "/app" || pathname.startsWith("/results");
+  const isAnalyticsActive = pathname === "/app/analytics";
+  const isReportsActive = pathname === "/app/reports";
+  const isSettingsActive = pathname === "/app/settings";
 
   return (
-    <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col items-center bg-transparent">
-      <div className="flex h-14 items-center justify-center">
-        <Link href="/" title="Back to home">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-warm-900 shadow-sm transition-transform duration-200 hover:scale-105">
-            <div className="grid h-4 w-4 grid-cols-2 gap-[2px]">
+    <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col border-r border-warm-100 bg-warm-50/50 lg:w-[200px]">
+      {/* Logo + Brand */}
+      <div className="flex h-14 items-center gap-2 px-3 lg:px-4">
+        <Link href="/" title="Back to home" className="flex items-center gap-2">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-warm-900 shadow-sm transition-transform duration-200 hover:scale-105">
+            <div className="grid h-3.5 w-3.5 grid-cols-2 gap-[2px]">
               <div className="h-1.5 w-1.5 rounded-[2px] bg-white" />
               <div className="h-1.5 w-1.5 rounded-[2px] bg-white" />
               <div className="h-1.5 w-1.5 rounded-[2px] bg-white" />
               <div className="h-1.5 w-1.5 rounded-[2px] bg-white" />
             </div>
           </div>
+          <span className="hidden text-[13px] font-bold text-warm-800 lg:block">
+            Glasswork
+          </span>
         </Link>
       </div>
 
-      <nav className="mt-2 flex flex-1 flex-col items-center gap-1">
-        <SidebarIcon icon={Search} label="Search" onClick={handleSearch} />
-        <SidebarIcon
+      {/* Navigation */}
+      <nav className="mt-2 flex flex-col gap-1 px-2 lg:px-3">
+        <SidebarNavItem
+          icon={Search}
+          label="Search"
+          onClick={handleSearch}
+        />
+        <SidebarNavItem
           icon={LayoutGrid}
           label="Analyses"
           href="/app"
           isActive={isAnalysesActive}
         />
+        <SidebarNavItem
+          icon={BarChart3}
+          label="Analytics"
+          href="/app/analytics"
+          isActive={isAnalyticsActive}
+        />
+        <SidebarNavItem
+          icon={FileText}
+          label="Reports"
+          href="/app/reports"
+          isActive={isReportsActive}
+        />
+        <SidebarNavItem
+          icon={Settings}
+          label="Settings"
+          href="/app/settings"
+          isActive={isSettingsActive}
+        />
       </nav>
 
-      <div className="mb-4">
+      {/* Recent section (expanded sidebar only) */}
+      <div className="mt-6 hidden px-4 lg:block">
+        <div className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-warm-400">
+          Recent
+        </div>
+        <div className="space-y-1">
+          {recentAnalyses && recentAnalyses.length > 0 ? (
+            recentAnalyses.slice(0, 3).map((a) => (
+              <Link key={a._id} href={`/results/${a._id}`}>
+                <div className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 transition-colors hover:bg-warm-100">
+                  {a.sourceType === "github_repo" ? (
+                    <GitBranch className="h-3 w-3 shrink-0 text-warm-400" />
+                  ) : (
+                    <FileText className="h-3 w-3 shrink-0 text-warm-400" />
+                  )}
+                  <span className="truncate text-[10px] text-warm-500">
+                    {a.title}
+                  </span>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <p className="px-2.5 text-[10px] text-warm-400">No analyses yet</p>
+          )}
+        </div>
+      </div>
+
+      {/* Bottom: Settings popover (collapsed sidebar only) */}
+      <div className="mt-auto mb-4 flex justify-center lg:hidden">
         <SettingsPopover />
       </div>
     </aside>
@@ -224,10 +294,10 @@ function DashboardTopBar() {
   return (
     <header className="sticky top-0 z-20 bg-white/70 backdrop-blur-xl">
       <div className="flex h-14 items-center justify-between px-6">
-        {/* Left: Brand */}
+        {/* Left: Brand (hidden on lg where sidebar shows it) */}
         <Link
           href="/app"
-          className="flex items-center gap-2 transition-opacity hover:opacity-70"
+          className="flex items-center gap-2 transition-opacity hover:opacity-70 lg:invisible"
         >
           <span className="font-display text-lg text-warm-800 tracking-tight italic">
             glasswork
@@ -257,7 +327,7 @@ export function AppShell({ children }: AppShellProps) {
     return (
       <div className="relative min-h-screen bg-white grain-overlay">
         <Sidebar />
-        <div className="relative z-10 pl-[56px]">
+        <div className="relative z-10 pl-[56px] lg:pl-[200px]">
           <DashboardTopBar />
           <main className="relative">{children}</main>
         </div>

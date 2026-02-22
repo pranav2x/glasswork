@@ -3,44 +3,16 @@
 import { Suspense, useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { useConvexAuth, useQuery, useMutation } from "convex/react";
+import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { NewAnalysisModal } from "@/components/NewAnalysisModal";
 import { GlassPanel } from "@/components/GlassPanel";
-import {
-  DonutChart,
-  ActivityChart,
-  ScoreBar,
-  AnalysisItem,
-  ReportItem,
-  ContributorTicket,
-} from "@/components/DashboardWidgets";
-import {
-  Plus,
-  Search,
-  ArrowUpRight,
-  SlidersHorizontal,
-  FileText,
-  GitBranch,
-  Calendar,
-  Trash2,
-  X,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+import { DonutChart } from "@/components/DashboardWidgets";
+import { Plus, Search } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getInitials, formatTimeAgo } from "@/lib/formatters";
-import { Id } from "../../../convex/_generated/dataModel";
+import { getInitials } from "@/lib/formatters";
 
 /* ─── Sub-components ─── */
-
-function DocIcon({ color }: { color: string }) {
-  return <FileText className="h-4 w-4" style={{ color }} />;
-}
-
-function RepoIcon({ color }: { color: string }) {
-  return <GitBranch className="h-4 w-4" style={{ color }} />;
-}
 
 function CardHeader({
   title,
@@ -57,27 +29,6 @@ function CardHeader({
   );
 }
 
-function IconAction({ children, className, onClick, title }: { children: React.ReactNode; className?: string; onClick?: () => void; title?: string }) {
-  return (
-    <button
-      onClick={onClick}
-      title={title}
-      className={cn(
-        "flex h-7 w-7 items-center justify-center rounded-lg text-warm-400 transition-colors hover:bg-warm-100 hover:text-warm-600",
-        className
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
-const TIME_FILTERS = [
-  { label: "Today", value: "today" as const },
-  { label: "This Week", value: "week" as const },
-  { label: "All Time", value: "month" as const },
-];
-
 /* ─── Main Dashboard ─── */
 
 export default function DashboardPageWrapper() {
@@ -93,34 +44,10 @@ function DashboardPage() {
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTaskFilter, setActiveTaskFilter] = useState<"docs" | "repos">("docs");
-  const [activeTimeFilter, setActiveTimeFilter] = useState<"today" | "week" | "month">("month");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedAnalysisId, setSelectedAnalysisId] = useState<Id<"analyses"> | null>(null);
-  const [scoreSortAsc, setScoreSortAsc] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const deleteAnalysisMutation = useMutation(api.analyses.deleteAnalysis);
 
-  const dashboardData = useQuery(api.analyses.getDashboardStats, { timeFilter: activeTimeFilter });
-
-  // Fetch selected analysis detail when one is selected
-  const selectedAnalysis = useQuery(
-    api.analyses.getAnalysis,
-    selectedAnalysisId ? { analysisId: selectedAnalysisId } : "skip"
-  );
-
-  const handleDeleteAnalysis = useCallback(
-    async (analysisId: Id<"analyses">, title: string) => {
-      if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return;
-      try {
-        await deleteAnalysisMutation({ analysisId });
-        toast.success("Analysis deleted");
-      } catch {
-        toast.error("Failed to delete analysis");
-      }
-    },
-    [deleteAnalysisMutation]
-  );
+  const dashboardData = useQuery(api.analyses.getDashboardStats, { timeFilter: "month" });
 
   // Listen for sidebar search focus event
   const handleFocusSearch = useCallback(() => {
@@ -149,8 +76,13 @@ function DashboardPage() {
     return (
       <div className="space-y-6 p-6">
         <Skeleton className="h-10 w-64 rounded-xl bg-warm-200" />
-        <div className="grid grid-cols-1 gap-5 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
+        <div className="grid grid-cols-3 gap-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-[80px] rounded-2xl bg-warm-100" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+          {Array.from({ length: 2 }).map((_, i) => (
             <Skeleton key={i} className="h-[280px] rounded-2xl bg-warm-100" />
           ))}
         </div>
@@ -158,175 +90,26 @@ function DashboardPage() {
     );
   }
 
-  // Derive all widget data from the query
-  const { analyses, statusCounts, scoreDistribution, totalContributors, topContributors, activityByMonth } = dashboardData;
-
-  const query = searchQuery.toLowerCase().trim();
-  const isViewingAnalysis = selectedAnalysisId !== null && selectedAnalysis?.status === "ready";
-  const selectedContributors = isViewingAnalysis ? (selectedAnalysis.contributors ?? []) : [];
-
-  const filteredAnalyses = analyses.filter((a) => {
-    const matchesType =
-      activeTaskFilter === "docs"
-        ? a.sourceType === "google_doc"
-        : a.sourceType === "github_repo";
-    if (!matchesType) return false;
-    if (!query) return true;
-    return (
-      a.title.toLowerCase().includes(query) ||
-      a.topContributor?.name.toLowerCase().includes(query)
-    );
-  });
-
-  // --- Donut chart: aggregate or per-analysis ---
-  const donutSegments = isViewingAnalysis
-    ? [
-        { value: selectedContributors.filter((c) => c.tier === "carry").length, color: "#D4A017", label: "Locked In" },
-        { value: selectedContributors.filter((c) => c.tier === "solid").length, color: "#2DA44E", label: "Solid" },
-        { value: selectedContributors.filter((c) => c.tier === "ghost").length, color: "#E53935", label: "Not Locked In" },
-      ]
-    : [
-        { value: statusCounts.ready, color: "#4A96D9", label: "Completed" },
-        { value: statusCounts.pending, color: "#F5A623", label: "In Progress" },
-        { value: statusCounts.error, color: "#E53935", label: "Failed" },
-      ];
-
-  // --- Score distribution: aggregate or per-analysis ---
-  const perAnalysisContributorCount = selectedContributors.length;
-  const perAnalysisScoreDist = isViewingAnalysis
-    ? {
-        excellent: selectedContributors.filter((c) => c.score >= 150).length,
-        good: selectedContributors.filter((c) => c.score >= 100 && c.score < 150).length,
-        fair: selectedContributors.filter((c) => c.score >= 60 && c.score < 100).length,
-        needsWork: selectedContributors.filter((c) => c.score >= 30 && c.score < 60).length,
-        minimal: selectedContributors.filter((c) => c.score < 30).length,
-      }
-    : scoreDistribution;
-
-  const effectiveTotal = isViewingAnalysis ? perAnalysisContributorCount : totalContributors;
-
-  const scoreBars = [
-    { label: "Excellent", count: perAnalysisScoreDist.excellent, total: "Score 150–200", percentage: effectiveTotal > 0 ? Math.round((perAnalysisScoreDist.excellent / effectiveTotal) * 100) : 0, color: "#2DA44E" },
-    { label: "Good", count: perAnalysisScoreDist.good, total: "Score 100–149", percentage: effectiveTotal > 0 ? Math.round((perAnalysisScoreDist.good / effectiveTotal) * 100) : 0, color: "#4A96D9" },
-    { label: "Fair", count: perAnalysisScoreDist.fair, total: "Score 60–99", percentage: effectiveTotal > 0 ? Math.round((perAnalysisScoreDist.fair / effectiveTotal) * 100) : 0, color: "#9B6FE3" },
-    { label: "Needs Work", count: perAnalysisScoreDist.needsWork, total: "Score 30–59", percentage: effectiveTotal > 0 ? Math.round((perAnalysisScoreDist.needsWork / effectiveTotal) * 100) : 0, color: "#E53935" },
-    { label: "Minimal", count: perAnalysisScoreDist.minimal, total: "Score 0–29", percentage: effectiveTotal > 0 ? Math.round((perAnalysisScoreDist.minimal / effectiveTotal) * 100) : 0, color: "#F5A623" },
-  ];
-
-  // --- Activity: aggregate or per-analysis contributor scores ---
-  const months = activityByMonth.map((m) => m.month);
-  const docsActivityData = activityByMonth.map((m) => m.docsCount);
-  const reposActivityData = activityByMonth.map((m) => m.reposCount);
-
-  const recentReports = analyses
-    .filter((a) => a.status === "ready")
-    .slice(0, 3)
-    .map((a) => ({
-      label: a.sourceType === "google_doc" ? "Doc Analysis" : "Repo Analysis",
-      title: a.title,
-      time: formatTimeAgo(a.updatedAt),
-      iconBg: a.sourceType === "google_doc" ? "#EEF0FF" : "#F0FDF4",
-      iconColor: a.sourceType === "google_doc" ? "#6C63FF" : "#2DA44E",
-      type: a.sourceType === "google_doc" ? "doc" : "repo",
-      analysisId: a._id,
-    }));
-
-  // --- Top contributors: aggregate or per-analysis ---
-  const isRepoAnalysis = selectedAnalysis?.sourceType === "github_repo";
-
-  const topContributorCards = isViewingAnalysis
-    ? selectedContributors
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 5)
-        .map((c) => ({
-          name: c.name,
-          message: `Score: ${c.score} · ${c.tier}`,
-          initials: getInitials(c.name),
-          color: c.tier === "carry" ? "#F5A623" : c.tier === "solid" ? "#2DA44E" : "#E53935",
-          avatarUrl: c.avatarUrl,
-          firstAnalysisId: selectedAnalysisId!,
-          profileUrl: isRepoAnalysis && c.emailOrHandle
-            ? `https://github.com/${c.emailOrHandle}`
-            : undefined,
-        }))
-    : topContributors
-        .filter((c) => !query || c.name.toLowerCase().includes(query))
-        .slice(0, 3)
-        .map((c) => ({
-          name: c.name,
-          message: `Score: ${c.score} across ${c.analysisCount} ${c.analysisCount === 1 ? "analysis" : "analyses"}`,
-          initials: getInitials(c.name),
-          color: c.tier === "carry" ? "#F5A623" : c.tier === "solid" ? "#2DA44E" : "#E53935",
-          avatarUrl: c.avatarUrl,
-          firstAnalysisId: c.firstAnalysisId,
-          profileUrl: c.emailOrHandle && !c.emailOrHandle.includes("@")
-            ? `https://github.com/${c.emailOrHandle}`
-            : undefined,
-        }));
-
+  const { analyses, totalContributors, topContributors } = dashboardData;
   const isEmpty = analyses.length === 0;
 
   return (
     <>
       <div className="space-y-6">
-        {/* ─── Context Banner ─── */}
-        {isViewingAnalysis && (
-          <div className="hero-fade-in mb-2 flex items-center justify-between rounded-xl border border-warm-200 bg-warm-50 px-4 py-2.5">
-            <div className="flex items-center gap-2.5">
-              <span className="rounded-full bg-warm-900 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                {selectedAnalysis?.sourceType === "google_doc" ? "Doc" : "Repo"}
-              </span>
-              <span className="text-[13px] font-semibold text-warm-800">
-                {selectedAnalysis?.title}
-              </span>
-              <span className="text-[11px] text-warm-400">— Individual analysis</span>
-            </div>
-            <button
-              onClick={() => setSelectedAnalysisId(null)}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-warm-900 px-3 py-1.5 text-[11px] font-semibold text-white transition-colors hover:bg-warm-800"
-            >
-              <X className="h-3 w-3" />
-              Back to All Analyses
-            </button>
-          </div>
-        )}
-
         {/* ─── Header ─── */}
         <div className="hero-fade-in flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-[13px] font-medium text-warm-400">
-              {isViewingAnalysis
-                ? `Showing stats for this ${selectedAnalysis?.sourceType === "google_doc" ? "doc" : "repo"} only`
-                : "Overview of all your analyses combined"}
+              Overview of all your analyses combined
             </p>
             <h1 className="mt-0.5 text-[28px] font-bold tracking-tight text-warm-900">
-              {isViewingAnalysis ? selectedAnalysis?.title : "All Analyses"}
+              Dashboard
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            {/* Time filter pills */}
-            <div
-              className="hero-fade-in flex items-center gap-1 rounded-full border border-warm-200 bg-white p-1 shadow-sm"
-              style={{ animationDelay: "0.04s" }}
-            >
-              {TIME_FILTERS.map((filter) => (
-                <button
-                  key={filter.value}
-                  onClick={() => setActiveTimeFilter(filter.value)}
-                  className={cn(
-                    "rounded-full px-4 py-1.5 text-[12px] font-semibold transition-all duration-200",
-                    activeTimeFilter === filter.value
-                      ? "bg-warm-900 text-white shadow-sm"
-                      : "text-warm-500 hover:text-warm-700 hover:bg-warm-50"
-                  )}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
             <div
               className="hero-fade-in flex items-center gap-2.5 rounded-2xl border border-warm-200 bg-white px-4 py-2.5 shadow-sm"
-              style={{ animationDelay: "0.06s" }}
+              style={{ animationDelay: "0.04s" }}
             >
               <Search className="h-4 w-4 text-warm-400" />
               <input
@@ -357,386 +140,89 @@ function DashboardPage() {
             </button>
           </div>
         ) : (
-          /* ─── Dashboard Grid ─── */
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-[260px_1fr_1fr_280px]">
-            {/* ──── Column 1: Recent Analyses (spans 2 rows) ──── */}
-            <GlassPanel className="hero-fade-in xl:row-span-2" style={{ animationDelay: "0.08s" }}>
-              <div className="p-5">
-                <CardHeader
-                  title="Recent Analyses"
-                  actions={
-                    <button
-                      onClick={() => setIsModalOpen(true)}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg bg-warm-900 text-white shadow-sm transition-all hover:bg-warm-800 hover:scale-105 active:scale-95"
-                    >
-                      <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
-                    </button>
-                  }
-                />
+          <>
+          {/* ─── Stat Cards Row ─── */}
+          <div className="hero-fade-in grid grid-cols-3 gap-4" style={{ animationDelay: "0.06s" }}>
+            {[
+              { label: "Analyses", value: analyses.length },
+              { label: "Contributors", value: totalContributors },
+              { label: "Avg Score", value: dashboardData.avgScore },
+            ].map((stat) => (
+              <GlassPanel key={stat.label} className="p-7">
+                <div className="text-[13px] font-medium text-warm-400">{stat.label}</div>
+                <div className="mt-2 text-[42px] font-bold leading-none text-warm-900">{stat.value}</div>
+              </GlassPanel>
+            ))}
+          </div>
 
-                {/* Filter pills */}
-                <div className="mt-3.5 flex gap-2">
-                  <button
-                    onClick={() => setActiveTaskFilter("docs")}
-                    className={cn(
-                      "rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-all",
-                      activeTaskFilter === "docs"
-                        ? "bg-warm-900 text-white shadow-sm"
-                        : "bg-warm-100 text-warm-500 hover:bg-warm-200 hover:text-warm-700"
-                    )}
-                  >
-                    Docs
-                  </button>
-                  <button
-                    onClick={() => setActiveTaskFilter("repos")}
-                    className={cn(
-                      "rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-all",
-                      activeTaskFilter === "repos"
-                        ? "bg-warm-900 text-white shadow-sm"
-                        : "bg-warm-100 text-warm-500 hover:bg-warm-200 hover:text-warm-700"
-                    )}
-                  >
-                    Repos
-                  </button>
+          {/* ─── Primary Section: Tier Distribution + Top Contributors ─── */}
+          <div className="hero-fade-in grid grid-cols-1 gap-5 md:grid-cols-2" style={{ animationDelay: "0.1s" }}>
+            {/* Score Distribution Donut (Tier-based, matching demo) */}
+            <GlassPanel hoverable className="flex flex-col">
+              <div className="flex flex-1 flex-col p-8">
+                <CardHeader title="Score Distribution" />
+                <div className="flex flex-1 items-center justify-center mt-4">
+                  <DonutChart
+                    segments={[
+                      { value: dashboardData.tierCounts.carry, color: "#111", label: "Locked In" },
+                      { value: dashboardData.tierCounts.solid, color: "#737373", label: "Solid" },
+                      { value: dashboardData.tierCounts.ghost, color: "#E5E5E5", label: "Not Locked" },
+                    ]}
+                  />
                 </div>
+              </div>
+            </GlassPanel>
 
-                {/* Active count */}
-                <div className="mt-3 flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-warm-900 text-[10px] font-bold text-white">
-                    {analyses.length}
-                  </span>
-                  <span className="text-[12px] font-medium text-warm-600">
-                    Active Analyses
-                  </span>
-                </div>
-
-                {/* Analysis list */}
-                <div className="mt-4 space-y-1">
-                  {filteredAnalyses.length === 0 ? (
+            {/* Top Contributors (matching demo style with progress bars) */}
+            <GlassPanel hoverable className="flex flex-col">
+              <div className="flex flex-1 flex-col p-8">
+                <CardHeader title="Top Contributors" />
+                <div className="mt-6 flex flex-1 flex-col justify-center space-y-5">
+                  {topContributors.length === 0 ? (
                     <p className="py-6 text-center text-[12px] text-warm-400">
-                      No {activeTaskFilter === "docs" ? "doc" : "repo"} analyses yet
+                      Run an analysis to see contributors
                     </p>
                   ) : (
-                    filteredAnalyses.map((item, i) => (
+                    topContributors.slice(0, 3).map((c) => (
                       <div
-                        key={item._id}
-                        className="group/item relative"
+                        key={c.name}
+                        className="flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-warm-50"
+                        onClick={() => router.push(`/results/${c.firstAnalysisId}`)}
                       >
-                        <div
-                          onClick={() => {
-                            if (item.status !== "ready") return;
-                            setSelectedAnalysisId(
-                              selectedAnalysisId === item._id ? null : item._id
-                            );
-                          }}
-                          className={cn(
-                            "rounded-xl transition-all",
-                            item.status === "ready" && "cursor-pointer",
-                            selectedAnalysisId === item._id &&
-                              "bg-warm-100 ring-1 ring-warm-300"
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm-200 text-[11px] font-bold text-warm-600">
+                          {c.avatarUrl ? (
+                            <Image
+                              src={c.avatarUrl}
+                              alt={c.name}
+                              width={36}
+                              height={36}
+                              className="h-full w-full object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            getInitials(c.name)
                           )}
-                        >
-                          <AnalysisItem
-                            icon={
-                              item.sourceType === "google_doc" ? (
-                                <DocIcon color="#6C63FF" />
-                              ) : (
-                                <RepoIcon color="#2DA44E" />
-                              )
-                            }
-                            iconBg={item.sourceType === "google_doc" ? "#EEF0FF" : "#F0FDF4"}
-                            title={item.title}
-                            description={
-                              item.status === "pending"
-                                ? "Analyzing..."
-                                : item.status === "error"
-                                  ? "Analysis failed"
-                                  : `${item.contributorCount} contributors`
-                            }
-                            isComplete={item.status === "ready"}
-                            delay={0.1 + i * 0.04}
-                          />
                         </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteAnalysis(item._id, item.title);
-                          }}
-                          className="absolute right-9 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-lg text-warm-300 opacity-0 transition-all hover:bg-red-50 hover:text-red-500 group-hover/item:opacity-100"
-                          aria-label={`Delete ${item.title}`}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
-                        </button>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[14px] font-medium text-warm-700">{c.name}</span>
+                            <span className="text-[14px] font-bold text-warm-900">{c.score}</span>
+                          </div>
+                          <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-warm-100">
+                            <div
+                              className="h-full rounded-full bg-warm-800 transition-all duration-500"
+                              style={{ width: `${Math.min(100, (c.score / 200) * 100)}%` }}
+                            />
+                          </div>
+                        </div>
                       </div>
                     ))
                   )}
                 </div>
               </div>
             </GlassPanel>
-
-            {/* ──── Column 2: Analysis Overview (Donut Chart) ──── */}
-            <GlassPanel
-              hoverable
-              className={cn("hero-fade-in", isViewingAnalysis && "ring-1 ring-warm-300")}
-              style={{ animationDelay: "0.12s" }}
-            >
-              <div className="p-5">
-                <CardHeader
-                  title={isViewingAnalysis ? "Tier Breakdown" : "Analysis Overview"}
-                  actions={
-                    <span className="rounded-full bg-warm-100 px-2 py-0.5 text-[10px] font-semibold text-warm-500">
-                      {isViewingAnalysis ? "This analysis" : "All analyses"}
-                    </span>
-                  }
-                />
-                <div className="mt-4">
-                  <DonutChart segments={donutSegments} />
-                </div>
-              </div>
-            </GlassPanel>
-
-            {/* ──── Column 3: Contribution Activity / Top Scores ──── */}
-            <GlassPanel
-              hoverable
-              className={cn("hero-fade-in", isViewingAnalysis && "ring-1 ring-warm-300")}
-              style={{ animationDelay: "0.16s" }}
-            >
-              <div className="p-5">
-                {isViewingAnalysis ? (
-                  <>
-                    <CardHeader
-                      title="Top Scores"
-                      actions={
-                        <button
-                          onClick={() => router.push(`/results/${selectedAnalysisId}`)}
-                          className="flex h-7 items-center gap-1 rounded-lg bg-warm-100 px-2.5 text-[11px] font-medium text-warm-600 transition-colors hover:bg-warm-200"
-                        >
-                          Full view
-                          <ArrowUpRight className="h-3 w-3" />
-                        </button>
-                      }
-                    />
-                    <div className="mt-4 space-y-2.5">
-                      {selectedContributors.length === 0 ? (
-                        <p className="py-6 text-center text-[12px] text-warm-400">No contributors</p>
-                      ) : (
-                        selectedContributors
-                          .sort((a, b) => b.score - a.score)
-                          .slice(0, 6)
-                          .map((c, i) => {
-                            const rankColors = ["#D4A017", "#6C63FF", "#2DA44E", "#E88D3F", "#9B6FE3", "#4A96D9"];
-                            const barColor = rankColors[i % rankColors.length];
-                            const tierColor = c.tier === "carry" ? "#D4A017" : c.tier === "solid" ? "#2DA44E" : "#E53935";
-
-                            return (
-                              <div key={c.name} className="flex items-center gap-2.5">
-                                <span className="w-4 text-right text-[10px] font-semibold text-warm-400">
-                                  {i + 1}
-                                </span>
-                                <div
-                                  className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-[9px] font-bold text-white"
-                                  style={{ backgroundColor: c.avatarUrl ? "transparent" : barColor }}
-                                >
-                                  {c.avatarUrl ? (
-                                    <Image
-                                      src={c.avatarUrl}
-                                      alt={c.name}
-                                      width={24}
-                                      height={24}
-                                      className="h-full w-full object-cover"
-                                      referrerPolicy="no-referrer"
-                                    />
-                                  ) : (
-                                    getInitials(c.name)
-                                  )}
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex items-center justify-between">
-                                    <span className="truncate text-[12px] font-medium text-warm-700">
-                                      {c.name}
-                                    </span>
-                                    <span
-                                      className="ml-2 text-[11px] font-bold"
-                                      style={{ color: tierColor }}
-                                    >
-                                      {c.score}
-                                    </span>
-                                  </div>
-                                  <div className="mt-0.5 h-1 w-full overflow-hidden rounded-full bg-warm-100">
-                                    <div
-                                      className="h-full rounded-full transition-all duration-500"
-                                      style={{
-                                        width: `${Math.min(100, (c.score / 200) * 100)}%`,
-                                        backgroundColor: barColor,
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <CardHeader
-                      title="Contribution Activity"
-                      actions={
-                        <span className="rounded-full bg-warm-100 px-2 py-0.5 text-[10px] font-semibold text-warm-500">
-                          All analyses
-                        </span>
-                      }
-                    />
-                    <div className="mt-3">
-                      <ActivityChart
-                        months={months}
-                        docsData={docsActivityData}
-                        reposData={reposActivityData}
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-            </GlassPanel>
-
-            {/* ──── Column 4: Right Sidebar (spans 2 rows) ──── */}
-            <div
-              className="hero-fade-in space-y-5 xl:row-span-2"
-              style={{ animationDelay: "0.2s" }}
-            >
-              {/* Recent Reports */}
-              <GlassPanel>
-                <div className="p-5">
-                  <CardHeader
-                    title="Recent Reports"
-                    actions={
-                      <IconAction>
-                        <Calendar className="h-3.5 w-3.5" />
-                      </IconAction>
-                    }
-                  />
-                  <div className="mt-4 space-y-3">
-                    {recentReports.length === 0 ? (
-                      <p className="py-4 text-center text-[12px] text-warm-400">
-                        No completed reports yet
-                      </p>
-                    ) : (
-                      recentReports.map((report) => (
-                        <div
-                          key={report.analysisId}
-                          onClick={() => router.push(`/results/${report.analysisId}`)}
-                          className="cursor-pointer"
-                        >
-                          <ReportItem
-                            label={report.label}
-                            title={report.title}
-                            time={report.time}
-                            icon={
-                              report.type === "doc" ? (
-                                <FileText
-                                  className="h-3 w-3"
-                                  style={{ color: report.iconColor }}
-                                />
-                              ) : (
-                                <GitBranch
-                                  className="h-3 w-3"
-                                  style={{ color: report.iconColor }}
-                                />
-                              )
-                            }
-                            iconBg={report.iconBg}
-                          />
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </GlassPanel>
-
-              {/* Top Contributors */}
-              <GlassPanel className={cn(isViewingAnalysis && "ring-1 ring-warm-300")}>
-                <div className="p-5">
-                  <CardHeader
-                    title={isViewingAnalysis ? "Contributors" : "Top Contributors"}
-                    actions={
-                      <span className="rounded-full bg-warm-100 px-2 py-0.5 text-[10px] font-semibold text-warm-500">
-                        {isViewingAnalysis ? "This analysis" : "All analyses"}
-                      </span>
-                    }
-                  />
-                  <div className="mt-4 space-y-3">
-                    {topContributorCards.length === 0 ? (
-                      <p className="py-4 text-center text-[12px] text-warm-400">
-                        Run an analysis to see contributors
-                      </p>
-                    ) : (
-                      topContributorCards.map((c) => (
-                        <div
-                          key={c.name}
-                          onClick={() => router.push(`/results/${c.firstAnalysisId}`)}
-                          className="cursor-pointer"
-                        >
-                          <ContributorTicket
-                            name={c.name}
-                            message={c.message}
-                            avatarColor={c.color}
-                            initials={c.initials}
-                            avatarUrl={c.avatarUrl}
-                            profileUrl={c.profileUrl}
-                          />
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </GlassPanel>
-            </div>
-
-            {/* ──── Row 2, Columns 2-3: Score Distribution ──── */}
-            <GlassPanel
-              className={cn("hero-fade-in lg:col-span-2 xl:col-span-2", isViewingAnalysis && "ring-1 ring-warm-300")}
-              style={{ animationDelay: "0.24s" }}
-            >
-              <div className="p-5">
-                <CardHeader
-                  title="Score Distribution"
-                  actions={
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-warm-100 px-2 py-0.5 text-[10px] font-semibold text-warm-500">
-                        {isViewingAnalysis ? "This analysis" : "All analyses"}
-                      </span>
-                      <IconAction
-                        onClick={() => setScoreSortAsc((v) => !v)}
-                        title={scoreSortAsc ? "Sort: Low → High" : "Sort: High → Low"}
-                      >
-                        <SlidersHorizontal className="h-3.5 w-3.5" />
-                      </IconAction>
-                    </div>
-                  }
-                />
-                <div className="mt-4 space-y-4">
-                  {effectiveTotal === 0 ? (
-                    <p className="py-6 text-center text-[12px] text-warm-400">
-                      No contributor scores yet
-                    </p>
-                  ) : (
-                    (scoreSortAsc ? [...scoreBars].reverse() : scoreBars).map((bar, i) => (
-                      <ScoreBar
-                        key={bar.label}
-                        label={bar.label}
-                        count={bar.count}
-                        total={bar.total}
-                        percentage={bar.percentage}
-                        color={bar.color}
-                        delay={0.28 + i * 0.04}
-                      />
-                    ))
-                  )}
-                </div>
-              </div>
-            </GlassPanel>
           </div>
+          </>
         )}
       </div>
 
