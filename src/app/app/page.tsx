@@ -164,9 +164,9 @@ function DashboardPage() {
                 <div className="flex flex-1 items-center justify-center mt-4">
                   <DonutChart
                     segments={[
-                      { value: dashboardData.tierCounts.carry, color: "#111", label: "Locked In" },
-                      { value: dashboardData.tierCounts.solid, color: "#737373", label: "Solid" },
-                      { value: dashboardData.tierCounts.ghost, color: "#E5E5E5", label: "Not Locked" },
+                      { value: dashboardData.tierCounts.carry, color: "#111", label: "Chad" },
+                      { value: dashboardData.tierCounts.solid, color: "#737373", label: "LTN" },
+                      { value: dashboardData.tierCounts.ghost, color: "#E5E5E5", label: "Subhuman" },
                     ]}
                   />
                 </div>

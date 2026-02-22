@@ -18,24 +18,24 @@ const DEMO_MODE = true;
 
 const DEMO_CONTRIBUTORS = [
   {
-    name: "Eddy Xu",
-    emailOrHandle: "ex247@cornell.edu",
+    name: "Caden Zhang",
+    emailOrHandle: "cz341@cornell.edu",
     score: 171,
     tier: "carry" as const,
     rawStats: { revisions: 89, charsAdded: 38400, wordsAdded: 6340 },
     heatmapData: [0.1,0.2,0.3,0.5,0.6,0.7,0.8,1.0,0.9,0.8,0.7,0.9,1.0,0.8,0.7,0.6,0.8,0.9,0.7,0.5],
   },
   {
-    name: "Madhav Rapelli",
-    emailOrHandle: "mr581@cornell.edu",
+    name: "Aryan Bedi",
+    emailOrHandle: "ab512@cornell.edu",
     score: 82,
     tier: "solid" as const,
     rawStats: { revisions: 34, charsAdded: 14100, wordsAdded: 2310 },
     heatmapData: [0.1,0.2,0.3,0.4,0.5,0.6,0.6,0.7,0.5,0.4,0.5,0.6,0.7,0.5,0.4,0.6,0.5,0.4,0.3,0.2],
   },
   {
-    name: "Max Lee",
-    emailOrHandle: "ml419@cornell.edu",
+    name: "Kevin Nguyen",
+    emailOrHandle: "kn287@cornell.edu",
     score: 31,
     tier: "ghost" as const,
     rawStats: { revisions: 9, charsAdded: 3200, wordsAdded: 510 },
@@ -44,7 +44,7 @@ const DEMO_CONTRIBUTORS = [
 ];
 
 const DEMO_SUMMARY =
-  "Eddy Xu wrote 87% of this document across 89 revisions — essentially the entire report — while his two teammates collectively contributed fewer than 700 words over the same 3-week period. Madhav Rapelli pulled a modest share late in the project, but Max Lee's heatmap flatlines for the final two weeks, suggesting he checked out entirely before the deadline.";
+  "Caden Zhang wrote 87% of this document across 89 revisions. Pure Chad. Aryan Bedi did his part and kept it LTN. Kevin Nguyen showed up for maybe 9 revisions total and basically went Subhuman for the last two weeks.";
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface GoogleRevision {

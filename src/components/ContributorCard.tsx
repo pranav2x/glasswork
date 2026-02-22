@@ -17,22 +17,22 @@ interface ContributorCardProps {
 
 const tierConfig = {
   carry: {
-    label: "LOCKED IN",
-    color: "text-amber-700",
-    bg: "bg-amber-50 border-amber-200 text-amber-700",
-    accent: "bg-amber-100",
+    label: "CHAD",
+    color: "text-warm-900",
+    bg: "bg-warm-900 border-warm-900 text-white",
+    accent: "bg-warm-100",
   },
   solid: {
-    label: "SOLID",
-    color: "text-emerald-700",
-    bg: "bg-emerald-50 border-emerald-200 text-emerald-700",
-    accent: "bg-emerald-100",
+    label: "LTN",
+    color: "text-warm-600",
+    bg: "bg-warm-200 border-warm-200 text-warm-800",
+    accent: "bg-warm-100",
   },
   ghost: {
-    label: "NOT LOCKED IN",
-    color: "text-red-600",
-    bg: "bg-red-50 border-red-200 text-red-600",
-    accent: "bg-red-100",
+    label: "SUBHUMAN",
+    color: "text-warm-400",
+    bg: "bg-warm-100 border-warm-100 text-warm-500",
+    accent: "bg-warm-50",
   },
 };
 

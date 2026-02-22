@@ -178,9 +178,9 @@ function AnalyticsPage() {
   // --- Donut chart: aggregate or per-analysis ---
   const donutSegments = isViewingAnalysis
     ? [
-        { value: selectedContributors.filter((c) => c.tier === "carry").length, color: "#D4A017", label: "Locked In" },
-        { value: selectedContributors.filter((c) => c.tier === "solid").length, color: "#2DA44E", label: "Solid" },
-        { value: selectedContributors.filter((c) => c.tier === "ghost").length, color: "#E53935", label: "Not Locked In" },
+        { value: selectedContributors.filter((c) => c.tier === "carry").length, color: "#111111", label: "Chad" },
+        { value: selectedContributors.filter((c) => c.tier === "solid").length, color: "#737373", label: "LTN" },
+        { value: selectedContributors.filter((c) => c.tier === "ghost").length, color: "#E5E5E5", label: "Subhuman" },
       ]
     : [
         { value: statusCounts.ready, color: "#4A96D9", label: "Completed" },
@@ -255,9 +255,9 @@ function AnalyticsPage() {
         .slice(0, 5)
         .map((c) => ({
           name: c.name,
-          message: `Score: ${c.score} · ${c.tier}`,
+          message: `Score: ${c.score} · ${c.tier === "carry" ? "Chad" : c.tier === "solid" ? "LTN" : "Subhuman"}`,
           initials: getInitials(c.name),
-          color: c.tier === "carry" ? "#F5A623" : c.tier === "solid" ? "#2DA44E" : "#E53935",
+          color: c.tier === "carry" ? "#111111" : c.tier === "solid" ? "#737373" : "#AAAAAA",
           avatarUrl: c.avatarUrl,
           firstAnalysisId: selectedAnalysisId!,
           profileUrl: isRepoAnalysis && c.emailOrHandle
@@ -271,7 +271,7 @@ function AnalyticsPage() {
           name: c.name,
           message: `Score: ${c.score} across ${c.analysisCount} ${c.analysisCount === 1 ? "analysis" : "analyses"}`,
           initials: getInitials(c.name),
-          color: c.tier === "carry" ? "#F5A623" : c.tier === "solid" ? "#2DA44E" : "#E53935",
+          color: c.tier === "carry" ? "#111111" : c.tier === "solid" ? "#737373" : "#AAAAAA",
           avatarUrl: c.avatarUrl,
           firstAnalysisId: c.firstAnalysisId,
           profileUrl: c.emailOrHandle && !c.emailOrHandle.includes("@")

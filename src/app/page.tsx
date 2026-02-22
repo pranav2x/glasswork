@@ -151,7 +151,7 @@ export default function LandingPage() {
             className="mx-auto mt-6 max-w-lg text-[18px] leading-relaxed text-warm-600 animate-fade-up"
             style={{ animationDelay: "0.25s" }}
           >
-            Analyze GitHub repos and Google Docs. Every teammate gets a Fair Share Score — instantly see who&apos;s locked in and who&apos;s not.
+            Analyze GitHub repos and Google Docs. Every teammate gets a Fair Share Score — instantly see who&apos;s a Chad and who&apos;s a Ghost.
           </p>
 
           {/* CTA */}
@@ -267,8 +267,8 @@ export default function LandingPage() {
             <p className="font-hand text-[15px] leading-snug text-warm-700">
               Track every edit,<br />
               every commit.<br />
-              See who&apos;s locked in<br />
-              and who&apos;s not.
+              See who&apos;s a Chad<br />
+              and who&apos;s a Ghost.
             </p>
           </div>
           <div className="absolute -bottom-4 -left-2">
@@ -548,9 +548,9 @@ export default function LandingPage() {
                     <div className="mb-5 text-[16px] font-bold text-warm-900">Analysis Results</div>
                     <div className="grid flex-1 grid-cols-3 gap-4">
                       {[
-                        { name: "Eddy Xu", score: 172, tier: "LOCKED IN", pct: "86%", hm: HEATMAP_DATA.alex },
-                        { name: "Madhav Rapelli", score: 118, tier: "SOLID", pct: "59%", hm: HEATMAP_DATA.sarah },
-                        { name: "Max Lee", score: 34, tier: "NOT LOCKED IN", pct: "17%", hm: HEATMAP_DATA.mike },
+                        { name: "Caden Zhang", score: 172, tier: "CHAD", pct: "86%", hm: HEATMAP_DATA.alex },
+                        { name: "Aryan Bedi", score: 118, tier: "LTN", pct: "59%", hm: HEATMAP_DATA.sarah },
+                        { name: "Kevin Nguyen", score: 34, tier: "SUBHUMAN", pct: "17%", hm: HEATMAP_DATA.mike },
                       ].map((c, idx) => (
                         <div key={c.name} className="flex flex-col rounded-2xl border border-warm-200 p-4">
                           {/* Avatar */}

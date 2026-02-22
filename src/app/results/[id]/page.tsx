@@ -275,14 +275,14 @@ export default function ResultsPage() {
                 >
                   {summaryStats.lockedIn > 0 && (
                     <span className="flex items-center gap-1.5 text-[12px] font-semibold">
-                      <span className="h-2 w-2 rounded-full bg-amber-400" />
-                      <span className="text-amber-700">{summaryStats.lockedIn} Locked In</span>
+                      <span className="h-2 w-2 rounded-full bg-warm-900" />
+                      <span className="text-warm-900">{summaryStats.lockedIn} Chad</span>
                     </span>
                   )}
                   {summaryStats.notLockedIn > 0 && (
                     <span className="flex items-center gap-1.5 text-[12px] font-semibold">
-                      <span className="h-2 w-2 rounded-full bg-red-400" />
-                      <span className="text-red-600">{summaryStats.notLockedIn} Not Locked In</span>
+                      <span className="h-2 w-2 rounded-full bg-warm-400" />
+                      <span className="text-warm-500">{summaryStats.notLockedIn} Subhuman</span>
                     </span>
                   )}
                 </motion.div>
