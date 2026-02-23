@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 /* ────────────────────────────────────────
@@ -397,21 +398,24 @@ export function ContributorTicket({
   avatarUrl,
   profileUrl,
 }: ContributorTicketProps) {
+  const [imgError, setImgError] = useState(false);
+  const showAvatar = avatarUrl && !imgError;
   return (
     <div className="rounded-xl border border-warm-100 p-3.5 transition-colors hover:border-warm-200 hover:bg-warm-50/50">
       <div className="flex items-start gap-3">
         <div
           className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full text-[11px] font-bold text-white"
-          style={{ backgroundColor: avatarUrl ? "transparent" : avatarColor }}
+          style={{ backgroundColor: showAvatar ? "transparent" : avatarColor }}
         >
-          {avatarUrl ? (
+          {showAvatar ? (
             <Image
-              src={avatarUrl}
+              src={avatarUrl!}
               alt={name}
               width={36}
               height={36}
               className="h-full w-full object-cover"
               referrerPolicy="no-referrer"
+              onError={() => setImgError(true)}
             />
           ) : (
             initials
