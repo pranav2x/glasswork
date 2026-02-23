@@ -8,11 +8,19 @@ import { api } from "../../../convex/_generated/api";
 import { NewAnalysisModal } from "@/components/NewAnalysisModal";
 import { GlassPanel } from "@/components/GlassPanel";
 import { DonutChart } from "@/components/DashboardWidgets";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, GitBranch, FileText, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getInitials } from "@/lib/formatters";
 
 /* ─── Sub-components ─── */
+
+function AvatarImg({ src, name, initials }: { src: string; name: string; initials: string }) {
+  const [err, setErr] = useState(false);
+  if (err) return <>{initials}</>;
+  return <Image src={src} alt={name} width={36} height={36} className="h-full w-full object-cover" referrerPolicy="no-referrer" onError={() => setErr(true)} />;
+}
 
 function CardHeader({
   title,
@@ -141,27 +149,27 @@ function DashboardPage() {
           </div>
         ) : (
           <>
-          {/* ─── Stat Cards Row ─── */}
-          <div className="hero-fade-in grid grid-cols-3 gap-4" style={{ animationDelay: "0.06s" }}>
+          {/* ─── Stat Chips Row (compact) ─── */}
+          <div className="hero-fade-in grid grid-cols-3 gap-3" style={{ animationDelay: "0.06s" }}>
             {[
               { label: "Analyses", value: analyses.length },
               { label: "Contributors", value: totalContributors },
               { label: "Avg Score", value: dashboardData.avgScore },
             ].map((stat) => (
-              <GlassPanel key={stat.label} className="p-7">
-                <div className="text-[13px] font-medium text-warm-400">{stat.label}</div>
-                <div className="mt-2 text-[42px] font-bold leading-none text-warm-900">{stat.value}</div>
+              <GlassPanel key={stat.label} className="p-5">
+                <div className="text-[12px] font-medium text-warm-400">{stat.label}</div>
+                <div className="mt-1.5 text-[36px] font-bold leading-none text-warm-900">{stat.value}</div>
               </GlassPanel>
             ))}
           </div>
 
-          {/* ─── Primary Section: Tier Distribution + Top Contributors ─── */}
-          <div className="hero-fade-in grid grid-cols-1 gap-5 md:grid-cols-2" style={{ animationDelay: "0.1s" }}>
-            {/* Score Distribution Donut (Tier-based, matching demo) */}
+          {/* ─── Bento Grid: Donut + Top Contributors ─── */}
+          <div className="hero-fade-in grid grid-cols-1 gap-4 md:grid-cols-[1fr_1.6fr]" style={{ animationDelay: "0.1s" }}>
+            {/* Score Distribution Donut (compact square) */}
             <GlassPanel hoverable className="flex flex-col">
-              <div className="flex flex-1 flex-col p-8">
+              <div className="flex flex-1 flex-col p-6">
                 <CardHeader title="Score Distribution" />
-                <div className="flex flex-1 items-center justify-center mt-4">
+                <div className="flex flex-1 items-center justify-center mt-3">
                   <DonutChart
                     segments={[
                       { value: dashboardData.tierCounts.carry, color: "#111", label: "Locked In" },
@@ -173,42 +181,34 @@ function DashboardPage() {
               </div>
             </GlassPanel>
 
-            {/* Top Contributors (matching demo style with progress bars) */}
+            {/* Top Contributors (wider panel, show more names) */}
             <GlassPanel hoverable className="flex flex-col">
-              <div className="flex flex-1 flex-col p-8">
+              <div className="flex flex-1 flex-col p-6">
                 <CardHeader title="Top Contributors" />
-                <div className="mt-6 flex flex-1 flex-col justify-center space-y-5">
+                <div className="mt-4 flex flex-1 flex-col justify-center space-y-4">
                   {topContributors.length === 0 ? (
                     <p className="py-6 text-center text-[12px] text-warm-400">
                       Run an analysis to see contributors
                     </p>
                   ) : (
-                    topContributors.slice(0, 3).map((c) => (
+                    topContributors.slice(0, 5).map((c) => (
                       <div
                         key={c.name}
-                        className="flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-warm-50"
+                        className="flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-warm-50/50"
                         onClick={() => router.push(`/results/${c.firstAnalysisId}`)}
                       >
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm-200 text-[11px] font-bold text-warm-600">
-                          {c.avatarUrl ? (
-                            <Image
-                              src={c.avatarUrl}
-                              alt={c.name}
-                              width={36}
-                              height={36}
-                              className="h-full w-full object-cover"
-                              referrerPolicy="no-referrer"
-                            />
-                          ) : (
-                            getInitials(c.name)
-                          )}
+                          {c.avatarUrl
+                            ? <AvatarImg src={c.avatarUrl} name={c.name} initials={getInitials(c.name)} />
+                            : getInitials(c.name)
+                          }
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between">
                             <span className="text-[14px] font-medium text-warm-700">{c.name}</span>
                             <span className="text-[14px] font-bold text-warm-900">{c.score}</span>
                           </div>
-                          <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-warm-100">
+                          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-warm-100">
                             <div
                               className="h-full rounded-full bg-warm-800 transition-all duration-500"
                               style={{ width: `${Math.min(100, (c.score / 200) * 100)}%` }}
@@ -222,6 +222,50 @@ function DashboardPage() {
               </div>
             </GlassPanel>
           </div>
+
+          {/* ─── Recent Analyses Strip (full-width bento bottom row) ─── */}
+          {analyses.length > 0 && (
+            <div className="hero-fade-in" style={{ animationDelay: "0.14s" }}>
+              <GlassPanel className="p-6">
+                <CardHeader title="Recent Analyses" />
+                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {analyses.slice(0, 3).map((a) => (
+                    <Link
+                      key={a._id}
+                      href={`/results/${a._id}`}
+                      className="group/analysis flex items-center justify-between gap-3 rounded-xl border border-warm-100 p-4 transition-all duration-200 hover:border-warm-200 hover:bg-warm-50/50"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-warm-100">
+                          {a.sourceType === "github_repo" ? (
+                            <GitBranch className="h-3.5 w-3.5 text-warm-500" />
+                          ) : (
+                            <FileText className="h-3.5 w-3.5 text-warm-500" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-[13px] font-semibold text-warm-800">
+                            {a.title}
+                          </p>
+                          <Badge
+                            variant="outline"
+                            className={`mt-1 text-[10px] font-medium ${
+                              a.sourceType === "google_doc"
+                                ? "border-docs-accent/20 text-docs-accent"
+                                : "border-repo-accent/20 text-repo-accent"
+                            }`}
+                          >
+                            {a.sourceType === "google_doc" ? "Google Doc" : "GitHub Repo"}
+                          </Badge>
+                        </div>
+                      </div>
+                      <ArrowUpRight className="h-4 w-4 shrink-0 text-warm-300 transition-colors group-hover/analysis:text-warm-500" />
+                    </Link>
+                  ))}
+                </div>
+              </GlassPanel>
+            </div>
+          )}
           </>
         )}
       </div>
