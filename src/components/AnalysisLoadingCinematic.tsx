@@ -14,7 +14,7 @@ const GITHUB_STEPS = [
   { text: "Analyzing commit history...", counter: { label: "commits", target: 2847 } },
   { text: "Detecting co-authors...", counter: { label: "contributors", target: 24 } },
   { text: "Computing Fair Share Scores...", counter: null },
-  { text: "Calculating Chad ratings...", counter: null },
+  { text: "Calculating MVP ratings...", counter: null },
 ];
 
 const DOC_STEPS = [
@@ -22,7 +22,7 @@ const DOC_STEPS = [
   { text: "Loading revision history...", counter: { label: "revisions", target: 156 } },
   { text: "Diffing character changes...", counter: { label: "chars analyzed", target: 48200 } },
   { text: "Computing Fair Share Scores...", counter: null },
-  { text: "Calculating Chad ratings...", counter: null },
+  { text: "Calculating MVP ratings...", counter: null },
 ];
 
 function AnimatedCounter({ target, duration = 2000 }: { target: number; duration?: number }) {

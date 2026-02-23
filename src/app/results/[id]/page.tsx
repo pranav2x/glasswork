@@ -281,13 +281,13 @@ export default function ResultsPage() {
                   {summaryStats.lockedIn > 0 && (
                     <span className="flex items-center gap-1.5 text-[12px] font-semibold">
                       <span className="h-2 w-2 rounded-full bg-warm-900" />
-                      <span className="text-warm-900">{summaryStats.lockedIn} Chad</span>
+                      <span className="text-warm-900">{summaryStats.lockedIn} MVP</span>
                     </span>
                   )}
                   {summaryStats.notLockedIn > 0 && (
                     <span className="flex items-center gap-1.5 text-[12px] font-semibold">
                       <span className="h-2 w-2 rounded-full bg-warm-400" />
-                      <span className="text-warm-500">{summaryStats.notLockedIn} Subhuman</span>
+                      <span className="text-warm-500">{summaryStats.notLockedIn} Ghost</span>
                     </span>
                   )}
                 </motion.div>

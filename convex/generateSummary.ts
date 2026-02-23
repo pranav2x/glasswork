@@ -71,7 +71,7 @@ Write 2-3 sentences about what happened. Use the actual names. Use the words Loc
         const bottomContributor = sorted[sorted.length - 1];
         const topStats = topContributor.rawStats as Record<string, number>;
 
-        let summary = `${topContributor.name} was a full Chad with a score of ${topContributor.score}. `;
+        let summary = `${topContributor.name} was a full MVP with a score of ${topContributor.score}. `;
         if (isRepo) {
           summary += `${topStats.commits ?? 0} commits and ${(topStats.additions ?? 0).toLocaleString()} lines added. `;
         } else {
@@ -79,7 +79,7 @@ Write 2-3 sentences about what happened. Use the actual names. Use the words Loc
         }
 
         if (totalContributors > 1 && bottomContributor.tier === "ghost") {
-          summary += `${bottomContributor.name} was basically Subhuman with a score of ${bottomContributor.score}. Not great.`;
+          summary += `${bottomContributor.name} was basically a ghost with a score of ${bottomContributor.score}. Not great.`;
         } else if (totalContributors > 1) {
           summary += `${sorted[1].name} held it down too with a score of ${sorted[1].score}.`;
         }
@@ -122,7 +122,7 @@ Write 2-3 sentences about what happened. Use the actual names. Use the words Loc
         console.error("Gemini API error:", response.status, await response.text());
         // Fall back to template
         const topContributor = sorted[0];
-        const summary = `${topContributor.name} led this ${isRepo ? "repo" : "doc"} with a score of ${topContributor.score}. Pure Chad behavior.`;
+        const summary = `${topContributor.name} led this ${isRepo ? "repo" : "doc"} with a score of ${topContributor.score}. Pure MVP behavior.`;
         await ctx.runMutation(internal.analyses.updateSummary, {
           analysisId: args.analysisId,
           summary,
