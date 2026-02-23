@@ -18,24 +18,27 @@ const DEMO_MODE = true;
 
 const DEMO_CONTRIBUTORS = [
   {
-    name: "Caden Zhang",
-    emailOrHandle: "cz341@cornell.edu",
+    name: "Eddy Xu",
+    emailOrHandle: "ex241@cornell.edu",
+    avatarUrl: "/avatar_eddy.png",
     score: 171,
     tier: "carry" as const,
     rawStats: { revisions: 89, charsAdded: 38400, wordsAdded: 6340 },
     heatmapData: [0.1,0.2,0.3,0.5,0.6,0.7,0.8,1.0,0.9,0.8,0.7,0.9,1.0,0.8,0.7,0.6,0.8,0.9,0.7,0.5],
   },
   {
-    name: "Aryan Bedi",
-    emailOrHandle: "ab512@cornell.edu",
+    name: "Madhav Rapelli",
+    emailOrHandle: "mr512@cornell.edu",
+    avatarUrl: "/avatar_madhav.png",
     score: 82,
     tier: "solid" as const,
     rawStats: { revisions: 34, charsAdded: 14100, wordsAdded: 2310 },
     heatmapData: [0.1,0.2,0.3,0.4,0.5,0.6,0.6,0.7,0.5,0.4,0.5,0.6,0.7,0.5,0.4,0.6,0.5,0.4,0.3,0.2],
   },
   {
-    name: "Kevin Nguyen",
-    emailOrHandle: "kn287@cornell.edu",
+    name: "Max Lee",
+    emailOrHandle: "ml287@cornell.edu",
+    avatarUrl: "/avatar_max.png",
     score: 31,
     tier: "ghost" as const,
     rawStats: { revisions: 9, charsAdded: 3200, wordsAdded: 510 },
@@ -44,7 +47,7 @@ const DEMO_CONTRIBUTORS = [
 ];
 
 const DEMO_SUMMARY =
-  "Caden Zhang wrote 87% of this document across 89 revisions. Pure Chad. Aryan Bedi did his part and kept it LTN. Kevin Nguyen showed up for maybe 9 revisions total and basically went Subhuman for the last two weeks.";
+  "Eddy Xu wrote 87% of this document across 89 revisions. Pure Chad. Madhav Rapelli did his part and kept it LTN. Max Lee showed up for maybe 9 revisions total and basically went Subhuman for the last two weeks.";
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface GoogleRevision {
