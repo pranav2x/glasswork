@@ -11,7 +11,7 @@ const GlassPanel = forwardRef<HTMLDivElement, GlassPanelProps>(
       <div
         ref={ref}
         className={cn(
-          "rounded-2xl border border-warm-200 bg-white shadow-card",
+          "rounded-2xl border border-white/60 bg-white/70 shadow-card backdrop-blur-xl",
           hoverable && "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover",
           className
         )}

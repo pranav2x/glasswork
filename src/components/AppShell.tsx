@@ -325,7 +325,16 @@ export function AppShell({ children }: AppShellProps) {
 
   if (isWorkspace && isAuthenticated) {
     return (
-      <div className="relative min-h-screen bg-white grain-overlay">
+      <div className="relative min-h-screen bg-[#FAFAF8] grain-overlay">
+        {/* Ambient color orbs for glassmorphism depth */}
+        <div
+          className="pointer-events-none fixed left-[10%] top-[15%] h-[480px] w-[480px] rounded-full opacity-30 blur-[120px]"
+          style={{ background: "radial-gradient(circle, #6C63FF 0%, transparent 70%)" }}
+        />
+        <div
+          className="pointer-events-none fixed bottom-[10%] right-[8%] h-[360px] w-[360px] rounded-full opacity-20 blur-[100px]"
+          style={{ background: "radial-gradient(circle, #D4A017 0%, transparent 70%)" }}
+        />
         <Sidebar />
         <div className="relative z-10 pl-[56px] lg:pl-[200px]">
           <DashboardTopBar />

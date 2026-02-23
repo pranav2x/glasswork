@@ -85,7 +85,7 @@ export function ContributorCard({ contributor, index, maxScore }: ContributorCar
       }}
     >
       <div className={cn(
-        "group flex h-full flex-col gap-5 rounded-2xl border border-warm-200 bg-white p-6 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover",
+        "group flex h-full flex-col gap-5 rounded-2xl border border-white/60 bg-white/70 p-6 shadow-card backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover",
         showGlow && "animate-golden-glow"
       )}>
         {/* Avatar + Name */}
