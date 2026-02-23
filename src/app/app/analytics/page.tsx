@@ -136,6 +136,14 @@ function AnalyticsPage() {
     }
   }, [searchParams]);
 
+  // Pre-select analysis via ?analysis=<id>
+  useEffect(() => {
+    const analysisParam = searchParams.get("analysis");
+    if (analysisParam) {
+      setSelectedAnalysisId(analysisParam as Id<"analyses">);
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
       router.push("/");
@@ -178,9 +186,9 @@ function AnalyticsPage() {
   // --- Donut chart: aggregate or per-analysis ---
   const donutSegments = isViewingAnalysis
     ? [
-        { value: selectedContributors.filter((c) => c.tier === "carry").length, color: "#111111", label: "Locked In" },
-        { value: selectedContributors.filter((c) => c.tier === "solid").length, color: "#737373", label: "Mid" },
-        { value: selectedContributors.filter((c) => c.tier === "ghost").length, color: "#E5E5E5", label: "Selling" },
+        { value: selectedContributors.filter((c) => c.tier === "carry").length, color: "#D4A017", label: "Locked In" },
+        { value: selectedContributors.filter((c) => c.tier === "solid").length, color: "#2DA44E", label: "Mid" },
+        { value: selectedContributors.filter((c) => c.tier === "ghost").length, color: "#E53935", label: "Selling" },
       ]
     : [
         { value: statusCounts.ready, color: "#4A96D9", label: "Completed" },
@@ -315,7 +323,7 @@ function AnalyticsPage() {
                 : "Detailed breakdown of all your analyses"}
             </p>
             <h1 className="mt-0.5 text-[28px] font-bold tracking-tight text-warm-900">
-              {isViewingAnalysis ? selectedAnalysis?.title : "Analytics"}
+              {isViewingAnalysis ? selectedAnalysis?.title : "Overall Analytics"}
             </h1>
           </div>
           <div className="flex items-center gap-3">
