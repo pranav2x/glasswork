@@ -22,7 +22,7 @@ const DEMO_CONTRIBUTORS = [
     emailOrHandle: "aaryanverma2004@gmail.com",
     avatarUrl: "/avatar_aaryan.png",
     score: 171,
-    tier: "carry" as const,
+    tier: "solid" as const,
     rawStats: { revisions: 89, charsAdded: 38400, wordsAdded: 6340 },
     heatmapData: [0.1,0.2,0.3,0.5,0.6,0.7,0.8,1.0,0.9,0.8,0.7,0.9,1.0,0.8,0.7,0.6,0.8,0.9,0.7,0.5],
   },
@@ -31,7 +31,7 @@ const DEMO_CONTRIBUTORS = [
     emailOrHandle: "rohanbedi2004@gmail.com",
     avatarUrl: "/avatar_rohan.png",
     score: 82,
-    tier: "solid" as const,
+    tier: "ghost" as const,
     rawStats: { revisions: 34, charsAdded: 14100, wordsAdded: 2310 },
     heatmapData: [0.1,0.2,0.3,0.4,0.5,0.6,0.6,0.7,0.5,0.4,0.5,0.6,0.7,0.5,0.4,0.6,0.5,0.4,0.3,0.2],
   },
@@ -45,9 +45,6 @@ const DEMO_CONTRIBUTORS = [
     heatmapData: [0.0,0.0,0.1,0.2,0.0,0.0,0.3,0.0,0.1,0.0,0.0,0.0,0.2,0.0,0.0,0.0,0.3,0.0,0.0,0.0],
   },
 ];
-
-const DEMO_SUMMARY =
-  "Aaryan Verma wrote 87% of this document across 89 revisions. Fully locked in. Rohan Bedi did his part and kept it mid. Jackie Lin showed up for maybe 9 revisions total and basically went full selling for the last two weeks.";
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface GoogleRevision {
@@ -144,9 +141,19 @@ export const analyzeGoogleDoc = internalAction({
 
       // ── Demo mode: skip real analysis, inject fake data ──
       if (DEMO_MODE) {
+        const currentUserContributor = {
+          name: user.name ?? "You",
+          emailOrHandle: user.email ?? "rapellipranav1@gmail.com",
+          avatarUrl: user.image ?? undefined,
+          score: 189,
+          tier: "carry" as const,
+          rawStats: { revisions: 112, charsAdded: 51200, wordsAdded: 8450 },
+          heatmapData: [0.4,0.6,0.7,0.8,0.9,1.0,0.9,1.0,0.8,0.9,1.0,0.9,0.8,0.9,1.0,0.9,0.8,0.9,0.7,0.6],
+        };
+        const demoSummary = `${user.name ?? "You"} absolutely carried with 112 revisions and a 189. Fully locked in. Aaryan Verma put in a decent mid effort. Rohan Bedi and Jackie Lin were basically selling the entire time.`;
         await ctx.runMutation(internal.analyses.writeContributors, {
           analysisId: args.analysisId,
-          contributors: DEMO_CONTRIBUTORS,
+          contributors: [currentUserContributor, ...DEMO_CONTRIBUTORS],
         });
         await ctx.runMutation(internal.analyses.updateAnalysisStatus, {
           analysisId: args.analysisId,
@@ -155,7 +162,7 @@ export const analyzeGoogleDoc = internalAction({
         });
         await ctx.runMutation(internal.analyses.updateSummary, {
           analysisId: args.analysisId,
-          summary: DEMO_SUMMARY,
+          summary: demoSummary,
         });
         return;
       }
