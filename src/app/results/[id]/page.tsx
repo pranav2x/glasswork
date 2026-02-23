@@ -152,6 +152,11 @@ export default function ResultsPage() {
             </div>
 
             <div className="flex items-center gap-2">
+              <Link href={`/app/analytics?analysis=${analysisId}`}>
+                <GlassButton variant="ghost" size="sm">
+                  Analytics
+                </GlassButton>
+              </Link>
               <Link href="/app">
                 <GlassButton variant="ghost" size="sm">
                   Workspace
