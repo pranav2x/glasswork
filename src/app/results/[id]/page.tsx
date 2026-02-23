@@ -16,7 +16,7 @@ import { PageTransition } from "@/components/PageTransition";
 import { Badge } from "@/components/ui/badge";
 import { mapConvexAnalysis } from "@/lib/mappers";
 import { cn } from "@/lib/utils";
-import { Users, BarChart3, Sparkles } from "lucide-react";
+import { Users, BarChart3, Sparkles, Share2 } from "lucide-react";
 
 function TypewriterText({ text }: { text: string }) {
   const [displayed, setDisplayed] = useState("");
@@ -163,7 +163,8 @@ export default function ResultsPage() {
                 </GlassButton>
               </Link>
               <GlassButton variant="ghost" size="sm" onClick={handleCopyLink}>
-                {copied ? "Copied!" : "Copy share link"}
+                <Share2 className="h-3.5 w-3.5" />
+                {copied ? "Link copied" : "Share results"}
               </GlassButton>
             </div>
           </GlassPanel>

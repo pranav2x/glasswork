@@ -38,6 +38,19 @@ export const metadata: Metadata = {
   title: "Glasswork — Group work telemetry",
   description:
     "Analyze Google Docs and GitHub repos to see who actually contributed.",
+  openGraph: {
+    title: "Glasswork — Group work telemetry",
+    description:
+      "Analyze Google Docs and GitHub repos to see who actually contributed.",
+    siteName: "Glasswork",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Glasswork — Group work telemetry",
+    description:
+      "Analyze Google Docs and GitHub repos to see who actually contributed.",
+  },
 };
 
 export default function RootLayout({
