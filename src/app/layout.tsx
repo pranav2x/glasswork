@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Inter, Caveat } from "next/font/google";
+import { DM_Sans, Inter, Caveat, Cormorant_Garamond } from "next/font/google";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { AppShell } from "@/components/AppShell";
 import { Toaster } from "sonner";
@@ -26,6 +26,14 @@ const caveat = Caveat({
   weight: ["400", "500"],
 });
 
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-myflora",
+  display: "swap",
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+});
+
 export const metadata: Metadata = {
   title: "Glasswork — Group work telemetry",
   description:
@@ -40,7 +48,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${dmSans.variable} ${inter.variable} ${caveat.variable} font-body antialiased grain-overlay`}
+        className={`${dmSans.variable} ${inter.variable} ${caveat.variable} ${cormorant.variable} font-body antialiased grain-overlay`}
       >
         <ConvexClientProvider>
           <AppShell>{children}</AppShell>
