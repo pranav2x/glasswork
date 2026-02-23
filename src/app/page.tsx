@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useConvexAuth, useMutation } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -140,7 +141,7 @@ export default function LandingPage() {
           </div>
 
           {/* Headline */}
-          <h1 className="font-display font-normal italic text-[3rem] leading-[1.08] tracking-tight text-warm-900 sm:text-[3.75rem] md:text-[4.5rem] animate-fade-up">
+          <h1 className="font-myflora font-normal italic text-[3rem] leading-[1.08] tracking-tight text-warm-900 sm:text-[3.75rem] md:text-[4.5rem] animate-fade-up">
             Who actually did
             <br />
             the work?
@@ -151,7 +152,7 @@ export default function LandingPage() {
             className="mx-auto mt-6 max-w-lg text-[18px] leading-relaxed text-warm-600 animate-fade-up"
             style={{ animationDelay: "0.25s" }}
           >
-            Analyze GitHub repos and Google Docs. Every teammate gets a Fair Share Score — instantly see who&apos;s a Chad and who&apos;s a Ghost.
+            Analyze GitHub repos and Google Docs. Every teammate gets a Fair Share Score — instantly see who&apos;s Locked In and who&apos;s Selling.
           </p>
 
           {/* CTA */}
@@ -159,13 +160,6 @@ export default function LandingPage() {
             className="mt-10 flex flex-col items-center gap-4 animate-fade-up"
             style={{ animationDelay: "0.35s" }}
           >
-            <button
-              onClick={handleGetStarted}
-              className="rounded-2xl bg-warm-900 px-8 py-3.5 text-[15px] font-semibold text-white shadow-layered transition-all duration-200 hover:scale-[1.03] hover:bg-warm-800 hover:shadow-layered-md active:scale-[0.97]"
-            >
-              {isAuthenticated ? "Go to workspace" : "Try for free"}
-            </button>
-
             {/* Quick repo input */}
             <div className="mx-auto mt-4 w-full max-w-md">
               <div className="relative flex items-center gap-2 rounded-2xl border border-warm-200 bg-white p-2 shadow-layered transition-all focus-within:border-warm-400 focus-within:ring-2 focus-within:ring-warm-200">
@@ -267,8 +261,8 @@ export default function LandingPage() {
             <p className="font-hand text-[15px] leading-snug text-warm-700">
               Track every edit,<br />
               every commit.<br />
-              See who&apos;s a Chad<br />
-              and who&apos;s a Ghost.
+              See who&apos;s locked in<br />
+              and who&apos;s selling.
             </p>
           </div>
           <div className="absolute -bottom-4 -left-2">
@@ -324,7 +318,7 @@ export default function LandingPage() {
 
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-200 text-[11px] font-bold text-warm-700">A</div>
+                <Image src="/avatar_eddy.png" alt="Aaryan Verma" width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[12px] font-medium text-warm-800">Aaryan Verma</span>
@@ -337,7 +331,7 @@ export default function LandingPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-200 text-[11px] font-bold text-warm-600">R</div>
+                <Image src="/avatar_madhav.png" alt="Rohan Bedi" width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[12px] font-medium text-warm-800">Rohan Bedi</span>
@@ -350,7 +344,7 @@ export default function LandingPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-100 text-[11px] font-bold text-warm-400">J</div>
+                <Image src="/avatar_max.png" alt="Jackie Lin" width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[12px] font-medium text-warm-800">Jackie Lin</span>
@@ -609,10 +603,10 @@ export default function LandingPage() {
       {/* ── Final CTA ── */}
       <section className="border-t border-warm-200/50 bg-white py-24">
         <div className="mx-auto max-w-2xl px-6 text-center">
-          <h2 className="font-display text-3xl tracking-tight text-warm-900 sm:text-4xl">
+          <h2 className="font-myflora text-3xl tracking-tight text-warm-900 sm:text-4xl italic">
             Your grades deserve
             <br />
-            transparency
+            <em>transparency</em>
           </h2>
 
           <button
