@@ -20,7 +20,7 @@ const DEMO_CONTRIBUTORS = [
   {
     name: "Aaryan Verma",
     emailOrHandle: "aaryanverma2004@gmail.com",
-    avatarUrl: "/avatar_aaryan.png",
+    avatarUrl: "/avatar_eddy.png",
     score: 171,
     tier: "solid" as const,
     rawStats: { revisions: 89, charsAdded: 38400, wordsAdded: 6340 },
@@ -29,7 +29,7 @@ const DEMO_CONTRIBUTORS = [
   {
     name: "Rohan Bedi",
     emailOrHandle: "rohanbedi2004@gmail.com",
-    avatarUrl: "/avatar_rohan.png",
+    avatarUrl: "/avatar_madhav.png",
     score: 82,
     tier: "ghost" as const,
     rawStats: { revisions: 34, charsAdded: 14100, wordsAdded: 2310 },
@@ -38,7 +38,7 @@ const DEMO_CONTRIBUTORS = [
   {
     name: "Jackie Lin",
     emailOrHandle: "jackieli2101@gmail.com",
-    avatarUrl: "/avatar_jackie.png",
+    avatarUrl: "/avatar_max.png",
     score: 31,
     tier: "ghost" as const,
     rawStats: { revisions: 9, charsAdded: 3200, wordsAdded: 510 },
