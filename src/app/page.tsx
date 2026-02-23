@@ -141,8 +141,8 @@ export default function LandingPage() {
           </div>
 
           {/* Headline */}
-          <h1 className="font-myflora font-normal italic text-[3rem] leading-[1.08] tracking-tight text-warm-900 sm:text-[3.75rem] md:text-[4.5rem] animate-fade-up">
-            Who actually did
+          <h1 className="font-myflora font-normal text-[3rem] leading-[1.08] tracking-tight text-warm-900 sm:text-[3.75rem] md:text-[4.5rem] animate-fade-up">
+            Who <em>actually</em> did
             <br />
             the work?
           </h1>
@@ -152,7 +152,7 @@ export default function LandingPage() {
             className="mx-auto mt-6 max-w-lg text-[18px] leading-relaxed text-warm-600 animate-fade-up"
             style={{ animationDelay: "0.25s" }}
           >
-            Analyze GitHub repos and Google Docs. Every teammate gets a Fair Share Score — instantly see who&apos;s Locked In and who&apos;s Selling.
+            analayze gthub repos and google docs to see if your group mates are locked in or just straight up selling. 
           </p>
 
           {/* CTA */}
@@ -318,7 +318,7 @@ export default function LandingPage() {
 
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <Image src="/avatar_eddy.png" alt="Aaryan Verma" width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
+                <Image src="/animepfp.jpeg" alt="Aaryan Verma" width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[12px] font-medium text-warm-800">Aaryan Verma</span>
@@ -331,7 +331,7 @@ export default function LandingPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Image src="/avatar_madhav.png" alt="Rohan Bedi" width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
+                <Image src="/catpj.jpeg" alt="Rohan Bedi" width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[12px] font-medium text-warm-800">Rohan Bedi</span>
@@ -344,7 +344,7 @@ export default function LandingPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Image src="/avatar_max.png" alt="Jackie Lin" width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
+                <Image src="/voidman.jpeg" alt="Jackie Lin" width={28} height={28} className="h-7 w-7 rounded-full object-cover" />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <span className="text-[12px] font-medium text-warm-800">Jackie Lin</span>
@@ -395,11 +395,11 @@ export default function LandingPage() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="font-display text-3xl font-bold tracking-tight text-warm-900 sm:text-4xl">
+          <h2 className="font-myflora font-light text-3xl tracking-tight text-warm-900 sm:text-4xl">
             See exactly who showed up
           </h2>
           <p className="mx-auto mt-4 max-w-md text-[16px] text-warm-500">
-            From the dashboard to the final score — everything at a glance.
+            See your group members&apos; scores and see exactly how much they contributed.
           </p>
         </motion.div>
 
@@ -542,15 +542,13 @@ export default function LandingPage() {
                     <div className="mb-5 text-[16px] font-bold text-warm-900">Analysis Results</div>
                     <div className="grid flex-1 grid-cols-3 gap-4">
                       {[
-                        { name: "Aaryan Verma", score: 172, tier: "LOCKED IN", pct: "86%", hm: HEATMAP_DATA.alex },
-                        { name: "Rohan Bedi", score: 118, tier: "MID", pct: "59%", hm: HEATMAP_DATA.sarah },
-                        { name: "Jackie Lin", score: 34, tier: "SELLING", pct: "17%", hm: HEATMAP_DATA.mike },
+                        { name: "Aaryan Verma", score: 172, tier: "LOCKED IN", pct: "86%", hm: HEATMAP_DATA.alex, avatar: "/animepfp.jpeg" },
+                        { name: "Rohan Bedi", score: 118, tier: "MID", pct: "59%", hm: HEATMAP_DATA.sarah, avatar: "/catpj.jpeg" },
+                        { name: "Jackie Lin", score: 34, tier: "SELLING", pct: "17%", hm: HEATMAP_DATA.mike, avatar: "/voidman.jpeg" },
                       ].map((c, idx) => (
                         <div key={c.name} className="flex flex-col rounded-2xl border border-warm-200 p-4">
                           {/* Avatar */}
-                          <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-full text-[15px] font-bold ${idx === 0 ? "bg-warm-900 text-white" : idx === 1 ? "bg-warm-500 text-white" : "bg-warm-200 text-warm-600"}`}>
-                            {c.name[0]}
-                          </div>
+                          <Image src={c.avatar} alt={c.name} width={40} height={40} className="mb-3 h-10 w-10 rounded-full object-cover" />
                           {/* Name */}
                           <div className="text-[12px] font-semibold text-warm-800">{c.name}</div>
                           {/* Score */}
@@ -603,7 +601,7 @@ export default function LandingPage() {
       {/* ── Final CTA ── */}
       <section className="border-t border-warm-200/50 bg-white py-24">
         <div className="mx-auto max-w-2xl px-6 text-center">
-          <h2 className="font-myflora text-3xl tracking-tight text-warm-900 sm:text-4xl italic">
+          <h2 className="font-myflora font-light text-3xl tracking-tight text-warm-900 sm:text-4xl">
             Your grades deserve
             <br />
             <em>transparency</em>
