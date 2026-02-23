@@ -5,9 +5,9 @@ import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 
 const TIER_LABELS: Record<string, string> = {
-  carry: "CHAD",
-  solid: "LTN",
-  ghost: "SUBHUMAN",
+  carry: "LOCKED IN",
+  solid: "MID",
+  ghost: "SELLING",
 };
 
 export const generateSummary = internalAction({
@@ -57,11 +57,11 @@ Total contributors: ${totalContributors}
 Highest score: ${topScore}, Lowest score: ${bottomScore}
 
 Tier definitions:
-- CHAD (top 25%): Did more than their fair share, carried hard
-- LTN (middle 50%): Put in their fair share
-- SUBHUMAN (bottom 25%): Barely showed up
+- LOCKED IN (top 25%): Did more than their fair share, carried hard
+- MID (middle 50%): Put in their fair share
+- SELLING (bottom 25%): Barely showed up
 
-Write 2-3 sentences about what happened. Use the actual names. Use the words Chad, LTN, and Subhuman naturally in the sentences. Write like a real person texting a friend about a group project, not like a formal report. Short sentences. No em dashes. No semicolons. No bullet points. No markdown. Keep it casual and a little funny.`;
+Write 2-3 sentences about what happened. Use the actual names. Use the words Locked In, Mid, and Selling naturally in the sentences. Write like a real person texting a friend about a group project, not like a formal report. Short sentences. No em dashes. No semicolons. No bullet points. No markdown. Keep it casual and a little funny.`;
 
       // 3. Call the Gemini API
       const apiKey = process.env.GEMINI_API_KEY;

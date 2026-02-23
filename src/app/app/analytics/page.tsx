@@ -178,9 +178,9 @@ function AnalyticsPage() {
   // --- Donut chart: aggregate or per-analysis ---
   const donutSegments = isViewingAnalysis
     ? [
-        { value: selectedContributors.filter((c) => c.tier === "carry").length, color: "#111111", label: "Chad" },
-        { value: selectedContributors.filter((c) => c.tier === "solid").length, color: "#737373", label: "LTN" },
-        { value: selectedContributors.filter((c) => c.tier === "ghost").length, color: "#E5E5E5", label: "Subhuman" },
+        { value: selectedContributors.filter((c) => c.tier === "carry").length, color: "#111111", label: "Locked In" },
+        { value: selectedContributors.filter((c) => c.tier === "solid").length, color: "#737373", label: "Mid" },
+        { value: selectedContributors.filter((c) => c.tier === "ghost").length, color: "#E5E5E5", label: "Selling" },
       ]
     : [
         { value: statusCounts.ready, color: "#4A96D9", label: "Completed" },
@@ -255,7 +255,7 @@ function AnalyticsPage() {
         .slice(0, 5)
         .map((c) => ({
           name: c.name,
-          message: `Score: ${c.score} · ${c.tier === "carry" ? "Chad" : c.tier === "solid" ? "LTN" : "Subhuman"}`,
+          message: `Score: ${c.score} · ${c.tier === "carry" ? "Locked In" : c.tier === "solid" ? "Mid" : "Selling"}`,
           initials: getInitials(c.name),
           color: c.tier === "carry" ? "#111111" : c.tier === "solid" ? "#737373" : "#AAAAAA",
           avatarUrl: c.avatarUrl,

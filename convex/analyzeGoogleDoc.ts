@@ -18,27 +18,27 @@ const DEMO_MODE = true;
 
 const DEMO_CONTRIBUTORS = [
   {
-    name: "Eddy Xu",
-    emailOrHandle: "ex241@cornell.edu",
-    avatarUrl: "/avatar_eddy.png",
+    name: "Aaryan Verma",
+    emailOrHandle: "aaryanverma2004@gmail.com",
+    avatarUrl: "/avatar_aaryan.png",
     score: 171,
     tier: "carry" as const,
     rawStats: { revisions: 89, charsAdded: 38400, wordsAdded: 6340 },
     heatmapData: [0.1,0.2,0.3,0.5,0.6,0.7,0.8,1.0,0.9,0.8,0.7,0.9,1.0,0.8,0.7,0.6,0.8,0.9,0.7,0.5],
   },
   {
-    name: "Madhav Rapelli",
-    emailOrHandle: "mr512@cornell.edu",
-    avatarUrl: "/avatar_madhav.png",
+    name: "Rohan Bedi",
+    emailOrHandle: "rohanbedi2004@gmail.com",
+    avatarUrl: "/avatar_rohan.png",
     score: 82,
     tier: "solid" as const,
     rawStats: { revisions: 34, charsAdded: 14100, wordsAdded: 2310 },
     heatmapData: [0.1,0.2,0.3,0.4,0.5,0.6,0.6,0.7,0.5,0.4,0.5,0.6,0.7,0.5,0.4,0.6,0.5,0.4,0.3,0.2],
   },
   {
-    name: "Max Lee",
-    emailOrHandle: "ml287@cornell.edu",
-    avatarUrl: "/avatar_max.png",
+    name: "Jackie Lin",
+    emailOrHandle: "jackieli2101@gmail.com",
+    avatarUrl: "/avatar_jackie.png",
     score: 31,
     tier: "ghost" as const,
     rawStats: { revisions: 9, charsAdded: 3200, wordsAdded: 510 },
@@ -47,7 +47,7 @@ const DEMO_CONTRIBUTORS = [
 ];
 
 const DEMO_SUMMARY =
-  "Eddy Xu wrote 87% of this document across 89 revisions. Pure Chad. Madhav Rapelli did his part and kept it LTN. Max Lee showed up for maybe 9 revisions total and basically went Subhuman for the last two weeks.";
+  "Aaryan Verma wrote 87% of this document across 89 revisions. Fully locked in. Rohan Bedi did his part and kept it mid. Jackie Lin showed up for maybe 9 revisions total and basically went full selling for the last two weeks.";
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface GoogleRevision {

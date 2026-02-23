@@ -17,19 +17,19 @@ interface ContributorCardProps {
 
 const tierConfig = {
   carry: {
-    label: "CHAD",
+    label: "LOCKED IN",
     color: "text-warm-900",
     bg: "bg-warm-900 border-warm-900 text-white",
     accent: "bg-warm-100",
   },
   solid: {
-    label: "LTN",
+    label: "MID",
     color: "text-warm-600",
     bg: "bg-warm-200 border-warm-200 text-warm-800",
     accent: "bg-warm-100",
   },
   ghost: {
-    label: "SUBHUMAN",
+    label: "SELLING",
     color: "text-warm-400",
     bg: "bg-warm-100 border-warm-100 text-warm-500",
     accent: "bg-warm-50",
@@ -103,9 +103,7 @@ export function ContributorCard({ contributor, index, maxScore }: ContributorCar
             <div
               className={cn(
                 "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[13px] font-bold",
-                source === "doc"
-                  ? "bg-brand/[0.1] text-brand"
-                  : "bg-repo-accent/[0.1] text-repo-accent"
+                "bg-warm-100 text-warm-700"
               )}
             >
               {getInitials(name)}

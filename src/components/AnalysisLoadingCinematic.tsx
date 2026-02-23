@@ -94,9 +94,9 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
                   cy="100"
                   r={radius}
                   fill="none"
-                  stroke={progressColor ? "#6C63FF" : "#E5E5E5"}
+                  stroke={progressColor ? "#111111" : "#E5E5E5"}
                   strokeWidth="1"
-                  strokeOpacity={progressColor ? 0.3 + (i * 0.1) : 0.15}
+                  strokeOpacity={progressColor ? 0.2 + (i * 0.08) : 0.12}
                   className="transition-all duration-700"
                   style={{
                     animation: `radar-pulse ${3 + i * 0.5}s ease-out infinite ${delay}s`,
@@ -112,9 +112,9 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
               y1="100"
               x2="100"
               y2="10"
-              stroke="#6C63FF"
+              stroke="#111111"
               strokeWidth="1.5"
-              strokeOpacity="0.4"
+              strokeOpacity="0.25"
               strokeLinecap="round"
               style={{
                 animation: "radar-spin 3s linear infinite",
@@ -135,7 +135,7 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
                   cx={cx}
                   cy={cy}
                   r="3"
-                  fill={isDoc ? "#6C63FF" : "#2DA44E"}
+                  fill="#111111"
                   opacity={0}
                   animate={{
                     cx: [cx, 100 + Math.cos(angle) * endR],
@@ -163,8 +163,8 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
             >
               {isDoc ? (
                 <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" fill="#4285F4" fillOpacity="0.12" stroke="#4285F4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M14 2v6h6M8 13h8M8 17h8M8 9h2" stroke="#4285F4" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" fill="#111111" fillOpacity="0.06" stroke="#111111" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M14 2v6h6M8 13h8M8 17h8M8 9h2" stroke="#111111" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               ) : (
                 <Github className="h-7 w-7 text-warm-900" strokeWidth={1.5} />
@@ -188,7 +188,7 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
                 {steps[currentStep].text}
               </p>
               {steps[currentStep].counter && (
-                <p className="mt-1 font-mono text-[12px] text-brand">
+                <p className="mt-1 font-mono text-[12px] text-warm-500">
                   <AnimatedCounter target={steps[currentStep].counter!.target} /> {steps[currentStep].counter!.label}
                 </p>
               )}
@@ -199,7 +199,7 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
         {/* Progress bar */}
         <div className="mt-6 h-1.5 w-full overflow-hidden rounded-full bg-warm-100">
           <motion.div
-            className="h-full rounded-full bg-brand"
+            className="h-full rounded-full bg-warm-900"
             initial={{ width: "0%" }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -212,7 +212,7 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
             <div
               key={i}
               className={`h-1.5 w-1.5 rounded-full transition-all duration-500 ${
-                i <= currentStep ? "bg-brand" : "bg-warm-200"
+                i <= currentStep ? "bg-warm-900" : "bg-warm-200"
               }`}
             />
           ))}

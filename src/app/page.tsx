@@ -324,10 +324,10 @@ export default function LandingPage() {
 
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-200 text-[11px] font-bold text-warm-700">E</div>
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-200 text-[11px] font-bold text-warm-700">A</div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-medium text-warm-800">Eddy Xu</span>
+                    <span className="text-[12px] font-medium text-warm-800">Aaryan Verma</span>
                     <span className="text-[11px] font-semibold text-warm-900">172</span>
                   </div>
                   <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-warm-100">
@@ -337,10 +337,10 @@ export default function LandingPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-200 text-[11px] font-bold text-warm-600">M</div>
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-200 text-[11px] font-bold text-warm-600">R</div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-medium text-warm-800">Madhav Rapelli</span>
+                    <span className="text-[12px] font-medium text-warm-800">Rohan Bedi</span>
                     <span className="text-[11px] font-semibold text-warm-700">118</span>
                   </div>
                   <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-warm-100">
@@ -350,10 +350,10 @@ export default function LandingPage() {
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-100 text-[11px] font-bold text-warm-400">M</div>
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-100 text-[11px] font-bold text-warm-400">J</div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-medium text-warm-800">Max Lee</span>
+                    <span className="text-[12px] font-medium text-warm-800">Jackie Lin</span>
                     <span className="text-[11px] font-semibold text-warm-400">34</span>
                   </div>
                   <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-warm-100">
@@ -548,9 +548,9 @@ export default function LandingPage() {
                     <div className="mb-5 text-[16px] font-bold text-warm-900">Analysis Results</div>
                     <div className="grid flex-1 grid-cols-3 gap-4">
                       {[
-                        { name: "Caden Zhang", score: 172, tier: "CHAD", pct: "86%", hm: HEATMAP_DATA.alex },
-                        { name: "Aryan Bedi", score: 118, tier: "LTN", pct: "59%", hm: HEATMAP_DATA.sarah },
-                        { name: "Kevin Nguyen", score: 34, tier: "SUBHUMAN", pct: "17%", hm: HEATMAP_DATA.mike },
+                        { name: "Aaryan Verma", score: 172, tier: "LOCKED IN", pct: "86%", hm: HEATMAP_DATA.alex },
+                        { name: "Rohan Bedi", score: 118, tier: "MID", pct: "59%", hm: HEATMAP_DATA.sarah },
+                        { name: "Jackie Lin", score: 34, tier: "SELLING", pct: "17%", hm: HEATMAP_DATA.mike },
                       ].map((c, idx) => (
                         <div key={c.name} className="flex flex-col rounded-2xl border border-warm-200 p-4">
                           {/* Avatar */}
