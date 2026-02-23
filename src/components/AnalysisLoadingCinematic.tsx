@@ -53,7 +53,7 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
 
   // Step through progress phases
   useEffect(() => {
-    const stepDurations = [1500, 2500, 2000, 1800, 1500];
+    const stepDurations = [800, 1200, 900, 800, 800];
     let elapsed = 0;
 
     const timers: ReturnType<typeof setTimeout>[] = [];

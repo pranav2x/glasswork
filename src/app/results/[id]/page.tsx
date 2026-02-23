@@ -223,7 +223,7 @@ export default function ResultsPage() {
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
             <GlassPanel className="border-l-2 border-l-brand/30 p-5">
               <div className="mb-2 flex items-center gap-2">
@@ -244,7 +244,7 @@ export default function ResultsPage() {
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ delay: 0.15, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
             <GlassPanel className="p-4">
               <div className="flex flex-wrap items-center justify-between gap-4">
@@ -252,7 +252,7 @@ export default function ResultsPage() {
                   className="flex items-center gap-2"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.4 }}
+                  transition={{ delay: 0.2 }}
                 >
                   <Users className="h-4 w-4 text-warm-500" />
                   <span className="text-[13px] font-semibold text-warm-800">
@@ -264,7 +264,7 @@ export default function ResultsPage() {
                   className="flex items-center gap-2"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.5 }}
+                  transition={{ delay: 0.25 }}
                 >
                   <BarChart3 className="h-4 w-4 text-warm-500" />
                   <span className="text-[13px] font-semibold text-warm-800">
@@ -276,7 +276,7 @@ export default function ResultsPage() {
                   className="flex items-center gap-3"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.6 }}
+                  transition={{ delay: 0.3 }}
                 >
                   {summaryStats.lockedIn > 0 && (
                     <span className="flex items-center gap-1.5 text-[12px] font-semibold">
@@ -296,7 +296,7 @@ export default function ResultsPage() {
                   className="text-[11px] text-warm-400"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.7 }}
+                  transition={{ delay: 0.4 }}
                 >
                   Analyzed just now
                 </motion.span>

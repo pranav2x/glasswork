@@ -68,7 +68,7 @@ export function ContributorCard({ contributor, index, maxScore }: ContributorCar
   // Trigger golden glow for LOCKED IN tier after card mounts
   useEffect(() => {
     if (tier === "carry") {
-      const timer = setTimeout(() => setShowGlow(true), (index * 150) + 1800);
+      const timer = setTimeout(() => setShowGlow(true), (index * 80) + 600);
       return () => clearTimeout(timer);
     }
   }, [tier, index]);
@@ -79,8 +79,8 @@ export function ContributorCard({ contributor, index, maxScore }: ContributorCar
       initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
       animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       transition={{
-        delay: index * 0.15,
-        duration: 0.6,
+        delay: index * 0.08,
+        duration: 0.45,
         ease: [0.22, 1, 0.36, 1],
       }}
     >
@@ -179,10 +179,10 @@ export function ContributorCard({ contributor, index, maxScore }: ContributorCar
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{
-                delay: (index * 0.15) + 1.2,
+                delay: (index * 0.08) + 0.5,
                 type: "spring",
-                stiffness: 300,
-                damping: 15,
+                stiffness: 400,
+                damping: 18,
               }}
             >
               <span className={cn(
@@ -202,7 +202,7 @@ export function ContributorCard({ contributor, index, maxScore }: ContributorCar
             className="h-full rounded-full bg-warm-800"
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(100, (fairShareScore / (maxScore ?? Math.max(fairShareScore, 100))) * 100)}%` }}
-            transition={{ delay: (index * 0.15) + 0.8, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ delay: (index * 0.08) + 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           />
         </div>
       </div>
