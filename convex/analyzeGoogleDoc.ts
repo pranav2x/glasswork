@@ -19,30 +19,30 @@ const DEMO_MODE = true;
 const DEMO_CONTRIBUTORS = [
   {
     name: "Aaryan Verma",
-    emailOrHandle: "aaryanverma2004@gmail.com",
+    emailOrHandle: "aaryanthatguy@gmail.com",
     avatarUrl: "/animepfp.jpeg",
-    score: 171,
+    score: 127,
     tier: "solid" as const,
-    rawStats: { revisions: 89, charsAdded: 38400, wordsAdded: 6340 },
-    heatmapData: [0.1,0.2,0.3,0.5,0.6,0.7,0.8,1.0,0.9,0.8,0.7,0.9,1.0,0.8,0.7,0.6,0.8,0.9,0.7,0.5],
+    rawStats: { revisions: 31, charsAdded: 3761, wordsAdded: 724 },
+    heatmapData: [0.2,0.4,0.5,0.6,0.7,0.8,0.6,0.9,0.7,0.5,0.6,0.8,0.7,0.6,0.5,0.7,0.6,0.5,0.4,0.3],
   },
   {
     name: "Rohan Bedi",
     emailOrHandle: "rohanbedi2004@gmail.com",
     avatarUrl: "/catpj.jpeg",
-    score: 82,
+    score: 68,
     tier: "ghost" as const,
-    rawStats: { revisions: 34, charsAdded: 14100, wordsAdded: 2310 },
-    heatmapData: [0.1,0.2,0.3,0.4,0.5,0.6,0.6,0.7,0.5,0.4,0.5,0.6,0.7,0.5,0.4,0.6,0.5,0.4,0.3,0.2],
+    rawStats: { revisions: 18, charsAdded: 2404, wordsAdded: 463 },
+    heatmapData: [0.0,0.1,0.2,0.3,0.2,0.4,0.3,0.2,0.4,0.3,0.2,0.3,0.4,0.2,0.1,0.3,0.2,0.1,0.0,0.1],
   },
   {
     name: "Jackie Lin",
     emailOrHandle: "jackieli2101@gmail.com",
     avatarUrl: "/voidman.jpeg",
-    score: 31,
+    score: 24,
     tier: "ghost" as const,
-    rawStats: { revisions: 9, charsAdded: 3200, wordsAdded: 510 },
-    heatmapData: [0.0,0.0,0.1,0.2,0.0,0.0,0.3,0.0,0.1,0.0,0.0,0.0,0.2,0.0,0.0,0.0,0.3,0.0,0.0,0.0],
+    rawStats: { revisions: 6, charsAdded: 1133, wordsAdded: 218 },
+    heatmapData: [0.0,0.0,0.1,0.0,0.0,0.2,0.0,0.1,0.0,0.0,0.0,0.1,0.0,0.0,0.2,0.0,0.0,0.0,0.1,0.0],
   },
 ];
 // ─────────────────────────────────────────────────────────────────────────────
@@ -147,10 +147,10 @@ export const analyzeGoogleDoc = internalAction({
           avatarUrl: user.image ?? undefined,
           score: 189,
           tier: "carry" as const,
-          rawStats: { revisions: 112, charsAdded: 51200, wordsAdded: 8450 },
-          heatmapData: [0.4,0.6,0.7,0.8,0.9,1.0,0.9,1.0,0.8,0.9,1.0,0.9,0.8,0.9,1.0,0.9,0.8,0.9,0.7,0.6],
+          rawStats: { revisions: 47, charsAdded: 5418, wordsAdded: 1043 },
+          heatmapData: [0.5,0.7,0.8,0.9,1.0,0.9,1.0,0.9,0.8,1.0,0.9,1.0,0.8,0.9,1.0,0.9,0.7,0.8,0.9,0.8],
         };
-        const demoSummary = `${user.name ?? "You"} absolutely carried with 112 revisions and a 189. Fully locked in. Aaryan Verma put in a decent mid effort. Rohan Bedi and Jackie Lin were basically selling the entire time.`;
+        const demoSummary = `${user.name ?? "You"} carried this doc hard — over a thousand words and a 189. Aaryan Verma showed up but wasn't all the way there. Rohan Bedi and Jackie Lin were basically selling the whole  time.`;
         await ctx.runMutation(internal.analyses.writeContributors, {
           analysisId: args.analysisId,
           contributors: [currentUserContributor, ...DEMO_CONTRIBUTORS],

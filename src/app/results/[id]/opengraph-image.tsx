@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { LOGO_BASE64 } from "@/lib/logo-base64";
 
 export const runtime = "edge";
 export const size = { width: 1200, height: 630 };
@@ -53,39 +54,14 @@ export default async function Image({ params }: { params: { id: string } }) {
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           {/* Logo */}
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              background: "#111111",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                width: "20px",
-                height: "20px",
-                gap: "3px",
-              }}
-            >
-              {[0, 1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "2px",
-                    background: "#ffffff",
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={LOGO_BASE64}
+            alt="Glasswork"
+            width={44}
+            height={44}
+            style={{ borderRadius: "10px", objectFit: "contain" }}
+          />
           <span style={{ fontSize: "24px", fontWeight: 700, color: "#111111" }}>
             Glasswork
           </span>

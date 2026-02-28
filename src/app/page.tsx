@@ -99,12 +99,7 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-50 border-b border-warm-200/40 bg-white/80 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="grid h-7 w-7 grid-cols-2 gap-[3px]">
-              <div className="h-3 w-3 rounded-[3px] bg-warm-900" />
-              <div className="h-3 w-3 rounded-[3px] bg-warm-900" />
-              <div className="h-3 w-3 rounded-[3px] bg-warm-900" />
-              <div className="h-3 w-3 rounded-[3px] bg-warm-900" />
-            </div>
+            <img src="/logo.png" alt="Glasswork" className="h-7 w-7 rounded-lg object-contain" />
             <span className="text-[16px] font-bold text-warm-900">Glasswork</span>
           </Link>
 
@@ -132,12 +127,7 @@ export default function LandingPage() {
         <div className="relative z-10 text-center">
           {/* Logo icon */}
           <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-layered animate-fade-up">
-            <div className="grid h-7 w-7 grid-cols-2 gap-[3px]">
-              <div className="h-3 w-3 rounded-[3px] bg-warm-900" />
-              <div className="h-3 w-3 rounded-[3px] bg-warm-900" />
-              <div className="h-3 w-3 rounded-[3px] bg-warm-900" />
-              <div className="h-3 w-3 rounded-[3px] bg-warm-900" />
-            </div>
+            <img src="/logo.png" alt="Glasswork" className="h-12 w-12 rounded-xl object-contain" />
           </div>
 
           {/* Headline */}
@@ -439,13 +429,8 @@ export default function LandingPage() {
                   <div className="flex h-full">
                     {/* Left sidebar */}
                     <div className="w-[180px] shrink-0 border-r border-warm-100 bg-warm-50/50 p-4">
-                      <div className="mb-5 flex items-center gap-2">
-                        <div className="grid h-5 w-5 grid-cols-2 gap-[2px]">
-                          <div className="h-2 w-2 rounded-[2px] bg-warm-700" />
-                          <div className="h-2 w-2 rounded-[2px] bg-warm-700" />
-                          <div className="h-2 w-2 rounded-[2px] bg-warm-700" />
-                          <div className="h-2 w-2 rounded-[2px] bg-warm-700" />
-                        </div>
+                        <div className="mb-5 flex items-center gap-2">
+                        <img src="/logo.png" alt="Glasswork" className="h-5 w-5 rounded object-contain" />
                         <span className="text-[12px] font-bold text-warm-800">Glasswork</span>
                       </div>
                       <div className="space-y-1">
@@ -621,12 +606,7 @@ export default function LandingPage() {
       <footer className="border-t border-warm-200/50 bg-white px-6 py-6">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="grid h-4 w-4 grid-cols-2 gap-[2px]">
-              <div className="h-1.5 w-1.5 rounded-[1px] bg-warm-400" />
-              <div className="h-1.5 w-1.5 rounded-[1px] bg-warm-400" />
-              <div className="h-1.5 w-1.5 rounded-[1px] bg-warm-400" />
-              <div className="h-1.5 w-1.5 rounded-[1px] bg-warm-400" />
-            </div>
+            <img src="/logo.png" alt="Glasswork" className="h-4 w-4 rounded object-contain opacity-50" />
             <span className="text-[13px] font-medium text-warm-500">Glasswork</span>
           </div>
           <p className="text-[12px] text-warm-400">

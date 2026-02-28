@@ -173,13 +173,8 @@ function Sidebar() {
       {/* Logo + Brand */}
       <div className="flex h-14 items-center gap-2 px-3 lg:px-4">
         <Link href="/" title="Back to home" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-warm-900 shadow-sm transition-transform duration-200 hover:scale-105">
-            <div className="grid h-3.5 w-3.5 grid-cols-2 gap-[2px]">
-              <div className="h-1.5 w-1.5 rounded-[2px] bg-white" />
-              <div className="h-1.5 w-1.5 rounded-[2px] bg-white" />
-              <div className="h-1.5 w-1.5 rounded-[2px] bg-white" />
-              <div className="h-1.5 w-1.5 rounded-[2px] bg-white" />
-            </div>
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl shadow-sm transition-transform duration-200 hover:scale-105">
+            <img src="/logo.png" alt="Glasswork" className="h-8 w-8 rounded-xl object-contain" />
           </div>
           <span className="hidden text-[13px] font-bold text-warm-800 lg:block">
             Glasswork
@@ -292,7 +287,7 @@ function UserAvatar() {
 
 function DashboardTopBar() {
   return (
-    <header className="sticky top-0 z-20 bg-white/70 backdrop-blur-xl">
+    <header className="sticky top-0 z-20 bg-[#FAFAF8]/90 backdrop-blur-xl">
       <div className="flex h-14 items-center justify-between px-6">
         {/* Left: Brand (hidden on lg where sidebar shows it) */}
         <Link
@@ -326,15 +321,6 @@ export function AppShell({ children }: AppShellProps) {
   if (isWorkspace && isAuthenticated) {
     return (
       <div className="relative min-h-screen bg-[#FAFAF8] grain-overlay">
-        {/* Ambient color orbs for glassmorphism depth */}
-        <div
-          className="pointer-events-none fixed left-[10%] top-[15%] h-[480px] w-[480px] rounded-full opacity-30 blur-[120px]"
-          style={{ background: "radial-gradient(circle, #6C63FF 0%, transparent 70%)" }}
-        />
-        <div
-          className="pointer-events-none fixed bottom-[10%] right-[8%] h-[360px] w-[360px] rounded-full opacity-20 blur-[100px]"
-          style={{ background: "radial-gradient(circle, #D4A017 0%, transparent 70%)" }}
-        />
         <Sidebar />
         <div className="relative z-10 pl-[56px] lg:pl-[200px]">
           <DashboardTopBar />
