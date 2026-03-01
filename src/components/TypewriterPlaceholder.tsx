@@ -69,7 +69,7 @@ export function TypewriterPlaceholder({ isVisible }: TypewriterPlaceholderProps)
   if (!isVisible) return null;
 
   return (
-    <span className="pointer-events-none text-warm-400">
+    <span className="pointer-events-none text-white/40">
       {text}
       <span className="animate-cursor-blink ml-[1px]">|</span>
     </span>

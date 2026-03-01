@@ -341,3 +341,58 @@ button:hover .fab-icon {
 .animate-cursor-blink {
   animation: cursor-blink 1s step-end infinite;
 }
+
+/* ── Atmospheric Hero Animations ── */
+
+/* Star twinkle */
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.5); }
+}
+
+.star-twinkle {
+  animation: star-twinkle 3s ease-in-out infinite;
+}
+
+/* Snowfall */
+@keyframes snowfall {
+  0% {
+    transform: translateY(-10px) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(100vh) translateX(var(--drift, 20px));
+    opacity: 0;
+  }
+}
+
+.snowflake {
+  top: -10px;
+  animation: snowfall linear infinite;
+}
+
+/* Scroll indicator bounce */
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(4px); opacity: 0.6; }
+}
+
+.scroll-indicator {
+  animation: scroll-bounce 2s ease-in-out infinite;
+}
+
+/* Large sparkle cross */
+@keyframes sparkle-cross {
+  0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(45deg); }
+}
+
+.sparkle-cross {
+  animation: sparkle-cross 4s ease-in-out infinite;
+}
