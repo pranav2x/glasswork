@@ -212,12 +212,12 @@ export default function LandingPage() {
 
           {/* Bottom-left glassmorphism card with input */}
           <motion.div
-            className="absolute bottom-12 left-6 right-6 z-20 sm:left-8 sm:right-auto lg:left-16"
+            className="absolute bottom-12 left-1/2 z-20 w-full max-w-[420px] -translate-x-1/2 px-6 sm:px-0"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="w-full rounded-2xl border border-white/[0.12] bg-white/[0.07] p-7 backdrop-blur-2xl sm:w-[420px]">
+            <div className="w-full rounded-2xl border border-white/[0.12] bg-white/[0.07] p-7 backdrop-blur-2xl">
               <h3 className="font-myflora text-[1.5rem] leading-tight text-white/90">
                 Who <em className="not-italic">actually</em> did the work?
               </h3>
