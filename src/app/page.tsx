@@ -330,16 +330,7 @@ export default function LandingPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
-              <p className="text-[17px] leading-[1.7] text-white/60">
-                We envision a world where every group project is fair.
-                Where contributions are measured, not guessed.
-              </p>
-              <p className="mt-5 text-[17px] leading-[1.7] text-white/60">
-                A world where someone who does all the work gets the
-                credit they deserve. Every edit tracked. Every commit counted.
-              </p>
-
-              <h2 className="font-myflora mt-12 text-[2.5rem] leading-[1.12] tracking-tight text-white sm:text-[3rem]">
+              <h2 className="font-myflora text-[2.5rem] leading-[1.12] tracking-tight text-white sm:text-[3rem]">
                 Where group work is as transparent as glass.
               </h2>
             </motion.div>
