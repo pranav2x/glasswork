@@ -15,8 +15,8 @@ import {
   Inbox,
   CheckCheck,
 } from "lucide-react";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
+import type { Id } from "../../../../convex/_generated/dataModel";
 
 const NOTIFICATION_ICONS = {
   analysis_complete: CheckCircle2,
@@ -67,7 +67,7 @@ function InboxPage() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const handleClick = async (notificationId: string, analysisId?: string) => {
-    await markRead({ notificationId: notificationId as any });
+    await markRead({ notificationId: notificationId as Id<"notifications"> });
     if (analysisId) {
       router.push(`/results/${analysisId}`);
     }

@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useState, useEffect, useRef, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { NewAnalysisModal } from "@/components/NewAnalysisModal";
@@ -76,7 +76,7 @@ function DashboardPage() {
     );
   }
 
-  const { avgScore, activityByMonth, tierCounts } = dashboardData;
+  const { avgScore, activityByMonth } = dashboardData;
   const isEmpty = dashboardData.analyses.length === 0;
 
   // Compute carry streak from sorted analyses (most recent first)

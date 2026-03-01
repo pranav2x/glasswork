@@ -6,7 +6,7 @@ import { GlassPanel } from "@/components/GlassPanel";
 import { TierBadge } from "@/components/TierBadge";
 import { Flame, ArrowUpRight, GitBranch, FileText, MessageSquare } from "lucide-react";
 import Link from "next/link";
-import { formatTimeAgo, getInitials } from "@/lib/formatters";
+import { formatTimeAgo } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
 /* ─── Animated Number ─── */
