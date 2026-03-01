@@ -6,26 +6,20 @@ import Link from "next/link";
 import Image from "next/image";
 import { useConvexAuth, useMutation } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { api } from "../../convex/_generated/api";
-import { Github, ArrowRight, FileText, Eye, Users } from "lucide-react";
+import { Github, ArrowRight, FileText, Eye, Users, BarChart3, MessageSquare, TrendingUp } from "lucide-react";
 import { TypewriterPlaceholder } from "@/components/TypewriterPlaceholder";
 
-// Pre-seeded heatmap data (no Math.random — avoids hydration mismatch)
+/* ─── Pre-seeded data for the results preview card ─── */
 const HEATMAP_DATA = {
   alex:  [1,0,1,1,0,1,0, 1,1,0,1,1,1,0],
   sarah: [0,1,0,1,0,0,1, 1,0,1,0,1,0,1],
   mike:  [0,0,1,0,0,0,1, 0,0,0,1,0,0,0],
 };
 
-// Subtle floating particles (reduced, larger, slower than before)
-const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
-  left: `${(i * 8.3) % 100}%`,
-  size: 2 + (i % 3),
-  delay: (i * 0.7) % 6,
-  duration: 10 + (i % 6),
-  drift: (i % 2 === 0 ? 1 : -1) * (15 + (i % 15)),
-}));
+/* ─── Framer Motion stagger config ─── */
+const easeOut = [0.22, 1, 0.36, 1] as const;
 
 export default function LandingPage() {
   const router = useRouter();
@@ -37,20 +31,12 @@ export default function LandingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [inputFocused, setInputFocused] = useState(false);
-  const [activeScreen, setActiveScreen] = useState(0);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 100);
+    const onScroll = () => setScrolled(window.scrollY > 80);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveScreen((s) => (s === 0 ? 1 : 0));
-    }, 3000);
-    return () => clearInterval(timer);
   }, []);
 
   const handleGetStarted = useCallback(async () => {
@@ -117,169 +103,255 @@ export default function LandingPage() {
   }, [isAuthenticated, signIn, createAnalysis, router]);
 
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        backgroundImage: "url('/Chaotic Gradient.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
+    <div className="min-h-screen bg-[#F4F1ED] overflow-x-hidden">
 
       {/* ── Floating Navbar ── */}
       <nav className="fixed left-0 right-0 top-0 z-50 transition-all duration-500">
         <div className={`mx-auto mt-4 flex max-w-3xl items-center justify-between rounded-full px-7 py-3.5 backdrop-blur-xl transition-all duration-500 ${
           scrolled
             ? "border border-warm-200/60 bg-white/90 shadow-layered"
-            : "border border-white/[0.12] bg-white/[0.06]"
+            : "border border-warm-300/20 bg-white/40"
         }`}>
           <Link href="/" className="flex items-center gap-2.5">
             <img src="/logo.png" alt="Glasswork" className="h-6 w-6 rounded-lg object-contain" />
-            <span className={`font-myflora text-[15px] font-medium transition-colors duration-500 ${scrolled ? "text-warm-900" : "text-white/90"}`}>
+            <span className={`font-myflora text-[15px] font-medium transition-colors duration-500 ${scrolled ? "text-warm-900" : "text-warm-800"}`}>
               Glasswork
             </span>
           </Link>
 
           <div className="hidden items-center gap-8 sm:flex">
-            <span onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })} className={`font-myflora text-[15px] cursor-pointer transition-colors duration-500 ${scrolled ? "text-warm-500 hover:text-warm-900" : "text-white/60 hover:text-white/90"}`}>
+            <span onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })} className="cursor-pointer font-myflora text-[15px] text-warm-500 transition-colors duration-300 hover:text-warm-800">
               About
             </span>
-            <span onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })} className={`font-myflora text-[15px] cursor-pointer transition-colors duration-500 ${scrolled ? "text-warm-500 hover:text-warm-900" : "text-white/60 hover:text-white/90"}`}>
+            <span onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })} className="cursor-pointer font-myflora text-[15px] text-warm-500 transition-colors duration-300 hover:text-warm-800">
               How it works
             </span>
           </div>
 
           <button
             onClick={handleGetStarted}
-            className={`flex items-center gap-1.5 rounded-full px-5 py-2 text-[13px] font-semibold transition-all duration-500 active:scale-[0.97] ${
-              scrolled
-                ? "bg-warm-900 text-white hover:bg-warm-800"
-                : "bg-white text-warm-900 hover:bg-white/90"
-            }`}
+            className="flex items-center gap-1.5 rounded-full border border-warm-800 bg-warm-900 px-5 py-2 text-[13px] font-semibold text-white transition-all duration-300 hover:bg-warm-800 active:scale-[0.97]"
           >
-            {isAuthenticated ? "Dashboard" : "Get Started"}
-            <ArrowRight className="h-3.5 w-3.5" />
+            {isAuthenticated ? "Dashboard" : "Sign up"}
           </button>
         </div>
       </nav>
 
-      {/* ── Hero — Full-bleed background image ── */}
+      {/* ── Hero Section — Earnwave-inspired ── */}
       <section className="relative min-h-screen overflow-hidden">
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-black/40" />
 
-        {/* Subtle floating particles */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {PARTICLES.map((p, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full bg-white/30 snowflake"
-              style={{
-                left: p.left,
-                width: p.size,
-                height: p.size,
-                animationDelay: `${p.delay}s`,
-                animationDuration: `${p.duration}s`,
-                "--drift": `${p.drift}px`,
-              } as React.CSSProperties}
+        {/* Soft warm gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#F4F1ED] via-[#EDE8E1] to-[#E8E2DA]" />
+
+        {/* Wave/curtain shapes — left side (Earnwave-style prominent curtains) */}
+        <div className="wave-left absolute left-0 top-0 h-full w-[30%] pointer-events-none">
+          <svg viewBox="0 0 400 1000" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full" preserveAspectRatio="none">
+            {/* Outer curtain — darker */}
+            <path
+              d="M0 0 L360 0 Q300 200 320 400 Q340 600 260 800 Q200 900 360 1000 L0 1000 Z"
+              fill="#DDD6CA"
+              fillOpacity="0.7"
             />
-          ))}
+            {/* Inner curtain — lighter, slightly offset */}
+            <path
+              d="M0 0 L280 0 Q220 180 240 360 Q260 540 200 720 Q140 860 280 1000 L0 1000 Z"
+              fill="#E5DED3"
+              fillOpacity="0.5"
+            />
+          </svg>
+        </div>
+
+        {/* Wave/curtain shapes — right side */}
+        <div className="wave-right absolute right-0 top-0 h-full w-[30%] pointer-events-none">
+          <svg viewBox="0 0 400 1000" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full" preserveAspectRatio="none">
+            {/* Outer curtain — darker */}
+            <path
+              d="M400 0 L40 0 Q100 200 80 400 Q60 600 140 800 Q200 900 40 1000 L400 1000 Z"
+              fill="#DDD6CA"
+              fillOpacity="0.7"
+            />
+            {/* Inner curtain — lighter */}
+            <path
+              d="M400 0 L120 0 Q180 180 160 360 Q140 540 200 720 Q260 860 120 1000 L400 1000 Z"
+              fill="#E5DED3"
+              fillOpacity="0.5"
+            />
+          </svg>
         </div>
 
         {/* Hero content */}
-        <div className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-10 px-6 pt-24">
+        <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 pt-24 pb-16">
 
-          {/* Centered title */}
-          <div className="flex flex-col items-center text-center">
-            <motion.h1
-              className="font-myflora text-[4.5rem] leading-[1] tracking-tight text-white sm:text-[6rem] md:text-[7.5rem]"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            >
-              Glasswork
-            </motion.h1>
-            <motion.p
-              className="font-myflora mt-3 text-[1.1rem] tracking-wide text-white/50 sm:text-[1.35rem]"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            >
-              See through the work
-            </motion.p>
-          </div>
+          {/* Headline */}
+          <motion.h1
+            className="font-myflora text-center text-[3.5rem] leading-[1.05] tracking-tight text-warm-900 sm:text-[4.5rem] md:text-[5.5rem]"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: easeOut }}
+          >
+            See through the work.
+          </motion.h1>
 
-          {/* Glassmorphism card — centered directly below subtitle */}
-          <motion.div
-            className="w-full max-w-[420px] px-6 sm:px-0"
+          {/* Subtitle */}
+          <motion.p
+            className="mt-5 max-w-lg text-center text-[1rem] leading-relaxed text-warm-500 sm:text-[1.15rem]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.9, delay: 0.2, ease: easeOut }}
           >
-            <div className="w-full rounded-2xl border border-white/[0.12] bg-white/[0.07] p-7 backdrop-blur-2xl">
-              <h3 className="font-myflora text-[1.5rem] leading-tight text-white/90">
-                Who <em className="not-italic">actually</em> did the work?
-              </h3>
-              <p className="mt-2 text-[13px] leading-relaxed text-white/40">
-                Analyze GitHub repos and Google Docs to see who&apos;s locked in and who&apos;s selling.
-              </p>
+            Glasswork analyzes GitHub repos and Google Docs to show exactly who contributed — and who didn&apos;t.
+          </motion.p>
 
-              {/* Input */}
-              <div className="relative mt-5 flex items-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.05] p-2 transition-all focus-within:border-white/20 focus-within:bg-white/[0.08]">
-                <div className="ml-2 flex shrink-0 items-center gap-1.5">
-                  <Github className="h-4 w-4 text-white/30" />
-                  <span className="text-white/20 text-[10px]">/</span>
-                  <FileText className="h-4 w-4 text-white/30" />
-                </div>
-                <div className="relative min-w-0 flex-1">
-                  <input
-                    type="text"
-                    value={repoInput}
-                    onChange={(e) => { setRepoInput(e.target.value); setError(null); }}
-                    onFocus={() => setInputFocused(true)}
-                    onBlur={() => setInputFocused(false)}
-                    onKeyDown={(e) => e.key === "Enter" && handleRepoAnalyze()}
-                    className="relative z-10 w-full bg-transparent py-2 text-[14px] text-white placeholder:text-white/30 focus:outline-none"
-                  />
-                  {!repoInput && !inputFocused && (
-                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px]">
-                      <TypewriterPlaceholder isVisible={!repoInput && !inputFocused} />
-                    </div>
-                  )}
-                  {!repoInput && inputFocused && (
-                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px] text-white/30">
-                      owner/repo or Google Doc link
-                    </div>
-                  )}
-                </div>
-                <button
-                  onClick={handleRepoAnalyze}
-                  disabled={isSubmitting || !repoInput.trim()}
-                  className="shrink-0 rounded-lg bg-white px-4 py-2 text-[13px] font-semibold text-warm-900 transition-all duration-200 hover:bg-white/90 disabled:opacity-30"
-                >
-                  {isSubmitting ? "..." : "Analyze"}
-                </button>
-              </div>
-              {error && <p className="mt-2 text-[12px] text-red-400">{error}</p>}
-
-              <div className="mt-3 flex items-center gap-3">
-                <button
-                  onClick={handleQuickDemo}
-                  disabled={isSubmitting}
-                  className="flex items-center gap-1 text-[13px] text-white/50 transition-colors hover:text-white/80 disabled:opacity-50"
-                >
-                  Try facebook/react
-                  <ArrowRight className="h-3 w-3" />
-                </button>
-              </div>
+          {/* Decorative dots / indicator line */}
+          <motion.div
+            className="mt-10 flex items-center gap-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <div className="h-[3px] w-6 rounded-full bg-warm-300" />
+            <div className="h-2 w-2 rounded-full bg-warm-400" />
+            <div className="h-[3px] w-10 rounded-full bg-warm-300" />
+            <div className="flex h-6 w-6 items-center justify-center rounded-full border border-warm-300">
+              <div className="h-1.5 w-1.5 rounded-full bg-warm-400" />
             </div>
+            <div className="h-[3px] w-10 rounded-full bg-warm-300" />
+            <div className="h-2 w-2 rounded-full bg-warm-400" />
+            <div className="h-[3px] w-6 rounded-full bg-warm-300" />
+          </motion.div>
+
+          {/* Three Bento Cards */}
+          <div className="mt-14 grid w-full max-w-5xl grid-cols-1 gap-5 px-4 sm:grid-cols-3 sm:px-0">
+
+            {/* Card 1: Your Score */}
+            <motion.div
+              className="card-tilt rounded-[20px] border border-warm-200/50 bg-white p-8 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6, ease: easeOut }}
+            >
+              <div className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-[#D4A017]/10 px-3 py-1">
+                <TrendingUp className="h-3 w-3 text-[#D4A017]" />
+                <span className="text-[11px] font-semibold text-[#D4A017]">Your score</span>
+              </div>
+              <div className="font-display text-[3rem] font-bold leading-none tracking-tight text-warm-900">
+                172
+              </div>
+              <p className="mt-1.5 text-[13px] text-warm-400">out of 200</p>
+              {/* Mini sparkline chart — warm gradient bars */}
+              <div className="mt-6 flex items-end gap-[4px] h-[52px]">
+                {[28, 42, 35, 58, 48, 68, 62, 78, 72, 88, 82, 96].map((h, i) => (
+                  <div
+                    key={i}
+                    className="w-full rounded-[3px]"
+                    style={{
+                      height: `${h * 0.54}%`,
+                      background: `linear-gradient(to top, #D4A017${i > 8 ? "" : "60"}, #5BA8C8${i > 8 ? "" : "40"})`,
+                    }}
+                  />
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Card 2: Analyze Sources (center, slightly elevated) */}
+            <motion.div
+              className="card-tilt rounded-[20px] border border-warm-200/50 bg-white p-8 shadow-[0_4px_32px_rgba(0,0,0,0.06)] sm:-mt-5"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.75, ease: easeOut }}
+            >
+              <h3 className="mb-7 text-center text-[16px] font-semibold text-warm-800">Analyze sources</h3>
+              {/* Source icons with connecting lines — like Earnwave's hub */}
+              <div className="relative mx-auto">
+                {/* Connection lines behind icons */}
+                <svg className="absolute inset-0 h-full w-full" viewBox="0 0 200 120" fill="none">
+                  <line x1="50" y1="40" x2="100" y2="40" stroke="#E5E5E5" strokeWidth="1.5" />
+                  <line x1="100" y1="40" x2="150" y2="40" stroke="#E5E5E5" strokeWidth="1.5" />
+                  <line x1="75" y1="90" x2="100" y2="60" stroke="#E5E5E5" strokeWidth="1.5" />
+                  <line x1="125" y1="90" x2="100" y2="60" stroke="#E5E5E5" strokeWidth="1.5" />
+                </svg>
+                <div className="relative flex flex-col items-center gap-5">
+                  <div className="flex items-center gap-6">
+                    <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-warm-200 bg-white shadow-sm">
+                      <Github className="h-6 w-6 text-warm-800" />
+                    </div>
+                    <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-warm-200 bg-white shadow-sm">
+                      <FileText className="h-6 w-6 text-[#4285F4]" />
+                    </div>
+                    <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-warm-200 bg-white shadow-sm">
+                      <Eye className="h-6 w-6 text-warm-500" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-warm-200 bg-white shadow-sm">
+                      <Users className="h-6 w-6 text-warm-500" />
+                    </div>
+                    <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-warm-200 bg-white shadow-sm">
+                      <BarChart3 className="h-6 w-6 text-[#D4A017]" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Card 3: AI Insights — chat bubbles */}
+            <motion.div
+              className="card-tilt rounded-[20px] border border-warm-200/50 bg-white p-8 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.9, ease: easeOut }}
+            >
+              <div className="mb-5 flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-warm-100">
+                  <MessageSquare className="h-4 w-4 text-warm-600" />
+                </div>
+              </div>
+              {/* Chat-style AI summary bubbles */}
+              <div className="space-y-3">
+                <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-warm-100 px-4 py-3">
+                  <p className="text-[12px] leading-relaxed text-warm-600">Who carried the React project?</p>
+                </div>
+                <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-warm-100 px-4 py-3">
+                  <p className="text-[12px] leading-relaxed text-warm-600">How much did Sarah actually write?</p>
+                </div>
+                <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-warm-800 px-4 py-3">
+                  <p className="text-[12px] leading-relaxed text-white/90">Aaryan was carrying hard. Jackie was selling.</p>
+                </div>
+              </div>
+              <div className="mt-5 flex justify-end">
+                <span className="text-[11px] text-warm-400">AI-powered insights</span>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* CTA below cards */}
+          <motion.div
+            className="mt-12 flex flex-col items-center gap-4"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 1.1, ease: easeOut }}
+          >
+            <button
+              onClick={handleGetStarted}
+              className="flex items-center gap-2 rounded-full bg-warm-900 px-8 py-3.5 text-[14px] font-semibold text-white shadow-layered transition-all duration-300 hover:bg-warm-800 hover:scale-[1.02] active:scale-[0.97]"
+            >
+              {isAuthenticated ? "Go to workspace" : "Get started free"}
+              <ArrowRight className="h-4 w-4" />
+            </button>
+            <button
+              onClick={handleQuickDemo}
+              disabled={isSubmitting}
+              className="flex items-center gap-1 text-[13px] text-warm-400 transition-colors hover:text-warm-600 disabled:opacity-50"
+            >
+              Try a demo with facebook/react
+              <ArrowRight className="h-3 w-3" />
+            </button>
           </motion.div>
         </div>
       </section>
 
-      {/* ── Editorial Vision Section ── */}
-      <section id="about" className="relative bg-black/30 py-36 backdrop-blur-sm sm:py-48">
+      {/* ── About Section ── */}
+      <section id="about" className="relative bg-white py-36 sm:py-48">
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid items-center gap-20 lg:grid-cols-2">
 
@@ -289,7 +361,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.8, ease: easeOut }}
             >
               <div className="relative">
                 <div className="grid grid-cols-7 gap-[5px]">
@@ -304,21 +376,21 @@ export default function LandingPage() {
                       0,0,0,1,1,0,0,
                     ][i];
                     const colors = [
-                      "bg-[#ebedf0]",
-                      "bg-[#9be9a8]",
-                      "bg-[#40c463]",
-                      "bg-[#30a14e]",
+                      "bg-warm-200",
+                      "bg-[#D4A017]/30",
+                      "bg-[#D4A017]/60",
+                      "bg-[#D4A017]",
                     ];
                     return (
                       <div
                         key={i}
-                        className={`h-9 w-9 rounded-[3px] ${colors[intensity]} sm:h-11 sm:w-11`}
+                        className={`h-9 w-9 rounded-[4px] ${colors[intensity]} sm:h-11 sm:w-11 transition-colors`}
                       />
                     );
                   })}
                 </div>
-                <div className="absolute -right-3 -top-3 z-10 rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 backdrop-blur-md">
-                  <span className="text-[11px] font-semibold text-white/80">172 contributions</span>
+                <div className="absolute -right-3 -top-3 z-10 rounded-lg border border-warm-200 bg-white px-3 py-1.5 shadow-sm">
+                  <span className="text-[11px] font-semibold text-warm-700">172 contributions</span>
                 </div>
               </div>
             </motion.div>
@@ -328,9 +400,9 @@ export default function LandingPage() {
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.8, delay: 0.1, ease: easeOut }}
             >
-              <h2 className="font-myflora text-[2.5rem] leading-[1.12] tracking-tight text-white sm:text-[3rem]">
+              <h2 className="font-myflora text-[2.5rem] leading-[1.12] tracking-tight text-warm-900 sm:text-[3rem]">
                 Where group work is as transparent as glass.
               </h2>
             </motion.div>
@@ -338,29 +410,29 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Problem Statement ── */}
-      <section id="how-it-works" className="relative bg-black/30 py-32 backdrop-blur-sm sm:py-44">
+      {/* ── How It Works ── */}
+      <section id="how-it-works" className="relative bg-[#F9F7F4] py-32 sm:py-44">
         <div className="mx-auto max-w-5xl px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.8, ease: easeOut }}
           >
-            <h2 className="font-myflora text-[2.75rem] leading-[1.12] tracking-tight text-white sm:text-[3.5rem]">
+            <h2 className="font-myflora text-[2.75rem] leading-[1.12] tracking-tight text-warm-900 sm:text-[3.5rem]">
               Every group project has someone who does nothing{" "}
-              <span className="text-white/40">
+              <span className="text-warm-400">
                 and someone who does everything.
               </span>
             </h2>
 
-            <p className="mt-8 font-myflora text-[1.75rem] text-white/90 sm:text-[2.25rem]">
+            <p className="mt-8 font-myflora text-[1.75rem] text-warm-700 sm:text-[2.25rem]">
               You already know who. Now prove it.
             </p>
           </motion.div>
 
           {/* Feature cards */}
-          <div className="mt-24 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-24 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
                 icon: <Eye className="h-5 w-5" />,
@@ -375,30 +447,30 @@ export default function LandingPage() {
               {
                 icon: <Users className="h-5 w-5" />,
                 title: "Fair share scores",
-                desc: "Each contributor gets a score. No hiding behind others' work.",
+                desc: "Each contributor gets a score from 0 to 200. No hiding behind others' work.",
               },
             ].map((feature, i) => (
               <motion.div
                 key={feature.title}
-                className="group rounded-2xl border border-white/[0.12] bg-white/[0.07] p-8 backdrop-blur-xl transition-all duration-300 hover:bg-white/[0.12]"
+                className="card-tilt group rounded-[20px] border border-warm-200/50 bg-white p-8 shadow-[0_4px_32px_rgba(0,0,0,0.04)]"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
               >
-                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 text-white/70 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white">
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-warm-100 text-warm-600 transition-all duration-300 group-hover:bg-warm-200 group-hover:text-warm-800">
                   {feature.icon}
                 </div>
-                <h3 className="text-[16px] font-semibold text-white">{feature.title}</h3>
-                <p className="mt-2 text-[14px] leading-relaxed text-white/50">{feature.desc}</p>
+                <h3 className="text-[16px] font-semibold text-warm-800">{feature.title}</h3>
+                <p className="mt-2 text-[14px] leading-relaxed text-warm-500">{feature.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Screenshots ── */}
-      <section className="bg-black/30 py-32 backdrop-blur-sm sm:py-40">
+      {/* ── Screenshots / Product Preview ── */}
+      <section className="bg-white py-32 sm:py-40">
         <div className="mx-auto max-w-5xl px-6">
           <motion.div
             className="mb-16"
@@ -407,10 +479,10 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="font-myflora text-[2.5rem] tracking-tight text-white sm:text-[3rem]">
+            <h2 className="font-myflora text-[2.5rem] tracking-tight text-warm-900 sm:text-[3rem]">
               See exactly who showed up
             </h2>
-            <p className="mt-4 max-w-md text-[17px] leading-[1.7] text-white/60">
+            <p className="mt-4 max-w-md text-[17px] leading-[1.7] text-warm-500">
               Your group members&apos; scores, their exact contributions,
               all in one clean dashboard.
             </p>
@@ -418,209 +490,177 @@ export default function LandingPage() {
 
           {/* Browser frame */}
           <motion.div
-            className="relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.07] shadow-[0_12px_48px_rgba(0,0,0,0.2)] backdrop-blur-xl"
+            className="relative overflow-hidden rounded-2xl border border-warm-200 bg-white shadow-[0_12px_48px_rgba(0,0,0,0.08)]"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            <div className="flex items-center gap-2 border-b border-white/10 bg-white/[0.05] px-4 py-3">
+            <div className="flex items-center gap-2 border-b border-warm-100 bg-warm-50 px-4 py-3">
               <div className="flex gap-1.5">
-                <div className="h-3 w-3 rounded-full bg-white/20" />
-                <div className="h-3 w-3 rounded-full bg-white/20" />
-                <div className="h-3 w-3 rounded-full bg-white/20" />
+                <div className="h-3 w-3 rounded-full bg-warm-300" />
+                <div className="h-3 w-3 rounded-full bg-warm-200" />
+                <div className="h-3 w-3 rounded-full bg-warm-200" />
               </div>
-              <div className="mx-auto flex h-6 w-48 items-center justify-center rounded-md bg-white/10 text-[11px] text-white/40">
+              <div className="mx-auto flex h-6 w-48 items-center justify-center rounded-md bg-warm-100 text-[11px] text-warm-400">
                 glasswork.app
               </div>
             </div>
 
-            <div className="relative h-[420px] overflow-hidden bg-black/20">
-              <AnimatePresence mode="wait">
-                {activeScreen === 0 ? (
-                  <motion.div
-                    key="dashboard"
-                    className="absolute inset-0"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <div className="flex h-full">
-                      <div className="w-[180px] shrink-0 border-r border-white/10 bg-white/[0.03] p-4">
-                        <div className="mb-5 flex items-center gap-2">
-                          <img src="/logo.png" alt="Glasswork" className="h-5 w-5 rounded object-contain" />
-                          <span className="text-[12px] font-bold text-white/80">Glasswork</span>
-                        </div>
-                        <div className="space-y-1">
-                          {["Analyses", "Reports", "Settings"].map((item, i) => (
-                            <div key={item} className={`flex items-center gap-2 rounded-lg px-2.5 py-2 ${i === 0 ? "bg-white/10" : ""}`}>
-                              <div className="h-3.5 w-3.5 rounded bg-white/20" />
-                              <span className={`text-[11px] font-medium ${i === 0 ? "text-white/90" : "text-white/50"}`}>{item}</span>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="mt-6">
-                          <div className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-white/30">Recent</div>
-                          <div className="space-y-1">
-                            {["facebook/react", "vercel/next.js", "torvalds/linux"].map((repo) => (
-                              <div key={repo} className="flex items-center gap-2 rounded-lg px-2.5 py-1.5">
-                                <Github className="h-3 w-3 shrink-0 text-white/30" />
-                                <span className="truncate text-[10px] text-white/50">{repo}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+            <div className="relative h-[420px] overflow-hidden bg-[#FAFAF8]">
+              {/* Results view - static showcase */}
+              <div className="flex h-full flex-col p-5">
+                <div className="mb-1 text-[11px] text-warm-400">facebook/react</div>
+                <div className="mb-5 text-[16px] font-bold text-warm-800">Analysis Results</div>
+                <div className="grid flex-1 grid-cols-3 gap-4">
+                  {[
+                    { name: "Aaryan Verma", score: 172, tier: "LOCKED IN", pct: "86%", hm: HEATMAP_DATA.alex, avatar: "/animepfp.jpeg", tierColor: "bg-[#D4A017] text-white" },
+                    { name: "Rohan Bedi", score: 118, tier: "MID", pct: "59%", hm: HEATMAP_DATA.sarah, avatar: "/catpj.jpeg", tierColor: "bg-[#5BA8C8]/20 text-[#5BA8C8]" },
+                    { name: "Jackie Lin", score: 34, tier: "SELLING", pct: "17%", hm: HEATMAP_DATA.mike, avatar: "/voidman.jpeg", tierColor: "bg-warm-200 text-warm-400" },
+                  ].map((c) => (
+                    <div key={c.name} className="flex flex-col rounded-2xl border border-warm-200/40 bg-white/60 p-4">
+                      <Image src={c.avatar} alt={c.name} width={40} height={40} className="mb-3 h-10 w-10 rounded-full object-cover" />
+                      <div className="text-[12px] font-semibold text-warm-700">{c.name}</div>
+                      <div className="mt-1 text-[32px] font-bold leading-none text-warm-900">{c.score}</div>
+                      <div className={`mt-2 w-fit rounded-full px-2 py-0.5 text-[8px] font-bold ${c.tierColor}`}>
+                        {c.tier}
                       </div>
-                      <div className="flex-1 p-5">
-                        <div className="mb-4 text-[15px] font-bold text-white/90">Dashboard</div>
-                        <div className="grid grid-cols-3 gap-3">
-                          {[{ label: "Analyses", val: "12" }, { label: "Contributors", val: "34" }, { label: "Avg Score", val: "124" }].map((s) => (
-                            <div key={s.label} className="rounded-xl border border-white/10 p-3">
-                              <div className="text-[10px] text-white/40">{s.label}</div>
-                              <div className="mt-1 text-[22px] font-bold text-white/90">{s.val}</div>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="mt-4 grid grid-cols-2 gap-3">
-                          <div className="rounded-xl border border-white/10 p-3">
-                            <div className="mb-2 text-[11px] font-semibold text-white/70">Score Distribution</div>
-                            <div className="flex items-center gap-4">
-                              <svg viewBox="0 0 64 64" className="h-14 w-14 shrink-0">
-                                <circle cx="32" cy="32" r="24" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
-                                <circle cx="32" cy="32" r="24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="8" strokeDasharray="75 75" strokeDashoffset="19" strokeLinecap="round" transform="rotate(-90 32 32)" />
-                                <circle cx="32" cy="32" r="24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="8" strokeDasharray="45 105" strokeDashoffset="-56" strokeLinecap="round" transform="rotate(-90 32 32)" />
-                              </svg>
-                              <div className="space-y-1.5">
-                                {[{ label: "Locked In", color: "bg-white/90" }, { label: "Solid", color: "bg-white/50" }, { label: "Not Locked", color: "bg-white/20" }].map((t) => (
-                                  <div key={t.label} className="flex items-center gap-1.5">
-                                    <div className={`h-2 w-2 rounded-full ${t.color}`} />
-                                    <span className="text-[9px] text-white/50">{t.label}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="rounded-xl border border-white/10 p-3">
-                            <div className="mb-2 text-[11px] font-semibold text-white/70">Top Contributors</div>
-                            <div className="space-y-2">
-                              {[{ name: "Alex C.", score: 172, pct: "86%" }, { name: "Sarah K.", score: 118, pct: "59%" }, { name: "Mike T.", score: 34, pct: "17%" }].map((p) => (
-                                <div key={p.name} className="flex items-center gap-2">
-                                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/10 text-[8px] font-bold text-white/60">{p.name[0]}</div>
-                                  <div className="min-w-0 flex-1">
-                                    <div className="flex justify-between">
-                                      <span className="text-[9px] text-white/60">{p.name}</span>
-                                      <span className="text-[9px] font-bold text-white/90">{p.score}</span>
-                                    </div>
-                                    <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-white/10">
-                                      <div className="h-full rounded-full bg-white/70" style={{ width: p.pct }} />
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="results"
-                    className="absolute inset-0"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <div className="flex h-full flex-col p-5">
-                      <div className="mb-1 text-[11px] text-white/40">facebook/react</div>
-                      <div className="mb-5 text-[16px] font-bold text-white/90">Analysis Results</div>
-                      <div className="grid flex-1 grid-cols-3 gap-4">
-                        {[
-                          { name: "Aaryan Verma", score: 172, tier: "LOCKED IN", pct: "86%", hm: HEATMAP_DATA.alex, avatar: "/animepfp.jpeg" },
-                          { name: "Rohan Bedi", score: 118, tier: "MID", pct: "59%", hm: HEATMAP_DATA.sarah, avatar: "/catpj.jpeg" },
-                          { name: "Jackie Lin", score: 34, tier: "SELLING", pct: "17%", hm: HEATMAP_DATA.mike, avatar: "/voidman.jpeg" },
-                        ].map((c, idx) => (
-                          <div key={c.name} className="flex flex-col rounded-2xl border border-white/10 p-4">
-                            <Image src={c.avatar} alt={c.name} width={40} height={40} className="mb-3 h-10 w-10 rounded-full object-cover" />
-                            <div className="text-[12px] font-semibold text-white/80">{c.name}</div>
-                            <div className="mt-1 text-[32px] font-bold leading-none text-white/90">{c.score}</div>
-                            <div className={`mt-2 w-fit rounded-full px-2 py-0.5 text-[8px] font-bold ${idx === 0 ? "bg-white/90 text-warm-900" : idx === 1 ? "bg-white/50 text-warm-900" : "bg-white/20 text-white/60"}`}>
-                              {c.tier}
-                            </div>
-                            <div className="mt-3 grid grid-cols-7 gap-[2px]">
-                              {c.hm.map((v, i) => (
-                                <div key={i} className={`aspect-square rounded-[2px] ${v ? (idx === 0 ? "bg-white/70" : idx === 1 ? "bg-white/50" : "bg-white/30") : "bg-white/10"}`} />
-                              ))}
-                            </div>
-                            <div className="mt-3">
-                              <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-                                <div className={`h-full rounded-full ${idx === 0 ? "bg-white/80" : idx === 1 ? "bg-white/50" : "bg-white/20"}`} style={{ width: c.pct }} />
-                              </div>
-                            </div>
-                          </div>
+                      <div className="mt-3 grid grid-cols-7 gap-[2px]">
+                        {c.hm.map((v, i) => (
+                          <div key={i} className={`aspect-square rounded-[2px] ${v ? "bg-warm-400" : "bg-warm-100"}`} />
                         ))}
                       </div>
+                      <div className="mt-3">
+                        <div className="h-1.5 overflow-hidden rounded-full bg-warm-100">
+                          <div className="h-full rounded-full bg-gradient-to-r from-[#5BA8C8] to-[#D4A017]" style={{ width: c.pct }} />
+                        </div>
+                      </div>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                  ))}
+                </div>
+              </div>
             </div>
           </motion.div>
+        </div>
+      </section>
 
-          <div className="mt-5 flex items-center justify-center gap-2">
-            {[0, 1].map((i) => (
-              <button
-                key={i}
-                onClick={() => setActiveScreen(i)}
-                className={`h-2 rounded-full transition-all duration-300 ${activeScreen === i ? "w-6 bg-white" : "w-2 bg-white/30"}`}
-                aria-label={i === 0 ? "Dashboard view" : "Results view"}
-              />
-            ))}
-          </div>
+      {/* ── Input Section — Where users actually try it ── */}
+      <section className="bg-[#F9F7F4] py-32 sm:py-40">
+        <div className="mx-auto max-w-xl px-6">
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: easeOut }}
+          >
+            <h2 className="font-myflora text-[2.5rem] leading-[1.1] tracking-tight text-warm-900 sm:text-[3rem]">
+              Try it yourself
+            </h2>
+            <p className="mt-4 text-[15px] text-warm-500">
+              Paste a GitHub repo or Google Doc link and see who actually did the work.
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="mt-10"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+          >
+            <div className="rounded-[20px] border border-warm-200/50 bg-white p-7 shadow-[0_4px_32px_rgba(0,0,0,0.06)]">
+              {/* Input */}
+              <div className="relative flex items-center gap-2 rounded-xl border border-warm-200 bg-warm-50/50 p-2 transition-all focus-within:border-warm-400 focus-within:bg-white">
+                <div className="ml-2 flex shrink-0 items-center gap-1.5">
+                  <Github className="h-4 w-4 text-warm-400" />
+                  <span className="text-warm-300 text-[10px]">/</span>
+                  <FileText className="h-4 w-4 text-warm-400" />
+                </div>
+                <div className="relative min-w-0 flex-1">
+                  <input
+                    type="text"
+                    value={repoInput}
+                    onChange={(e) => { setRepoInput(e.target.value); setError(null); }}
+                    onFocus={() => setInputFocused(true)}
+                    onBlur={() => setInputFocused(false)}
+                    onKeyDown={(e) => e.key === "Enter" && handleRepoAnalyze()}
+                    className="relative z-10 w-full bg-transparent py-2 text-[14px] text-warm-800 placeholder:text-warm-400 focus:outline-none"
+                  />
+                  {!repoInput && !inputFocused && (
+                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px]">
+                      <TypewriterPlaceholder isVisible={!repoInput && !inputFocused} />
+                    </div>
+                  )}
+                  {!repoInput && inputFocused && (
+                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px] text-warm-400">
+                      owner/repo or Google Doc link
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={handleRepoAnalyze}
+                  disabled={isSubmitting || !repoInput.trim()}
+                  className="shrink-0 rounded-lg bg-warm-900 px-4 py-2 text-[13px] font-semibold text-white transition-all duration-200 hover:bg-warm-800 disabled:opacity-30"
+                >
+                  {isSubmitting ? "..." : "Analyze"}
+                </button>
+              </div>
+              {error && <p className="mt-2 text-[12px] text-red-500">{error}</p>}
+
+              <div className="mt-3 flex items-center gap-3">
+                <button
+                  onClick={handleQuickDemo}
+                  disabled={isSubmitting}
+                  className="flex items-center gap-1 text-[13px] text-warm-400 transition-colors hover:text-warm-600 disabled:opacity-50"
+                >
+                  Try facebook/react
+                  <ArrowRight className="h-3 w-3" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── Final CTA ── */}
-      <section className="relative overflow-hidden bg-black/30 py-40 backdrop-blur-sm sm:py-48">
+      <section className="relative overflow-hidden bg-white py-40 sm:py-48">
         <div className="mx-auto max-w-3xl px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.8, ease: easeOut }}
           >
-            <h2 className="font-myflora text-[2.75rem] leading-[1.1] tracking-tight text-white sm:text-[3.5rem]">
+            <h2 className="font-myflora text-[2.75rem] leading-[1.1] tracking-tight text-warm-900 sm:text-[3.5rem]">
               Your grades deserve
               <br />
               <em>transparency</em>
             </h2>
-            <p className="mt-6 text-[17px] leading-[1.7] text-white/60">
+            <p className="mt-6 text-[17px] leading-[1.7] text-warm-500">
               Stop guessing. Start knowing. Glasswork shows you
               exactly who did what.
             </p>
 
             <button
               onClick={handleGetStarted}
-              className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-[15px] font-semibold text-warm-900 shadow-layered transition-all duration-200 hover:scale-[1.03] hover:bg-white/90 active:scale-[0.97]"
+              className="mt-10 inline-flex items-center gap-2 rounded-full bg-warm-900 px-8 py-4 text-[15px] font-semibold text-white shadow-layered transition-all duration-200 hover:scale-[1.03] hover:bg-warm-800 active:scale-[0.97]"
             >
               {isAuthenticated ? "Go to workspace" : "Get started free"}
               <ArrowRight className="h-4 w-4" />
             </button>
-
           </motion.div>
         </div>
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-white/10 bg-black/30 px-6 py-10 backdrop-blur-sm">
+      <footer className="border-t border-warm-200 bg-[#F9F7F4] px-6 py-10">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="Glasswork" className="h-5 w-5 rounded-lg object-contain opacity-40" />
-            <span className="font-myflora text-[14px] text-white/40">Glasswork</span>
+            <img src="/logo.png" alt="Glasswork" className="h-5 w-5 rounded-lg object-contain opacity-50" />
+            <span className="font-myflora text-[14px] text-warm-400">Glasswork</span>
           </div>
-          <p className="text-[12px] text-white/40">
+          <p className="text-[12px] text-warm-400">
             Built by a 16-year-old who was always locked in.
           </p>
         </div>

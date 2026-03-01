@@ -366,3 +366,86 @@ button:hover .fab-icon {
   top: -10px;
   animation: snowfall linear infinite;
 }
+
+/* ── Earnwave-inspired wave/curtain animations ── */
+@keyframes wave-rise-left {
+  0% {
+    transform: translateY(100%) scaleY(0);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes wave-rise-right {
+  0% {
+    transform: translateY(100%) scaleY(0);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scaleY(1);
+    opacity: 1;
+  }
+}
+
+.wave-left {
+  transform-origin: bottom center;
+  animation: wave-rise-left 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.wave-right {
+  transform-origin: bottom center;
+  animation: wave-rise-right 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+
+/* Card perspective tilt on hover (Earnwave flatten effect) */
+.card-tilt {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card-tilt:hover {
+  transform: perspective(800px) rotateX(2deg) rotateY(-1deg) translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+/* Staggered fade-in for hero content */
+@keyframes calm-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.calm-fade-in {
+  animation: calm-fade-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Dot pulse for decorative indicators */
+@keyframes dot-fade {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dot-fade {
+  animation: dot-fade 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
