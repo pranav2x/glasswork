@@ -19,20 +19,20 @@ interface ContributorCardProps {
 const tierConfig = {
   carry: {
     label: "LOCKED IN",
-    color: "text-warm-900",
-    bg: "bg-warm-900 border-warm-900 text-white",
-    accent: "bg-warm-100",
+    color: "text-[#D4A017]",
+    bg: "bg-[#D4A017] border-[#D4A017] text-white",
+    accent: "bg-[#D4A017]/5",
   },
   solid: {
     label: "MID",
-    color: "text-warm-600",
-    bg: "bg-warm-200 border-warm-200 text-warm-800",
-    accent: "bg-warm-100",
+    color: "text-[#5BA8C8]",
+    bg: "bg-[#5BA8C8]/20 border-[#5BA8C8]/30 text-[#5BA8C8]",
+    accent: "bg-[#5BA8C8]/5",
   },
   ghost: {
     label: "SELLING",
     color: "text-warm-400",
-    bg: "bg-warm-100 border-warm-100 text-warm-500",
+    bg: "bg-warm-100 border-warm-200 text-warm-400 opacity-60",
     accent: "bg-warm-50",
   },
 };
@@ -91,7 +91,7 @@ export function ContributorCard({ contributor, index, maxScore, revealDelay }: C
       }}
     >
       <div className={cn(
-        "group flex h-full flex-col gap-5 rounded-2xl border border-white/60 bg-white/70 p-6 shadow-card backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover",
+        "group flex h-full flex-col gap-5 rounded-2xl border border-white/50 bg-white/55 p-6 shadow-card backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover",
         showGlow && "animate-golden-glow"
       )}>
         {/* Avatar + Name */}
@@ -203,9 +203,9 @@ export function ContributorCard({ contributor, index, maxScore, revealDelay }: C
         </div>
 
         {/* Score Progress Bar */}
-        <div className="h-1.5 overflow-hidden rounded-full bg-warm-100">
+        <div className="h-1.5 overflow-hidden rounded-full bg-white/40">
           <motion.div
-            className="h-full rounded-full bg-warm-800"
+            className="h-full rounded-full bg-gradient-to-r from-[#3B7A9E] to-[#D4A017]"
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(100, (fairShareScore / (maxScore ?? Math.max(fairShareScore, 100))) * 100)}%` }}
             transition={{ delay: baseDelay + 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
