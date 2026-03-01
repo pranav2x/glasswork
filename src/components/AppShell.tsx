@@ -11,20 +11,18 @@ import { useClickOutside } from "@/hooks/useClickOutside";
 import { getInitials } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 import {
-  Search,
-  LayoutGrid,
-  BarChart3,
-  FileText,
+  Home,
+  Inbox,
+  FolderKanban,
   Settings,
   LogOut,
-  GitBranch,
 } from "lucide-react";
 
 interface AppShellProps {
   children: React.ReactNode;
 }
 
-/* ─── Settings Popover (for collapsed sidebar) ─── */
+/* ─── Settings Popover (for collapsed sidebar on mobile) ─── */
 
 function SettingsPopover() {
   const { signOut } = useAuthActions();
@@ -36,7 +34,7 @@ function SettingsPopover() {
   useClickOutside(ref, close);
 
   return (
-    <div className="relative lg:hidden" ref={ref}>
+    <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
         className={cn(
@@ -51,7 +49,7 @@ function SettingsPopover() {
       </button>
 
       {open && (
-        <div className="absolute bottom-0 left-[56px] z-50 min-w-[220px] overflow-hidden rounded-2xl border border-warm-200 bg-white shadow-layered-lg">
+        <div className="absolute bottom-0 left-[56px] z-50 min-w-[220px] overflow-hidden rounded-2xl border border-white/[0.25] bg-white/80 backdrop-blur-xl shadow-layered-lg lg:bottom-auto lg:left-auto lg:right-0 lg:top-full lg:mt-2">
           {user && (
             <div className="flex items-center gap-3 border-b border-warm-100 px-4 py-3.5">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm-100">
@@ -83,6 +81,14 @@ function SettingsPopover() {
             </div>
           )}
           <div className="py-1.5">
+            <Link
+              href="/app/settings"
+              onClick={() => setOpen(false)}
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] font-medium text-warm-500 transition-colors hover:bg-warm-50 hover:text-warm-700"
+            >
+              <Settings className="h-3.5 w-3.5" />
+              Settings
+            </Link>
             <button
               onClick={() => {
                 setOpen(false);
@@ -108,12 +114,14 @@ function SidebarNavItem({
   isActive,
   href,
   onClick,
+  badge,
 }: {
-  icon: typeof LayoutGrid;
+  icon: typeof Home;
   label: string;
   isActive?: boolean;
   href?: string;
   onClick?: () => void;
+  badge?: number;
 }) {
   const inner = (
     <button
@@ -121,8 +129,8 @@ function SidebarNavItem({
       className={cn(
         "group/icon relative flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 transition-all duration-200",
         isActive
-          ? "bg-warm-200 text-warm-900"
-          : "text-warm-500 hover:bg-warm-100 hover:text-warm-700"
+          ? "bg-white/50 text-warm-900 shadow-sm"
+          : "text-warm-500 hover:bg-white/30 hover:text-warm-700"
       )}
     >
       <Icon className="h-[16px] w-[16px] shrink-0" strokeWidth={1.5} />
@@ -134,6 +142,12 @@ function SidebarNavItem({
       >
         {label}
       </span>
+      {/* Unread badge */}
+      {badge !== undefined && badge > 0 && (
+        <span className="absolute right-1.5 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-carry px-1 text-[9px] font-bold text-white lg:relative lg:right-auto lg:top-auto lg:ml-auto">
+          {badge > 99 ? "99+" : badge}
+        </span>
+      )}
       {/* Tooltip for collapsed sidebar */}
       <span className="pointer-events-none absolute left-[44px] whitespace-nowrap rounded-lg bg-warm-900 px-2.5 py-1 text-[11px] font-medium text-white opacity-0 shadow-md transition-opacity group-hover/icon:opacity-100 lg:hidden">
         {label}
@@ -151,25 +165,14 @@ function SidebarNavItem({
 
 function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const recentAnalyses = useQuery(api.analyses.listAnalyses, {});
 
-  const handleSearch = () => {
-    if (pathname !== "/app") {
-      router.push("/app?search=1");
-    } else {
-      window.dispatchEvent(new CustomEvent("glasswork:focus-search"));
-    }
-  };
-
-  const isAnalysesActive =
+  const isHomeActive =
     pathname === "/app" || pathname.startsWith("/results");
-  const isAnalyticsActive = pathname === "/app/analytics";
-  const isReportsActive = pathname === "/app/reports";
-  const isSettingsActive = pathname === "/app/settings";
+  const isInboxActive = pathname === "/app/inbox";
+  const isProjectsActive = pathname === "/app/projects";
 
   return (
-    <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col border-r border-warm-100 bg-warm-50/50 lg:w-[200px]">
+    <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col border-r border-white/[0.25] bg-[#FFF5EB]/[0.12] backdrop-blur-[20px] lg:w-[200px]">
       {/* Logo + Brand */}
       <div className="flex h-14 items-center gap-2 px-3 lg:px-4">
         <Link href="/" title="Back to home" className="flex items-center gap-2">
@@ -182,68 +185,30 @@ function Sidebar() {
         </Link>
       </div>
 
-      {/* Navigation */}
+      {/* Navigation — 3 primary destinations */}
       <nav className="mt-2 flex flex-col gap-1 px-2 lg:px-3">
         <SidebarNavItem
-          icon={Search}
-          label="Search"
-          onClick={handleSearch}
-        />
-        <SidebarNavItem
-          icon={LayoutGrid}
-          label="Analyses"
+          icon={Home}
+          label="Home"
           href="/app"
-          isActive={isAnalysesActive}
+          isActive={isHomeActive}
         />
         <SidebarNavItem
-          icon={BarChart3}
-          label="Analytics"
-          href="/app/analytics"
-          isActive={isAnalyticsActive}
+          icon={Inbox}
+          label="Inbox"
+          href="/app/inbox"
+          isActive={isInboxActive}
         />
         <SidebarNavItem
-          icon={FileText}
-          label="Reports"
-          href="/app/reports"
-          isActive={isReportsActive}
-        />
-        <SidebarNavItem
-          icon={Settings}
-          label="Settings"
-          href="/app/settings"
-          isActive={isSettingsActive}
+          icon={FolderKanban}
+          label="Projects"
+          href="/app/projects"
+          isActive={isProjectsActive}
         />
       </nav>
 
-      {/* Recent section (expanded sidebar only) */}
-      <div className="mt-6 hidden px-4 lg:block">
-        <div className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-warm-400">
-          Recent
-        </div>
-        <div className="space-y-1">
-          {recentAnalyses && recentAnalyses.length > 0 ? (
-            recentAnalyses.slice(0, 3).map((a) => (
-              <Link key={a._id} href={`/results/${a._id}`}>
-                <div className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 transition-colors hover:bg-warm-100">
-                  {a.sourceType === "github_repo" ? (
-                    <GitBranch className="h-3 w-3 shrink-0 text-warm-400" />
-                  ) : (
-                    <FileText className="h-3 w-3 shrink-0 text-warm-400" />
-                  )}
-                  <span className="truncate text-[10px] text-warm-500">
-                    {a.title}
-                  </span>
-                </div>
-              </Link>
-            ))
-          ) : (
-            <p className="px-2.5 text-[10px] text-warm-400">No analyses yet</p>
-          )}
-        </div>
-      </div>
-
-      {/* Bottom: Settings popover (collapsed sidebar only) */}
-      <div className="mt-auto mb-4 flex justify-center lg:hidden">
+      {/* Bottom: Settings */}
+      <div className="mt-auto mb-4 px-2 lg:px-3">
         <SettingsPopover />
       </div>
     </aside>
@@ -287,7 +252,7 @@ function UserAvatar() {
 
 function DashboardTopBar() {
   return (
-    <header className="sticky top-0 z-20 bg-[#FAFAF8]/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-20 bg-white/60 backdrop-blur-xl border-b border-white/[0.25]">
       <div className="flex h-14 items-center justify-between px-6">
         {/* Left: Brand (hidden on lg where sidebar shows it) */}
         <Link
@@ -320,7 +285,11 @@ export function AppShell({ children }: AppShellProps) {
 
   if (isWorkspace && isAuthenticated) {
     return (
-      <div className="relative min-h-screen bg-[#FAFAF8] grain-overlay">
+      <div className="relative min-h-screen grain-overlay">
+        {/* Warm cream gradient background */}
+        <div className="fixed inset-0 -z-10" style={{ background: "linear-gradient(135deg, #FFF8F0 0%, #FBF7F4 40%, #F5F0EB 100%)" }} />
+        <div className="fixed -left-[200px] -top-[200px] -z-10 h-[600px] w-[600px] rounded-full bg-[#FFE8D4] opacity-30 blur-[120px]" />
+        <div className="fixed -bottom-[100px] -right-[100px] -z-10 h-[500px] w-[500px] rounded-full bg-[#FFF0D4] opacity-25 blur-[120px]" />
         <Sidebar />
         <div className="relative z-10 pl-[56px] lg:pl-[200px]">
           <DashboardTopBar />
