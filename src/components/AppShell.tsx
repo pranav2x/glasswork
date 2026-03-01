@@ -165,6 +165,7 @@ function SidebarNavItem({
 
 function Sidebar() {
   const pathname = usePathname();
+  const unreadCount = useQuery(api.notifications.getUnreadCount);
 
   const isHomeActive =
     pathname === "/app" || pathname.startsWith("/results");
@@ -198,6 +199,7 @@ function Sidebar() {
           label="Inbox"
           href="/app/inbox"
           isActive={isInboxActive}
+          badge={unreadCount ?? undefined}
         />
         <SidebarNavItem
           icon={FolderKanban}

@@ -53,4 +53,22 @@ export default defineSchema({
       })
     ),
   }).index("by_analysisId", ["analysisId"]),
+
+  notifications: defineTable({
+    userId: v.id("users"),
+    type: v.union(
+      v.literal("tier_change"),
+      v.literal("mvp_status"),
+      v.literal("analysis_complete"),
+      v.literal("streak_milestone")
+    ),
+    title: v.string(),
+    body: v.string(),
+    analysisId: v.optional(v.id("analyses")),
+    contributorName: v.optional(v.string()),
+    read: v.boolean(),
+    createdAt: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_userId_read", ["userId", "read"]),
 });

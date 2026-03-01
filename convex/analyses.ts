@@ -250,6 +250,36 @@ export const writeContributors = internalMutation({
         heatmapData: c.heatmapData,
       });
     }
+
+    // Create notifications
+    const analysis = await ctx.db.get(args.analysisId);
+    if (analysis && args.contributors.length > 0) {
+      // Analysis complete notification
+      await ctx.db.insert("notifications", {
+        userId: analysis.userId,
+        type: "analysis_complete",
+        title: `Analysis complete: ${analysis.title}`,
+        body: `${args.contributors.length} contributor${args.contributors.length !== 1 ? "s" : ""} scored.`,
+        analysisId: args.analysisId,
+        read: false,
+        createdAt: Date.now(),
+      });
+
+      // MVP notification if top contributor is carry tier
+      const mvp = args.contributors.reduce((top, c) => c.score > top.score ? c : top);
+      if (mvp.tier === "carry") {
+        await ctx.db.insert("notifications", {
+          userId: analysis.userId,
+          type: "mvp_status",
+          title: `${mvp.name} is LOCKED IN`,
+          body: `Score: ${mvp.score}/200 on ${analysis.title}`,
+          analysisId: args.analysisId,
+          contributorName: mvp.name,
+          read: false,
+          createdAt: Date.now(),
+        });
+      }
+    }
   },
 });
 
