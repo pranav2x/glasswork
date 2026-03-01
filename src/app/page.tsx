@@ -618,9 +618,6 @@ export default function LandingPage() {
               <ArrowRight className="h-4 w-4" />
             </button>
 
-            <p className="mt-4 text-[13px] text-white/40">
-              Free to use. No credit card required.
-            </p>
           </motion.div>
         </div>
       </section>
