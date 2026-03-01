@@ -142,10 +142,10 @@ export default function LandingPage() {
           </Link>
 
           <div className="hidden items-center gap-8 sm:flex">
-            <span className={`text-[14px] font-medium cursor-pointer transition-colors duration-500 ${scrolled ? "text-warm-500 hover:text-warm-900" : "text-white/60 hover:text-white/90"}`}>
+            <span onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })} className={`font-myflora text-[15px] cursor-pointer transition-colors duration-500 ${scrolled ? "text-warm-500 hover:text-warm-900" : "text-white/60 hover:text-white/90"}`}>
               About
             </span>
-            <span className={`text-[14px] font-medium cursor-pointer transition-colors duration-500 ${scrolled ? "text-warm-500 hover:text-warm-900" : "text-white/60 hover:text-white/90"}`}>
+            <span onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })} className={`font-myflora text-[15px] cursor-pointer transition-colors duration-500 ${scrolled ? "text-warm-500 hover:text-warm-900" : "text-white/60 hover:text-white/90"}`}>
               How it works
             </span>
           </div>
@@ -279,7 +279,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Editorial Vision Section ── */}
-      <section className="relative bg-black/30 py-36 backdrop-blur-sm sm:py-48">
+      <section id="about" className="relative bg-black/30 py-36 backdrop-blur-sm sm:py-48">
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid items-center gap-20 lg:grid-cols-2">
 
@@ -348,7 +348,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Problem Statement ── */}
-      <section className="relative bg-black/30 py-32 backdrop-blur-sm sm:py-44">
+      <section id="how-it-works" className="relative bg-black/30 py-32 backdrop-blur-sm sm:py-44">
         <div className="mx-auto max-w-5xl px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
