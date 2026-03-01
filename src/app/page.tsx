@@ -282,20 +282,20 @@ export default function LandingPage() {
       </section>
 
       {/* ── Editorial Vision Section ── */}
-      <section className="relative bg-white py-36 sm:py-48">
+      <section className="relative bg-white py-40 sm:py-56">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="grid items-center gap-20 lg:grid-cols-2">
+          <div className="grid items-start gap-24 lg:grid-cols-[1fr_1.2fr]">
 
-            {/* Left: GitHub-style contribution graph */}
+            {/* Left: Decorative contribution grid */}
             <motion.div
-              className="flex justify-center"
+              className="flex justify-center lg:sticky lg:top-32"
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="relative">
-                <div className="grid grid-cols-7 gap-[5px]">
+                <div className="grid grid-cols-7 gap-[6px]">
                   {Array.from({ length: 49 }, (_, i) => {
                     const intensity = [
                       0,0,1,0,0,0,0,
@@ -315,7 +315,7 @@ export default function LandingPage() {
                     return (
                       <div
                         key={i}
-                        className={`h-9 w-9 rounded-[3px] ${colors[intensity]} sm:h-11 sm:w-11`}
+                        className={`h-10 w-10 rounded-[4px] ${colors[intensity]} sm:h-12 sm:w-12`}
                       />
                     );
                   })}
@@ -333,16 +333,16 @@ export default function LandingPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
-              <p className="text-[17px] leading-[1.7] text-warm-500">
+              <p className="text-[20px] leading-[1.8] text-warm-400">
                 We envision a world where every group project is fair.
                 Where contributions are measured, not guessed.
               </p>
-              <p className="mt-5 text-[17px] leading-[1.7] text-warm-500">
+              <p className="mt-8 text-[20px] leading-[1.8] text-warm-400">
                 A world where someone who does all the work gets the
                 credit they deserve. Every edit tracked. Every commit counted.
               </p>
 
-              <h2 className="font-myflora mt-12 text-[2.5rem] leading-[1.12] tracking-tight text-warm-900 sm:text-[3rem]">
+              <h2 className="font-myflora mt-16 text-[2.75rem] leading-[1.1] tracking-tight text-warm-900 sm:text-[3.5rem]">
                 Where group work is as transparent as glass.
               </h2>
             </motion.div>
