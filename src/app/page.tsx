@@ -3,12 +3,20 @@
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useConvexAuth, useMutation } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../../convex/_generated/api";
-import { Github, ArrowRight, FileText } from "lucide-react";
+import { Github, ArrowRight, FileText, Eye, Users } from "lucide-react";
 import { TypewriterPlaceholder } from "@/components/TypewriterPlaceholder";
+
+// Pre-seeded heatmap data (no Math.random — avoids hydration mismatch)
+const HEATMAP_DATA = {
+  alex:  [1,0,1,1,0,1,0, 1,1,0,1,1,1,0],
+  sarah: [0,1,0,1,0,0,1, 1,0,1,0,1,0,1],
+  mike:  [0,0,1,0,0,0,1, 0,0,0,1,0,0,0],
+};
 
 // Subtle floating particles (reduced, larger, slower than before)
 const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
@@ -29,12 +37,20 @@ export default function LandingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [inputFocused, setInputFocused] = useState(false);
+  const [activeScreen, setActiveScreen] = useState(0);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 100);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveScreen((s) => (s === 0 ? 1 : 0));
+    }, 3000);
+    return () => clearInterval(timer);
   }, []);
 
   const handleGetStarted = useCallback(async () => {
@@ -101,7 +117,15 @@ export default function LandingPage() {
   }, [isAuthenticated, signIn, createAnalysis, router]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundImage: "url('/Chaotic Gradient.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
 
       {/* ── Floating Navbar ── */}
       <nav className="fixed left-0 right-0 top-0 z-50 transition-all duration-500">
@@ -128,7 +152,11 @@ export default function LandingPage() {
 
           <button
             onClick={handleGetStarted}
-            className="flex items-center gap-1.5 rounded-full bg-warm-900 px-5 py-2 text-[13px] font-semibold text-white transition-all duration-500 hover:bg-warm-800 active:scale-[0.97]"
+            className={`flex items-center gap-1.5 rounded-full px-5 py-2 text-[13px] font-semibold transition-all duration-500 active:scale-[0.97] ${
+              scrolled
+                ? "bg-warm-900 text-white hover:bg-warm-800"
+                : "bg-white text-warm-900 hover:bg-white/90"
+            }`}
           >
             {isAuthenticated ? "Dashboard" : "Get Started"}
             <ArrowRight className="h-3.5 w-3.5" />
@@ -137,19 +165,9 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero — Full-bleed background image ── */}
-      <section
-        className="relative min-h-[200vh] overflow-hidden"
-        style={{
-          backgroundImage: "url('/Chaotic Gradient.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
-        }}
-      >
+      <section className="relative min-h-screen overflow-hidden">
         {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-black/40" />
-        {/* Bottom fade to black for seamless transition */}
-        <div className="absolute bottom-0 left-0 right-0 h-[60%] bg-gradient-to-t from-black via-black/60 to-transparent" />
 
         {/* Subtle floating particles */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -182,6 +200,14 @@ export default function LandingPage() {
             >
               Glasswork
             </motion.h1>
+            <motion.p
+              className="font-myflora mt-3 text-center text-[1.1rem] tracking-wide text-white/50 sm:text-[1.35rem]"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            >
+              See through the work
+            </motion.p>
           </div>
 
           {/* Bottom-left glassmorphism card with input */}
@@ -249,37 +275,24 @@ export default function LandingPage() {
               </div>
             </div>
           </motion.div>
-
-          {/* Bottom-right tagline */}
-          <motion.div
-            className="absolute bottom-12 right-6 z-20 hidden items-center gap-3 sm:flex lg:right-16"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.9, duration: 0.8 }}
-          >
-            <img src="/logo.png" alt="" className="h-5 w-5 rounded-lg object-contain opacity-60" />
-            <p className="max-w-[240px] text-[13px] leading-snug text-white/40">
-              See who actually did the work in every group project.
-            </p>
-          </motion.div>
         </div>
       </section>
 
       {/* ── Editorial Vision Section ── */}
-      <section className="relative bg-white py-40 sm:py-56">
+      <section className="relative bg-black/30 py-36 backdrop-blur-sm sm:py-48">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="grid items-start gap-24 lg:grid-cols-[1fr_1.2fr]">
+          <div className="grid items-center gap-20 lg:grid-cols-2">
 
-            {/* Left: Decorative contribution grid */}
+            {/* Left: GitHub-style contribution graph */}
             <motion.div
-              className="flex justify-center lg:sticky lg:top-32"
+              className="flex justify-center"
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="relative">
-                <div className="grid grid-cols-7 gap-[6px]">
+                <div className="grid grid-cols-7 gap-[5px]">
                   {Array.from({ length: 49 }, (_, i) => {
                     const intensity = [
                       0,0,1,0,0,0,0,
@@ -299,13 +312,13 @@ export default function LandingPage() {
                     return (
                       <div
                         key={i}
-                        className={`h-10 w-10 rounded-[4px] ${colors[intensity]} sm:h-12 sm:w-12`}
+                        className={`h-9 w-9 rounded-[3px] ${colors[intensity]} sm:h-11 sm:w-11`}
                       />
                     );
                   })}
                 </div>
-                <div className="absolute -right-3 -top-3 rounded-lg border border-warm-200 bg-white px-3 py-1.5 shadow-layered">
-                  <span className="text-[11px] font-semibold text-warm-700">172 contributions</span>
+                <div className="absolute -right-3 -top-3 rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 backdrop-blur-md">
+                  <span className="text-[11px] font-semibold text-white/80">172 contributions</span>
                 </div>
               </div>
             </motion.div>
@@ -317,16 +330,16 @@ export default function LandingPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
-              <p className="text-[20px] leading-[1.8] text-warm-400">
+              <p className="text-[17px] leading-[1.7] text-white/60">
                 We envision a world where every group project is fair.
                 Where contributions are measured, not guessed.
               </p>
-              <p className="mt-8 text-[20px] leading-[1.8] text-warm-400">
+              <p className="mt-5 text-[17px] leading-[1.7] text-white/60">
                 A world where someone who does all the work gets the
                 credit they deserve. Every edit tracked. Every commit counted.
               </p>
 
-              <h2 className="font-myflora mt-16 text-[2.75rem] leading-[1.1] tracking-tight text-warm-900 sm:text-[3.5rem]">
+              <h2 className="font-myflora mt-12 text-[2.5rem] leading-[1.12] tracking-tight text-white sm:text-[3rem]">
                 Where group work is as transparent as glass.
               </h2>
             </motion.div>
@@ -334,8 +347,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Problem Statement + Device Mockup ── */}
-      <section className="relative bg-white py-32 sm:py-44">
+      {/* ── Problem Statement ── */}
+      <section className="relative bg-black/30 py-32 backdrop-blur-sm sm:py-44">
         <div className="mx-auto max-w-5xl px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -343,151 +356,244 @@ export default function LandingPage() {
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            <h2 className="font-myflora text-[2.75rem] leading-[1.12] tracking-tight text-warm-800 sm:text-[3.5rem]">
+            <h2 className="font-myflora text-[2.75rem] leading-[1.12] tracking-tight text-white sm:text-[3.5rem]">
               Every group project has someone who does nothing{" "}
-              <span className="text-warm-300">
+              <span className="text-white/40">
                 and someone who does everything.
               </span>
             </h2>
 
-            <p className="mt-8 font-myflora text-[1.75rem] text-warm-900 sm:text-[2.25rem]">
-              They need a way to prove it.
+            <p className="mt-8 font-myflora text-[1.75rem] text-white/90 sm:text-[2.25rem]">
+              You already know who. Now prove it.
             </p>
           </motion.div>
 
-          {/* Text + Device Mockup */}
+          {/* Feature cards */}
+          <div className="mt-24 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                icon: <Eye className="h-5 w-5" />,
+                title: "See through repos",
+                desc: "Every commit, every line change, every contributor scored fairly.",
+              },
+              {
+                icon: <FileText className="h-5 w-5" />,
+                title: "See through docs",
+                desc: "Google Docs revision history analyzed to see who actually wrote what.",
+              },
+              {
+                icon: <Users className="h-5 w-5" />,
+                title: "Fair share scores",
+                desc: "Each contributor gets a score. No hiding behind others' work.",
+              },
+            ].map((feature, i) => (
+              <motion.div
+                key={feature.title}
+                className="group rounded-2xl border border-white/[0.12] bg-white/[0.07] p-8 backdrop-blur-xl transition-all duration-300 hover:bg-white/[0.12]"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+              >
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 text-white/70 transition-all duration-300 group-hover:bg-white/20 group-hover:text-white">
+                  {feature.icon}
+                </div>
+                <h3 className="text-[16px] font-semibold text-white">{feature.title}</h3>
+                <p className="mt-2 text-[14px] leading-relaxed text-white/50">{feature.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Screenshots ── */}
+      <section className="bg-black/30 py-32 backdrop-blur-sm sm:py-40">
+        <div className="mx-auto max-w-5xl px-6">
           <motion.div
-            className="mt-24 grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:items-start"
+            className="mb-16"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="font-myflora text-[2.5rem] tracking-tight text-white sm:text-[3rem]">
+              See exactly who showed up
+            </h2>
+            <p className="mt-4 max-w-md text-[17px] leading-[1.7] text-white/60">
+              Your group members&apos; scores, their exact contributions,
+              all in one clean dashboard.
+            </p>
+          </motion.div>
+
+          {/* Browser frame */}
+          <motion.div
+            className="relative overflow-hidden rounded-2xl border border-white/[0.12] bg-white/[0.07] shadow-[0_12px_48px_rgba(0,0,0,0.2)] backdrop-blur-xl"
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            {/* Left: description */}
-            <div>
-              <h3 className="font-myflora text-[1.5rem] text-warm-900">
-                Scattered contributions
-              </h3>
-              <p className="mt-4 text-[16px] leading-[1.7] text-warm-400">
-                GitHub commits and Google Doc edits are scattered across
-                platforms. Manual checking is tedious and unreliable.
-                You need a unified view of who did what.
-              </p>
+            <div className="flex items-center gap-2 border-b border-white/10 bg-white/[0.05] px-4 py-3">
+              <div className="flex gap-1.5">
+                <div className="h-3 w-3 rounded-full bg-white/20" />
+                <div className="h-3 w-3 rounded-full bg-white/20" />
+                <div className="h-3 w-3 rounded-full bg-white/20" />
+              </div>
+              <div className="mx-auto flex h-6 w-48 items-center justify-center rounded-md bg-white/10 text-[11px] text-white/40">
+                glasswork.app
+              </div>
             </div>
 
-            {/* Right: Static browser mockup */}
-            <div className="overflow-hidden rounded-2xl border border-warm-200 bg-white shadow-[0_12px_48px_rgba(0,0,0,0.08)]">
-              {/* Browser chrome */}
-              <div className="flex items-center gap-2 border-b border-warm-200 bg-warm-50 px-4 py-3">
-                <div className="flex gap-1.5">
-                  <div className="h-3 w-3 rounded-full bg-warm-300" />
-                  <div className="h-3 w-3 rounded-full bg-warm-300" />
-                  <div className="h-3 w-3 rounded-full bg-warm-300" />
-                </div>
-                <div className="mx-auto flex h-6 w-48 items-center justify-center rounded-md bg-warm-200/60 text-[11px] text-warm-400">
-                  glasswork.app
-                </div>
-              </div>
-
-              {/* Static dashboard content */}
-              <div className="h-[400px] overflow-hidden bg-white">
-                <div className="flex h-full">
-                  <div className="w-[180px] shrink-0 border-r border-warm-100 bg-warm-50/50 p-4">
-                    <div className="mb-5 flex items-center gap-2">
-                      <img src="/logo.png" alt="Glasswork" className="h-5 w-5 rounded object-contain" />
-                      <span className="text-[12px] font-bold text-warm-800">Glasswork</span>
-                    </div>
-                    <div className="space-y-1">
-                      {["Analyses", "Reports", "Settings"].map((item, i) => (
-                        <div key={item} className={`flex items-center gap-2 rounded-lg px-2.5 py-2 ${i === 0 ? "bg-warm-200" : ""}`}>
-                          <div className="h-3.5 w-3.5 rounded bg-warm-300" />
-                          <span className={`text-[11px] font-medium ${i === 0 ? "text-warm-900" : "text-warm-500"}`}>{item}</span>
+            <div className="relative h-[420px] overflow-hidden bg-black/20">
+              <AnimatePresence mode="wait">
+                {activeScreen === 0 ? (
+                  <motion.div
+                    key="dashboard"
+                    className="absolute inset-0"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <div className="flex h-full">
+                      <div className="w-[180px] shrink-0 border-r border-white/10 bg-white/[0.03] p-4">
+                        <div className="mb-5 flex items-center gap-2">
+                          <img src="/logo.png" alt="Glasswork" className="h-5 w-5 rounded object-contain" />
+                          <span className="text-[12px] font-bold text-white/80">Glasswork</span>
                         </div>
-                      ))}
-                    </div>
-                    <div className="mt-6">
-                      <div className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-warm-400">Recent</div>
-                      <div className="space-y-1">
-                        {["facebook/react", "vercel/next.js", "torvalds/linux"].map((repo) => (
-                          <div key={repo} className="flex items-center gap-2 rounded-lg px-2.5 py-1.5">
-                            <Github className="h-3 w-3 shrink-0 text-warm-400" />
-                            <span className="truncate text-[10px] text-warm-500">{repo}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex-1 p-5">
-                    <div className="mb-4 text-[15px] font-bold text-warm-900">Dashboard</div>
-                    <div className="grid grid-cols-3 gap-3">
-                      {[{ label: "Analyses", val: "12" }, { label: "Contributors", val: "34" }, { label: "Avg Score", val: "124" }].map((s) => (
-                        <div key={s.label} className="rounded-xl border border-warm-100 p-3">
-                          <div className="text-[10px] text-warm-400">{s.label}</div>
-                          <div className="mt-1 text-[22px] font-bold text-warm-900">{s.val}</div>
+                        <div className="space-y-1">
+                          {["Analyses", "Reports", "Settings"].map((item, i) => (
+                            <div key={item} className={`flex items-center gap-2 rounded-lg px-2.5 py-2 ${i === 0 ? "bg-white/10" : ""}`}>
+                              <div className="h-3.5 w-3.5 rounded bg-white/20" />
+                              <span className={`text-[11px] font-medium ${i === 0 ? "text-white/90" : "text-white/50"}`}>{item}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                    <div className="mt-4 grid grid-cols-2 gap-3">
-                      <div className="rounded-xl border border-warm-100 p-3">
-                        <div className="mb-2 text-[11px] font-semibold text-warm-700">Score Distribution</div>
-                        <div className="flex items-center gap-4">
-                          <svg viewBox="0 0 64 64" className="h-14 w-14 shrink-0">
-                            <circle cx="32" cy="32" r="24" fill="none" stroke="#E5E5E5" strokeWidth="8" />
-                            <circle cx="32" cy="32" r="24" fill="none" stroke="#111" strokeWidth="8" strokeDasharray="75 75" strokeDashoffset="19" strokeLinecap="round" transform="rotate(-90 32 32)" />
-                            <circle cx="32" cy="32" r="24" fill="none" stroke="#737373" strokeWidth="8" strokeDasharray="45 105" strokeDashoffset="-56" strokeLinecap="round" transform="rotate(-90 32 32)" />
-                          </svg>
-                          <div className="space-y-1.5">
-                            {[{ label: "Locked In", color: "bg-warm-900" }, { label: "Solid", color: "bg-warm-500" }, { label: "Not Locked", color: "bg-warm-300" }].map((t) => (
-                              <div key={t.label} className="flex items-center gap-1.5">
-                                <div className={`h-2 w-2 rounded-full ${t.color}`} />
-                                <span className="text-[9px] text-warm-500">{t.label}</span>
+                        <div className="mt-6">
+                          <div className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-white/30">Recent</div>
+                          <div className="space-y-1">
+                            {["facebook/react", "vercel/next.js", "torvalds/linux"].map((repo) => (
+                              <div key={repo} className="flex items-center gap-2 rounded-lg px-2.5 py-1.5">
+                                <Github className="h-3 w-3 shrink-0 text-white/30" />
+                                <span className="truncate text-[10px] text-white/50">{repo}</span>
                               </div>
                             ))}
                           </div>
                         </div>
                       </div>
-                      <div className="rounded-xl border border-warm-100 p-3">
-                        <div className="mb-2 text-[11px] font-semibold text-warm-700">Top Contributors</div>
-                        <div className="space-y-2">
-                          {[{ name: "Alex C.", score: 172, pct: "86%" }, { name: "Sarah K.", score: 118, pct: "59%" }, { name: "Mike T.", score: 34, pct: "17%" }].map((p) => (
-                            <div key={p.name} className="flex items-center gap-2">
-                              <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-warm-200 text-[8px] font-bold text-warm-600">{p.name[0]}</div>
-                              <div className="min-w-0 flex-1">
-                                <div className="flex justify-between">
-                                  <span className="text-[9px] text-warm-600">{p.name}</span>
-                                  <span className="text-[9px] font-bold text-warm-900">{p.score}</span>
-                                </div>
-                                <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-warm-100">
-                                  <div className="h-full rounded-full bg-warm-800" style={{ width: p.pct }} />
-                                </div>
-                              </div>
+                      <div className="flex-1 p-5">
+                        <div className="mb-4 text-[15px] font-bold text-white/90">Dashboard</div>
+                        <div className="grid grid-cols-3 gap-3">
+                          {[{ label: "Analyses", val: "12" }, { label: "Contributors", val: "34" }, { label: "Avg Score", val: "124" }].map((s) => (
+                            <div key={s.label} className="rounded-xl border border-white/10 p-3">
+                              <div className="text-[10px] text-white/40">{s.label}</div>
+                              <div className="mt-1 text-[22px] font-bold text-white/90">{s.val}</div>
                             </div>
                           ))}
                         </div>
+                        <div className="mt-4 grid grid-cols-2 gap-3">
+                          <div className="rounded-xl border border-white/10 p-3">
+                            <div className="mb-2 text-[11px] font-semibold text-white/70">Score Distribution</div>
+                            <div className="flex items-center gap-4">
+                              <svg viewBox="0 0 64 64" className="h-14 w-14 shrink-0">
+                                <circle cx="32" cy="32" r="24" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
+                                <circle cx="32" cy="32" r="24" fill="none" stroke="rgba(255,255,255,0.9)" strokeWidth="8" strokeDasharray="75 75" strokeDashoffset="19" strokeLinecap="round" transform="rotate(-90 32 32)" />
+                                <circle cx="32" cy="32" r="24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="8" strokeDasharray="45 105" strokeDashoffset="-56" strokeLinecap="round" transform="rotate(-90 32 32)" />
+                              </svg>
+                              <div className="space-y-1.5">
+                                {[{ label: "Locked In", color: "bg-white/90" }, { label: "Solid", color: "bg-white/50" }, { label: "Not Locked", color: "bg-white/20" }].map((t) => (
+                                  <div key={t.label} className="flex items-center gap-1.5">
+                                    <div className={`h-2 w-2 rounded-full ${t.color}`} />
+                                    <span className="text-[9px] text-white/50">{t.label}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="rounded-xl border border-white/10 p-3">
+                            <div className="mb-2 text-[11px] font-semibold text-white/70">Top Contributors</div>
+                            <div className="space-y-2">
+                              {[{ name: "Alex C.", score: 172, pct: "86%" }, { name: "Sarah K.", score: 118, pct: "59%" }, { name: "Mike T.", score: 34, pct: "17%" }].map((p) => (
+                                <div key={p.name} className="flex items-center gap-2">
+                                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/10 text-[8px] font-bold text-white/60">{p.name[0]}</div>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex justify-between">
+                                      <span className="text-[9px] text-white/60">{p.name}</span>
+                                      <span className="text-[9px] font-bold text-white/90">{p.score}</span>
+                                    </div>
+                                    <div className="mt-0.5 h-1 overflow-hidden rounded-full bg-white/10">
+                                      <div className="h-full rounded-full bg-white/70" style={{ width: p.pct }} />
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="results"
+                    className="absolute inset-0"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <div className="flex h-full flex-col p-5">
+                      <div className="mb-1 text-[11px] text-white/40">facebook/react</div>
+                      <div className="mb-5 text-[16px] font-bold text-white/90">Analysis Results</div>
+                      <div className="grid flex-1 grid-cols-3 gap-4">
+                        {[
+                          { name: "Aaryan Verma", score: 172, tier: "LOCKED IN", pct: "86%", hm: HEATMAP_DATA.alex, avatar: "/animepfp.jpeg" },
+                          { name: "Rohan Bedi", score: 118, tier: "MID", pct: "59%", hm: HEATMAP_DATA.sarah, avatar: "/catpj.jpeg" },
+                          { name: "Jackie Lin", score: 34, tier: "SELLING", pct: "17%", hm: HEATMAP_DATA.mike, avatar: "/voidman.jpeg" },
+                        ].map((c, idx) => (
+                          <div key={c.name} className="flex flex-col rounded-2xl border border-white/10 p-4">
+                            <Image src={c.avatar} alt={c.name} width={40} height={40} className="mb-3 h-10 w-10 rounded-full object-cover" />
+                            <div className="text-[12px] font-semibold text-white/80">{c.name}</div>
+                            <div className="mt-1 text-[32px] font-bold leading-none text-white/90">{c.score}</div>
+                            <div className={`mt-2 w-fit rounded-full px-2 py-0.5 text-[8px] font-bold ${idx === 0 ? "bg-white/90 text-warm-900" : idx === 1 ? "bg-white/50 text-warm-900" : "bg-white/20 text-white/60"}`}>
+                              {c.tier}
+                            </div>
+                            <div className="mt-3 grid grid-cols-7 gap-[2px]">
+                              {c.hm.map((v, i) => (
+                                <div key={i} className={`aspect-square rounded-[2px] ${v ? (idx === 0 ? "bg-white/70" : idx === 1 ? "bg-white/50" : "bg-white/30") : "bg-white/10"}`} />
+                              ))}
+                            </div>
+                            <div className="mt-3">
+                              <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+                                <div className={`h-full rounded-full ${idx === 0 ? "bg-white/80" : idx === 1 ? "bg-white/50" : "bg-white/20"}`} style={{ width: c.pct }} />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
+
+          <div className="mt-5 flex items-center justify-center gap-2">
+            {[0, 1].map((i) => (
+              <button
+                key={i}
+                onClick={() => setActiveScreen(i)}
+                className={`h-2 rounded-full transition-all duration-300 ${activeScreen === i ? "w-6 bg-white" : "w-2 bg-white/30"}`}
+                aria-label={i === 0 ? "Dashboard view" : "Results view"}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── Product Section — Dark with gradient bg ── */}
-      <section className="relative overflow-hidden py-32 sm:py-44">
-        {/* Background: Chaotic Gradient at low opacity */}
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: "url('/Chaotic Gradient.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-        <div className="absolute inset-0 bg-warm-900/80" />
-
-        <div className="relative z-10 mx-auto max-w-5xl px-6">
+      {/* ── Final CTA ── */}
+      <section className="relative overflow-hidden bg-black/30 py-40 backdrop-blur-sm sm:py-48">
+        <div className="mx-auto max-w-3xl px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -495,185 +601,40 @@ export default function LandingPage() {
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
             <h2 className="font-myflora text-[2.75rem] leading-[1.1] tracking-tight text-white sm:text-[3.5rem]">
-              Glasswork lets you analyze contributions with a single link
+              Your grades deserve
+              <br />
+              <em>transparency</em>
             </h2>
-            <p className="mt-8 max-w-2xl text-[18px] leading-[1.7] text-white/60">
-              Paste a GitHub repo or Google Doc link and get instant breakdowns
-              of who did what. Fair scores, contribution heatmaps, and
-              detailed timelines for every team member.
+            <p className="mt-6 text-[17px] leading-[1.7] text-white/60">
+              Stop guessing. Start knowing. Glasswork shows you
+              exactly who did what.
             </p>
 
             <button
               onClick={handleGetStarted}
-              className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-[15px] font-semibold text-warm-900 transition-all duration-200 hover:scale-[1.03] hover:bg-white/90 active:scale-[0.97]"
+              className="mt-10 inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-[15px] font-semibold text-warm-900 shadow-layered transition-all duration-200 hover:scale-[1.03] hover:bg-white/90 active:scale-[0.97]"
             >
-              {isAuthenticated ? "Go to workspace" : "Get Started"}
+              {isAuthenticated ? "Go to workspace" : "Get started free"}
               <ArrowRight className="h-4 w-4" />
             </button>
-          </motion.div>
 
-          {/* Bottom tagline */}
-          <div className="mt-32 flex items-center gap-3">
-            <img src="/logo.png" alt="" className="h-5 w-5 rounded-lg object-contain opacity-60" />
-            <p className="text-[13px] text-white/40">
-              Your grades deserve transparency.
+            <p className="mt-4 text-[13px] text-white/40">
+              Free to use. No credit card required.
             </p>
-          </div>
-        </div>
-
-        {/* Floating preview card */}
-        <div className="absolute right-8 top-8 hidden xl:block">
-          <motion.div
-            className="w-[280px] rounded-2xl border border-white/10 bg-white/10 p-5 backdrop-blur-xl"
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-          >
-            <div className="text-[11px] text-white/40">Analysis complete</div>
-            <div className="mt-1 text-[14px] font-semibold text-white">facebook/react</div>
-            <div className="mt-2 text-[12px] text-white/60">3 contributors scored</div>
           </motion.div>
-        </div>
-      </section>
-
-      {/* ── Use Cases Grid ── */}
-      <section className="bg-white py-32 sm:py-44">
-        <div className="mx-auto max-w-6xl px-6">
-          {/* Header row */}
-          <div className="flex items-end justify-between">
-            <h2 className="font-myflora text-[2.5rem] leading-[1.1] tracking-tight text-warm-900 sm:text-[3rem]">
-              Built for teams who care about fairness
-            </h2>
-            <button
-              onClick={handleGetStarted}
-              className="hidden items-center gap-1.5 text-[14px] font-medium text-warm-500 transition-colors hover:text-warm-900 sm:flex"
-            >
-              See all use cases
-              <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-
-          {/* 3-card grid */}
-          <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                title: "Computer Science Group Projects",
-                desc: "Track GitHub commits across team repos",
-                gradient: "from-purple-900/80 to-purple-600/80",
-                pos: "25% center",
-              },
-              {
-                title: "Research Paper Collaborations",
-                desc: "See who wrote what in shared Google Docs",
-                gradient: "from-warm-900/80 to-warm-700/80",
-                pos: "50% center",
-              },
-              {
-                title: "Hackathon Teams",
-                desc: "Fair judging with contribution breakdowns",
-                gradient: "from-blue-900/80 to-blue-600/80",
-                pos: "75% center",
-              },
-            ].map((card, i) => (
-              <motion.div
-                key={card.title}
-                className="group relative h-[320px] overflow-hidden rounded-2xl"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-              >
-                {/* Background: Chaotic Gradient with gradient overlay */}
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    backgroundImage: "url('/Chaotic Gradient.jpg')",
-                    backgroundSize: "cover",
-                    backgroundPosition: card.pos,
-                  }}
-                />
-                <div className={`absolute inset-0 bg-gradient-to-b ${card.gradient}`} />
-
-                {/* Text overlay at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="font-myflora text-[1.35rem] leading-tight text-white">
-                    {card.title}
-                  </h3>
-                  <p className="mt-2 text-[13px] text-white/60">
-                    {card.desc}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
 
       {/* ── Footer ── */}
-      <footer className="bg-white">
-        {/* Top CTA area */}
-        <div className="mx-auto max-w-5xl px-6 py-32 sm:py-40">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <h2 className="font-myflora text-[2.75rem] leading-[1.1] tracking-tight text-warm-900 sm:text-[3.5rem]">
-              We&apos;re building tools that make group work fair
-            </h2>
-            <p className="mt-6 text-[17px] text-warm-500">
-              If that sounds useful,{" "}
-              <button
-                onClick={handleGetStarted}
-                className="inline-flex items-center gap-1 font-medium text-warm-900 underline decoration-warm-300 underline-offset-4 transition-colors hover:decoration-warm-900"
-              >
-                try Glasswork today
-                <ArrowRight className="h-3.5 w-3.5" />
-              </button>
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Separator */}
-        <div className="mx-auto max-w-5xl px-6">
-          <div className="h-px bg-warm-200" />
-        </div>
-
-        {/* Footer links row */}
-        <div className="mx-auto max-w-5xl px-6 py-8">
-          <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-            {/* Left: nav links */}
-            <div className="flex items-center gap-6">
-              <Link href="/" className="text-[13px] text-warm-500 transition-colors hover:text-warm-900">Home</Link>
-              <span className="cursor-pointer text-[13px] text-warm-500 transition-colors hover:text-warm-900">About</span>
-              <span className="cursor-pointer text-[13px] text-warm-500 transition-colors hover:text-warm-900">How it works</span>
-              <span className="cursor-pointer text-[13px] text-warm-500 transition-colors hover:text-warm-900">Privacy</span>
-            </div>
-            {/* Right: branding */}
-            <div className="flex items-center gap-2.5">
-              <img src="/logo.png" alt="Glasswork" className="h-5 w-5 rounded-lg object-contain opacity-40" />
-              <span className="font-myflora text-[14px] text-warm-400">Glasswork</span>
-            </div>
+      <footer className="border-t border-white/10 bg-black/30 px-6 py-10 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-5xl items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <img src="/logo.png" alt="Glasswork" className="h-5 w-5 rounded-lg object-contain opacity-40" />
+            <span className="font-myflora text-[14px] text-white/40">Glasswork</span>
           </div>
-        </div>
-
-        {/* Bottom gradient strip */}
-        <div
-          className="relative h-[200px] overflow-hidden"
-          style={{
-            backgroundImage: "url('/Chaotic Gradient.jpg')",
-            backgroundSize: "cover",
-            backgroundPosition: "center bottom",
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-b from-white via-white/60 to-transparent" />
-          <div className="absolute bottom-4 left-0 right-0 text-center">
-            <p className="text-[12px] text-white/60">
-              &copy; Glasswork 2026
-            </p>
-          </div>
+          <p className="text-[12px] text-white/40">
+            Built by a 16-year-old who was always locked in.
+          </p>
         </div>
       </footer>
     </div>
