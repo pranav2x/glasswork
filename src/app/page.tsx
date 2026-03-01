@@ -3,20 +3,12 @@
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { useConvexAuth, useMutation } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { api } from "../../convex/_generated/api";
-import { Github, ArrowRight, FileText, Eye, Users } from "lucide-react";
+import { Github, ArrowRight, FileText } from "lucide-react";
 import { TypewriterPlaceholder } from "@/components/TypewriterPlaceholder";
-
-// Pre-seeded heatmap data (no Math.random — avoids hydration mismatch)
-const HEATMAP_DATA = {
-  alex:  [1,0,1,1,0,1,0, 1,1,0,1,1,1,0],
-  sarah: [0,1,0,1,0,0,1, 1,0,1,0,1,0,1],
-  mike:  [0,0,1,0,0,0,1, 0,0,0,1,0,0,0],
-};
 
 // Subtle floating particles (reduced, larger, slower than before)
 const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
@@ -37,20 +29,12 @@ export default function LandingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [inputFocused, setInputFocused] = useState(false);
-  const [activeScreen, setActiveScreen] = useState(0);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 100);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveScreen((s) => (s === 0 ? 1 : 0));
-    }, 3000);
-    return () => clearInterval(timer);
   }, []);
 
   const handleGetStarted = useCallback(async () => {
