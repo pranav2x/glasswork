@@ -317,7 +317,7 @@ export default function LandingPage() {
                     );
                   })}
                 </div>
-                <div className="absolute -right-3 -top-3 rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 backdrop-blur-md">
+                <div className="absolute -right-3 -top-3 z-10 rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 backdrop-blur-md">
                   <span className="text-[11px] font-semibold text-white/80">172 contributions</span>
                 </div>
               </div>
