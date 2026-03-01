@@ -402,7 +402,31 @@ export default function LandingPage() {
             </div>
           </motion.div>
 
-          {/* Subtle "Get to know us" link at bottom */}
+          {/* Bottom-left glassmorphism info card (like reference) */}
+          <motion.div
+            className="absolute bottom-24 left-8 z-20 hidden lg:block"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="w-[320px] rounded-2xl border border-white/10 bg-white/[0.06] p-6 backdrop-blur-2xl">
+              <h3 className="font-myflora text-[1.5rem] leading-tight text-white/90">
+                See through the work
+              </h3>
+              <p className="mt-2 text-[13px] leading-relaxed text-white/40">
+                Glasswork analyzes GitHub repos and Google Docs to score every contributor fairly. No more guessing.
+              </p>
+              <button
+                onClick={handleGetStarted}
+                className="mt-4 flex items-center gap-1.5 text-[13px] text-white/60 transition-colors hover:text-white"
+              >
+                Get to know us
+                <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Scroll indicator */}
           <motion.div
             className="absolute bottom-8 left-1/2 -translate-x-1/2"
             initial={{ opacity: 0 }}
@@ -417,8 +441,11 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Dark-to-white transition ── */}
+      <div className="h-32 bg-gradient-to-b from-[#0c0c20] to-white" />
+
       {/* ── Editorial Vision Section ── */}
-      <section className="relative bg-white py-32 sm:py-40">
+      <section className="relative bg-white py-24 sm:py-32">
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid items-center gap-16 lg:grid-cols-2">
             {/* Left: Visual element */}
