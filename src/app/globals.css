@@ -408,14 +408,26 @@ button:hover .fab-icon {
 
 /* Card perspective tilt on hover (Earnwave flatten effect) */
 .card-tilt {
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
   transform-style: preserve-3d;
   will-change: transform;
+  perspective: 600px;
 }
 
 .card-tilt:hover {
-  transform: perspective(800px) rotateX(2deg) rotateY(-1deg) translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  transform: perspective(600px) rotateX(4deg) rotateY(-3deg) scale(1.02);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.10), 0 0 0 1px rgba(0, 0, 0, 0.03);
+}
+
+/* Alternate tilt direction for variety */
+.card-tilt-right:hover {
+  transform: perspective(600px) rotateX(3deg) rotateY(3deg) scale(1.02);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.10), 0 0 0 1px rgba(0, 0, 0, 0.03);
+}
+
+.card-tilt-center:hover {
+  transform: perspective(600px) rotateX(5deg) rotateY(0deg) scale(1.02);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.10), 0 0 0 1px rgba(0, 0, 0, 0.03);
 }
 
 /* Staggered fade-in for hero content */

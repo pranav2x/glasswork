@@ -232,12 +232,12 @@ export default function LandingPage() {
             >
               <div className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-[#D4A017]/10 px-3 py-1">
                 <TrendingUp className="h-3 w-3 text-[#D4A017]" />
-                <span className="text-[11px] font-semibold text-[#D4A017]">Your score</span>
+                <span className="font-body text-[11px] font-semibold text-[#D4A017]">Your score</span>
               </div>
-              <div className="font-display text-[3rem] font-bold leading-none tracking-tight text-warm-900">
+              <div className="font-body text-[3rem] font-bold leading-none tracking-tight text-warm-900">
                 172
               </div>
-              <p className="mt-1.5 text-[13px] text-warm-400">out of 200</p>
+              <p className="font-body mt-1.5 text-[13px] text-warm-400">out of 200</p>
               {/* Mini sparkline chart — warm gradient bars */}
               <div className="mt-6 flex items-end gap-[4px] h-[52px]">
                 {[28, 42, 35, 58, 48, 68, 62, 78, 72, 88, 82, 96].map((h, i) => (
@@ -255,12 +255,12 @@ export default function LandingPage() {
 
             {/* Card 2: Analyze Sources (center, slightly elevated) */}
             <motion.div
-              className="card-tilt rounded-[20px] border border-warm-200/50 bg-white p-8 shadow-[0_4px_32px_rgba(0,0,0,0.06)] sm:-mt-5"
+              className="card-tilt card-tilt-center rounded-[20px] border border-warm-200/50 bg-white p-8 shadow-[0_4px_32px_rgba(0,0,0,0.06)] sm:-mt-5"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.75, ease: easeOut }}
             >
-              <h3 className="mb-7 text-center text-[16px] font-semibold text-warm-800">Analyze sources</h3>
+              <h3 className="font-body mb-7 text-center text-[17px] font-semibold text-warm-800">Analyze sources</h3>
               {/* Source icons with connecting lines — like Earnwave's hub */}
               <div className="relative mx-auto">
                 {/* Connection lines behind icons */}
@@ -296,7 +296,7 @@ export default function LandingPage() {
 
             {/* Card 3: AI Insights — chat bubbles */}
             <motion.div
-              className="card-tilt rounded-[20px] border border-warm-200/50 bg-white p-8 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
+              className="card-tilt card-tilt-right rounded-[20px] border border-warm-200/50 bg-white p-8 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.9, ease: easeOut }}
@@ -309,17 +309,17 @@ export default function LandingPage() {
               {/* Chat-style AI summary bubbles */}
               <div className="space-y-3">
                 <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-warm-100 px-4 py-3">
-                  <p className="text-[12px] leading-relaxed text-warm-600">Who carried the React project?</p>
+                  <p className="font-body text-[12px] leading-relaxed text-warm-600">Who carried the React project?</p>
                 </div>
                 <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-warm-100 px-4 py-3">
-                  <p className="text-[12px] leading-relaxed text-warm-600">How much did Sarah actually write?</p>
+                  <p className="font-body text-[12px] leading-relaxed text-warm-600">How much did Sarah actually write?</p>
                 </div>
                 <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-sm bg-warm-800 px-4 py-3">
-                  <p className="text-[12px] leading-relaxed text-white/90">Aaryan was carrying hard. Jackie was selling.</p>
+                  <p className="font-body text-[12px] leading-relaxed text-white/90">Aaryan was carrying hard. Jackie was selling.</p>
                 </div>
               </div>
               <div className="mt-5 flex justify-end">
-                <span className="text-[11px] text-warm-400">AI-powered insights</span>
+                <span className="font-body text-[11px] font-medium text-warm-400">AI-powered insights</span>
               </div>
             </motion.div>
           </div>
