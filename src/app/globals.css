@@ -342,29 +342,19 @@ button:hover .fab-icon {
   animation: cursor-blink 1s step-end infinite;
 }
 
-/* ── Atmospheric Hero Animations ── */
+/* ── Hero Animations ── */
 
-/* Star twinkle */
-@keyframes star-twinkle {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.5); }
-}
-
-.star-twinkle {
-  animation: star-twinkle 3s ease-in-out infinite;
-}
-
-/* Snowfall */
+/* Subtle floating particles */
 @keyframes snowfall {
   0% {
     transform: translateY(-10px) translateX(0);
     opacity: 0;
   }
   10% {
-    opacity: 1;
+    opacity: 0.6;
   }
   90% {
-    opacity: 0.6;
+    opacity: 0.3;
   }
   100% {
     transform: translateY(100vh) translateX(var(--drift, 20px));
@@ -375,32 +365,4 @@ button:hover .fab-icon {
 .snowflake {
   top: -10px;
   animation: snowfall linear infinite;
-}
-
-/* Scroll indicator bounce */
-@keyframes scroll-bounce {
-  0%, 100% { transform: translateY(0); opacity: 0.3; }
-  50% { transform: translateY(4px); opacity: 0.6; }
-}
-
-.scroll-indicator {
-  animation: scroll-bounce 2s ease-in-out infinite;
-}
-
-/* Large sparkle cross */
-@keyframes sparkle-cross {
-  0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
-  25% { opacity: 0.8; transform: scale(1) rotate(15deg); }
-  50% { opacity: 1; transform: scale(1.2) rotate(30deg); }
-  75% { opacity: 0.6; transform: scale(0.8) rotate(40deg); }
-}
-
-.sparkle-cross {
-  animation: sparkle-cross 4s ease-in-out infinite;
-  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
-}
-
-/* Hero to white section transition */
-.hero-fade-to-white {
-  background: linear-gradient(to bottom, #0c0c20, #FFFFFF);
 }
