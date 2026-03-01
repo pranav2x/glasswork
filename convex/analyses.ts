@@ -279,6 +279,45 @@ export const writeContributors = internalMutation({
           createdAt: Date.now(),
         });
       }
+
+      // Update carry streak
+      const hasGhost = args.contributors.some((c) => c.tier === "ghost");
+      const existingStreak = await ctx.db
+        .query("streaks")
+        .withIndex("by_userId", (q) => q.eq("userId", analysis.userId))
+        .first();
+
+      if (existingStreak) {
+        const newStreak = hasGhost ? 0 : existingStreak.currentStreak + 1;
+        const newLongest = Math.max(existingStreak.longestStreak, newStreak);
+        await ctx.db.patch(existingStreak._id, {
+          currentStreak: newStreak,
+          longestStreak: newLongest,
+          lastAnalysisId: args.analysisId,
+          updatedAt: Date.now(),
+        });
+
+        // Streak milestone notifications (5, 10, 25)
+        if ([5, 10, 25].includes(newStreak)) {
+          await ctx.db.insert("notifications", {
+            userId: analysis.userId,
+            type: "streak_milestone",
+            title: `${newStreak} project streak!`,
+            body: `You've avoided SELLING for ${newStreak} projects in a row.`,
+            analysisId: args.analysisId,
+            read: false,
+            createdAt: Date.now(),
+          });
+        }
+      } else {
+        await ctx.db.insert("streaks", {
+          userId: analysis.userId,
+          currentStreak: hasGhost ? 0 : 1,
+          longestStreak: hasGhost ? 0 : 1,
+          lastAnalysisId: args.analysisId,
+          updatedAt: Date.now(),
+        });
+      }
     }
   },
 });
@@ -700,5 +739,77 @@ export const deleteAnalysis = mutation({
     }
 
     await ctx.db.delete(args.analysisId);
+  },
+});
+
+/**
+ * Contextual leaderboard: rank contributors the user has worked with,
+ * aggregated across all shared analyses. Returns top 10.
+ */
+export const getLeaderboard = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return [];
+
+    const analyses = await ctx.db
+      .query("analyses")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .collect();
+
+    // Collect all contributors across all analyses
+    const contributorMap = new Map<
+      string,
+      { name: string; avatarUrl?: string; bestScore: number; bestTier: "carry" | "solid" | "ghost"; analysisCount: number }
+    >();
+
+    for (const analysis of analyses) {
+      const contributors = await ctx.db
+        .query("contributors")
+        .withIndex("by_analysisId", (q) => q.eq("analysisId", analysis._id))
+        .collect();
+
+      for (const c of contributors) {
+        const key = c.name.toLowerCase();
+        const existing = contributorMap.get(key);
+        if (existing) {
+          existing.analysisCount++;
+          if (c.score > existing.bestScore) {
+            existing.bestScore = c.score;
+            existing.bestTier = c.tier;
+            existing.avatarUrl = c.avatarUrl ?? existing.avatarUrl;
+          }
+        } else {
+          contributorMap.set(key, {
+            name: c.name,
+            avatarUrl: c.avatarUrl,
+            bestScore: c.score,
+            bestTier: c.tier,
+            analysisCount: 1,
+          });
+        }
+      }
+    }
+
+    // Sort by best score descending, return top 10
+    return Array.from(contributorMap.values())
+      .sort((a, b) => b.bestScore - a.bestScore)
+      .slice(0, 10);
+  },
+});
+
+/**
+ * Get the current user's streak data.
+ */
+export const getUserStreak = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    return await ctx.db
+      .query("streaks")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .first();
   },
 });

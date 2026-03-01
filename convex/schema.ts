@@ -54,6 +54,14 @@ export default defineSchema({
     ),
   }).index("by_analysisId", ["analysisId"]),
 
+  streaks: defineTable({
+    userId: v.id("users"),
+    currentStreak: v.number(),
+    longestStreak: v.number(),
+    lastAnalysisId: v.optional(v.id("analyses")),
+    updatedAt: v.number(),
+  }).index("by_userId", ["userId"]),
+
   notifications: defineTable({
     userId: v.id("users"),
     type: v.union(
