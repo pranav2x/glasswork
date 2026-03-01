@@ -144,11 +144,7 @@ export default function LandingPage() {
 
           <button
             onClick={handleGetStarted}
-            className={`flex items-center gap-1.5 rounded-full px-5 py-2 text-[13px] font-semibold transition-all duration-500 active:scale-[0.97] ${
-              scrolled
-                ? "bg-warm-900 text-white hover:bg-warm-800"
-                : "bg-white text-warm-900 hover:bg-white/90"
-            }`}
+            className="flex items-center gap-1.5 rounded-full bg-warm-900 px-5 py-2 text-[13px] font-semibold text-white transition-all duration-500 hover:bg-warm-800 active:scale-[0.97]"
           >
             {isAuthenticated ? "Dashboard" : "Get Started"}
             <ArrowRight className="h-3.5 w-3.5" />
@@ -158,17 +154,18 @@ export default function LandingPage() {
 
       {/* ── Hero — Full-bleed background image ── */}
       <section
-        className="relative min-h-screen overflow-hidden"
+        className="relative min-h-[200vh] overflow-hidden"
         style={{
           backgroundImage: "url('/Chaotic Gradient.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
+          backgroundAttachment: "fixed",
         }}
       >
         {/* Dark overlay for text readability */}
         <div className="absolute inset-0 bg-black/40" />
         {/* Bottom fade to black for seamless transition */}
-        <div className="absolute bottom-0 left-0 right-0 h-[45%] bg-gradient-to-t from-black/80 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-[60%] bg-gradient-to-t from-black via-black/60 to-transparent" />
 
         {/* Subtle floating particles */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -201,14 +198,6 @@ export default function LandingPage() {
             >
               Glasswork
             </motion.h1>
-            <motion.p
-              className="font-myflora mt-3 text-center text-[1.1rem] tracking-wide text-white/50 sm:text-[1.35rem]"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            >
-              See through the work
-            </motion.p>
           </div>
 
           {/* Bottom-left glassmorphism card with input */}
@@ -275,6 +264,19 @@ export default function LandingPage() {
                 </button>
               </div>
             </div>
+          </motion.div>
+
+          {/* Bottom-right tagline */}
+          <motion.div
+            className="absolute bottom-12 right-6 z-20 hidden items-center gap-3 sm:flex lg:right-16"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9, duration: 0.8 }}
+          >
+            <img src="/logo.png" alt="" className="h-5 w-5 rounded-lg object-contain opacity-60" />
+            <p className="max-w-[240px] text-[13px] leading-snug text-white/40">
+              See who actually did the work in every group project.
+            </p>
           </motion.div>
         </div>
       </section>
