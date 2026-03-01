@@ -350,6 +350,35 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Social Proof Strip — scrolling AI summaries ── */}
+      <section className="overflow-hidden bg-[#F4F1ED] py-6">
+        <div className="flex animate-scroll-left gap-6" style={{ width: "max-content" }}>
+          {[
+            "Aaryan added 4,000 lines of code. Jackie added a comma.",
+            "Mike was carrying hard with 189. Sarah barely showed up.",
+            "Priya wrote the entire backend. Marcus changed the README font.",
+            "Tyler and Aisha were neck and neck at 165 each. Everyone else? Selling.",
+            "Sam solo-carried the auth microservice. Score: 200/200.",
+            "Zoe started strong but fell off week two. Eli picked up the slack.",
+            "Aaryan added 4,000 lines of code. Jackie added a comma.",
+            "Mike was carrying hard with 189. Sarah barely showed up.",
+            "Priya wrote the entire backend. Marcus changed the README font.",
+            "Tyler and Aisha were neck and neck at 165 each. Everyone else? Selling.",
+            "Sam solo-carried the auth microservice. Score: 200/200.",
+            "Zoe started strong but fell off week two. Eli picked up the slack.",
+          ].map((summary, i) => (
+            <div
+              key={i}
+              className="w-[300px] shrink-0 rounded-xl border border-warm-200/40 bg-white/70 p-5 backdrop-blur-sm"
+            >
+              <p className="font-body text-[13px] leading-relaxed text-warm-500">
+                &ldquo;{summary}&rdquo;
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ── About Section ── */}
       <section id="about" className="relative bg-white py-36 sm:py-48">
         <div className="mx-auto max-w-6xl px-6">
