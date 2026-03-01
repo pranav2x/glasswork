@@ -79,6 +79,7 @@ export const listAnalyses = query({
 
         return {
           ...analysis,
+          summary: analysis.summary,
           topContributor: topContributor
             ? {
                 name: topContributor.name,
