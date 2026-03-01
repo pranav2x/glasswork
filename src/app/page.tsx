@@ -188,12 +188,12 @@ export default function LandingPage() {
         </div>
 
         {/* Hero content */}
-        <div className="relative z-10 flex min-h-screen flex-col px-6 pt-32">
+        <div className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-10 px-6 pt-24">
 
-          {/* Centered title in upper portion */}
-          <div className="flex flex-1 flex-col items-center justify-center pb-48">
+          {/* Centered title */}
+          <div className="flex flex-col items-center text-center">
             <motion.h1
-              className="font-myflora text-center text-[4.5rem] leading-[1] tracking-tight text-white sm:text-[6rem] md:text-[7.5rem]"
+              className="font-myflora text-[4.5rem] leading-[1] tracking-tight text-white sm:text-[6rem] md:text-[7.5rem]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
@@ -201,7 +201,7 @@ export default function LandingPage() {
               Glasswork
             </motion.h1>
             <motion.p
-              className="font-myflora mt-3 text-center text-[1.1rem] tracking-wide text-white/50 sm:text-[1.35rem]"
+              className="font-myflora mt-3 text-[1.1rem] tracking-wide text-white/50 sm:text-[1.35rem]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
@@ -210,9 +210,9 @@ export default function LandingPage() {
             </motion.p>
           </div>
 
-          {/* Bottom-left glassmorphism card with input */}
+          {/* Glassmorphism card — centered directly below subtitle */}
           <motion.div
-            className="absolute bottom-12 left-1/2 z-20 w-full max-w-[420px] -translate-x-1/2 px-6 sm:px-0"
+            className="w-full max-w-[420px] px-6 sm:px-0"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
