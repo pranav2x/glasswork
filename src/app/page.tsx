@@ -244,7 +244,7 @@ export default function LandingPage() {
           className="absolute left-4 top-16 hidden lg:block"
           initial={{ opacity: 0, x: -40, rotate: -8 }}
           animate={{ opacity: 1, x: 0, rotate: -6 }}
-          transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="floating-card-1 w-[180px] rounded-sm bg-[#FFF9C4] p-4 shadow-layered" style={{ transform: "rotate(-6deg)" }}>
             <div className="absolute -right-1 -top-2 h-4 w-4 rounded-full bg-[#EF5350]/80 shadow-sm" />
@@ -269,7 +269,7 @@ export default function LandingPage() {
           className="absolute right-4 top-12 hidden lg:block"
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="floating-card-2 w-[220px] rounded-2xl border border-warm-200 bg-white p-5 shadow-layered">
             <div className="mb-3 flex items-center justify-between">
@@ -301,7 +301,7 @@ export default function LandingPage() {
           className="absolute bottom-8 left-2 hidden lg:block"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="floating-card-3 w-[240px] rounded-2xl border border-warm-200 bg-white p-5 shadow-layered">
             <p className="mb-3 text-[14px] font-semibold text-warm-900">Fair Share Scores</p>
@@ -354,7 +354,7 @@ export default function LandingPage() {
           className="absolute bottom-12 right-4 hidden lg:block"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
           <div className="floating-card-4 w-[200px] rounded-2xl border border-warm-200 bg-white p-5 shadow-layered">
             <p className="mb-4 text-[14px] font-semibold text-warm-900">Works with</p>

@@ -13,10 +13,11 @@ import { GlassButton } from "@/components/GlassButton";
 import { ContributorCard } from "@/components/ContributorCard";
 import { AnalysisLoadingCinematic } from "@/components/AnalysisLoadingCinematic";
 import { PageTransition } from "@/components/PageTransition";
+import { ReceiptCard } from "@/components/ReceiptCard";
 import { Badge } from "@/components/ui/badge";
 import { mapConvexAnalysis } from "@/lib/mappers";
 import { cn } from "@/lib/utils";
-import { Users, BarChart3, Sparkles, Share2 } from "lucide-react";
+import { Users, BarChart3, Sparkles, Share2, Download } from "lucide-react";
 
 function TypewriterText({ text }: { text: string }) {
   const [displayed, setDisplayed] = useState("");
@@ -50,6 +51,7 @@ export default function ResultsPage() {
   const params = useParams();
   const analysisId = params.id as string;
   const [copied, setCopied] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
   const prevStatusRef = useRef<string | undefined>(undefined);
   const confettiFiredRef = useRef(false);
 
@@ -77,6 +79,21 @@ export default function ResultsPage() {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  function handleShareTwitter() {
+    if (!mapped) return;
+    const tierLabel = (tier: string) =>
+      tier === "carry" ? "LOCKED IN" : tier === "solid" ? "MID" : "SELLING";
+    const lines = mapped.contributors
+      .sort((a, b) => b.fairShareScore - a.fairShareScore)
+      .map((c) => `• ${c.name} — ${tierLabel(c.tier)} (${c.fairShareScore})`)
+      .join("\n");
+    const text = `📊 Glasswork just exposed my group project:\n${lines}\n\nwho actually did the work 😭\n${window.location.href}`;
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
+      "_blank"
+    );
   }
 
   if (data === undefined) {
@@ -164,8 +181,22 @@ export default function ResultsPage() {
               </Link>
               <GlassButton variant="ghost" size="sm" onClick={handleCopyLink}>
                 <Share2 className="h-3.5 w-3.5" />
-                {copied ? "Link copied" : "Share results"}
+                {copied ? "Link copied" : "Copy link"}
               </GlassButton>
+              {mapped && (
+                <>
+                  <GlassButton variant="ghost" size="sm" onClick={handleShareTwitter}>
+                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                    Share on X
+                  </GlassButton>
+                  <GlassButton variant="primary" size="sm" onClick={() => setShowReceipt(true)}>
+                    <Download className="h-3.5 w-3.5" />
+                    Receipt
+                  </GlassButton>
+                </>
+              )}
             </div>
           </GlassPanel>
         </div>
@@ -309,17 +340,28 @@ export default function ResultsPage() {
         {mapped && (
           <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3">
             {(() => {
-              const maxScore = Math.max(...mapped.contributors.map((c) => c.fairShareScore), 1);
-              return mapped.contributors.map((contributor, i) => (
+              const sorted = [...mapped.contributors].sort(
+                (a, b) => b.fairShareScore - a.fairShareScore
+              );
+              const maxScore = Math.max(...sorted.map((c) => c.fairShareScore), 1);
+              return sorted.map((contributor, i) => (
                 <ContributorCard
                   key={contributor.id}
                   contributor={contributor}
                   index={i}
                   maxScore={maxScore}
+                  revealDelay={i * 0.18}
                 />
               ));
             })()}
           </div>
+        )}
+        {mapped && showReceipt && (
+          <ReceiptCard
+            title={data.title}
+            contributors={mapped.contributors}
+            onClose={() => setShowReceipt(false)}
+          />
         )}
       </div>
     </PageTransition>

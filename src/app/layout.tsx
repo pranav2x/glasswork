@@ -35,11 +35,15 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Glasswork — Group work telemetry",
+  title: "Glasswork",
   description:
     "Analyze Google Docs and GitHub repos to see who actually contributed.",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
   openGraph: {
-    title: "Glasswork — Group work telemetry",
+    title: "Glasswork",
     description:
       "Analyze Google Docs and GitHub repos to see who actually contributed.",
     siteName: "Glasswork",
@@ -47,7 +51,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Glasswork — Group work telemetry",
+    title: "Glasswork",
     description:
       "Analyze Google Docs and GitHub repos to see who actually contributed.",
   },

@@ -13,6 +13,7 @@ interface ContributorCardProps {
   contributor: Contributor;
   index: number;
   maxScore?: number;
+  revealDelay?: number;
 }
 
 const tierConfig = {
@@ -59,27 +60,32 @@ function AnimatedScore({ value, tier }: { value: number; tier: string }) {
   );
 }
 
-export function ContributorCard({ contributor, index, maxScore }: ContributorCardProps) {
+export function ContributorCard({ contributor, index, maxScore, revealDelay }: ContributorCardProps) {
   const { name, avatarUrl, email, handle, source, stats, fairShareScore, tier, heatmapData } =
     contributor;
   const tierInfo = tierConfig[tier];
   const [showGlow, setShowGlow] = useState(false);
+  const baseDelay = revealDelay ?? index * 0.08;
 
-  // Trigger golden glow for LOCKED IN tier after card mounts
   useEffect(() => {
     if (tier === "carry") {
-      const timer = setTimeout(() => setShowGlow(true), (index * 80) + 600);
+      const timer = setTimeout(() => setShowGlow(true), baseDelay * 1000 + 600);
       return () => clearTimeout(timer);
     }
-  }, [tier, index]);
+  }, [tier, baseDelay]);
 
   return (
     <motion.div
       className="h-full"
-      initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      transition={{
-        delay: index * 0.08,
+      initial={{ opacity: 0, y: 40, scale: 0.85, filter: "blur(8px)" }}
+      animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+      transition={revealDelay !== undefined ? {
+        delay: baseDelay,
+        type: "spring",
+        stiffness: 260,
+        damping: 20,
+      } : {
+        delay: baseDelay,
         duration: 0.45,
         ease: [0.22, 1, 0.36, 1],
       }}
@@ -179,7 +185,7 @@ export function ContributorCard({ contributor, index, maxScore }: ContributorCar
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{
-                delay: (index * 0.08) + 0.5,
+                delay: baseDelay + 0.5,
                 type: "spring",
                 stiffness: 400,
                 damping: 18,
@@ -202,7 +208,7 @@ export function ContributorCard({ contributor, index, maxScore }: ContributorCar
             className="h-full rounded-full bg-warm-800"
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(100, (fairShareScore / (maxScore ?? Math.max(fairShareScore, 100))) * 100)}%` }}
-            transition={{ delay: (index * 0.08) + 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ delay: baseDelay + 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           />
         </div>
       </div>

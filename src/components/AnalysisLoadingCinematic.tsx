@@ -26,7 +26,7 @@ const DOC_STEPS = [
 ];
 
 // How long each step is visible before advancing (ms)
-const STEP_DURATIONS = [2500, 2000, 1800, 1400, 1200];
+const STEP_DURATIONS = [1200, 900, 800, 600, 500];
 
 function AnimatedCounter({ target }: { target: number }) {
   const [count, setCount] = useState(0);
