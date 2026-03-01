@@ -37,6 +37,14 @@ const STARS = [
   { left: "48%", top: "38%", size: 2, delay: 1.6, duration: 3.7 },
 ];
 
+// Sparkle cross positions (the large twinkling stars from the reference)
+const SPARKLES = [
+  { left: "30%", top: "15%", size: 20, delay: 0, duration: 4 },
+  { left: "72%", top: "22%", size: 16, delay: 1.5, duration: 5 },
+  { left: "88%", top: "12%", size: 12, delay: 3, duration: 4.5 },
+  { left: "15%", top: "30%", size: 14, delay: 2, duration: 5.5 },
+];
+
 // Snowflake positions (pre-computed)
 const SNOWFLAKES = Array.from({ length: 40 }, (_, i) => ({
   left: `${(i * 2.5) % 100}%`,
@@ -57,6 +65,14 @@ export default function LandingPage() {
   const [error, setError] = useState<string | null>(null);
   const [inputFocused, setInputFocused] = useState(false);
   const [activeScreen, setActiveScreen] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Track scroll for navbar transition
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 100);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Auto-switch screenshots every 3 seconds
   useEffect(() => {
@@ -150,21 +166,35 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* ── Floating Navigation ── */}
-      <nav className="fixed left-0 right-0 top-0 z-50">
-        <div className="mx-auto mt-4 flex max-w-3xl items-center justify-between rounded-full border border-white/10 bg-white/5 px-6 py-3 backdrop-blur-xl">
+      <nav className="fixed left-0 right-0 top-0 z-50 transition-all duration-500">
+        <div className={`mx-auto mt-4 flex max-w-3xl items-center justify-between rounded-full px-6 py-3 backdrop-blur-xl transition-all duration-500 ${
+          scrolled
+            ? "border border-warm-200/60 bg-white/90 shadow-layered"
+            : "border border-white/10 bg-white/5"
+        }`}>
           <Link href="/" className="flex items-center gap-2.5">
             <img src="/logo.png" alt="Glasswork" className="h-6 w-6 rounded-lg object-contain" />
-            <span className="font-myflora text-[15px] font-medium text-white/90">Glasswork</span>
+            <span className={`font-myflora text-[15px] font-medium transition-colors duration-500 ${scrolled ? "text-warm-900" : "text-white/90"}`}>
+              Glasswork
+            </span>
           </Link>
 
           <div className="hidden items-center gap-8 sm:flex">
-            <span className="text-[13px] text-white/60 transition-colors hover:text-white/90 cursor-pointer">About</span>
-            <span className="text-[13px] text-white/60 transition-colors hover:text-white/90 cursor-pointer">How it works</span>
+            <span className={`text-[13px] cursor-pointer transition-colors duration-500 ${scrolled ? "text-warm-500 hover:text-warm-900" : "text-white/60 hover:text-white/90"}`}>
+              About
+            </span>
+            <span className={`text-[13px] cursor-pointer transition-colors duration-500 ${scrolled ? "text-warm-500 hover:text-warm-900" : "text-white/60 hover:text-white/90"}`}>
+              How it works
+            </span>
           </div>
 
           <button
             onClick={handleGetStarted}
-            className="flex items-center gap-1.5 rounded-full bg-white px-5 py-2 text-[13px] font-semibold text-warm-900 transition-all duration-200 hover:bg-white/90 active:scale-[0.97]"
+            className={`flex items-center gap-1.5 rounded-full px-5 py-2 text-[13px] font-semibold transition-all duration-500 active:scale-[0.97] ${
+              scrolled
+                ? "bg-warm-900 text-white hover:bg-warm-800"
+                : "bg-white text-warm-900 hover:bg-white/90"
+            }`}
           >
             {isAuthenticated ? "Dashboard" : "Get Started"}
             <ArrowRight className="h-3.5 w-3.5" />
@@ -173,7 +203,10 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero Section — Atmospheric Dark ── */}
-      <section className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#0a0a1a] via-[#111133] to-[#1a1a3e]">
+      <section className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#0c0c20] via-[#141438] to-[#1c1c44]">
+        {/* Radial glow behind title */}
+        <div className="absolute left-1/2 top-[35%] h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#2a2a5a]/30 blur-[120px]" />
+
         {/* Star field */}
         <div className="absolute inset-0">
           {STARS.map((star, i) => (
@@ -189,6 +222,31 @@ export default function LandingPage() {
                 animationDuration: `${star.duration}s`,
               }}
             />
+          ))}
+        </div>
+
+        {/* Cross-shaped sparkles (like the reference) */}
+        <div className="absolute inset-0 pointer-events-none">
+          {SPARKLES.map((sparkle, i) => (
+            <svg
+              key={`sparkle-${i}`}
+              className="absolute sparkle-cross"
+              style={{
+                left: sparkle.left,
+                top: sparkle.top,
+                width: sparkle.size,
+                height: sparkle.size,
+                animationDelay: `${sparkle.delay}s`,
+                animationDuration: `${sparkle.duration}s`,
+              }}
+              viewBox="0 0 24 24"
+              fill="white"
+            >
+              <path d="M12 0C12 0 12.5 9 12 12C11.5 9 12 0 12 0Z" />
+              <path d="M0 12C0 12 9 11.5 12 12C9 12.5 0 12 0 12Z" />
+              <path d="M24 12C24 12 15 12.5 12 12C15 11.5 24 12 24 12Z" />
+              <path d="M12 24C12 24 11.5 15 12 12C12.5 15 12 24 12 24Z" />
+            </svg>
           ))}
         </div>
 
@@ -211,13 +269,41 @@ export default function LandingPage() {
         </div>
 
         {/* Atmospheric gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a1a]/80 via-transparent to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-[40%] bg-gradient-to-t from-[#0a0a1a] to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0c20]/90 via-transparent to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-[50%] bg-gradient-to-t from-[#0c0c20] to-transparent" />
 
-        {/* Subtle city silhouette at bottom */}
+        {/* City skyline silhouette */}
         <div className="absolute bottom-0 left-0 right-0">
-          <svg viewBox="0 0 1440 200" fill="none" className="w-full opacity-20" preserveAspectRatio="none">
-            <path d="M0 200V140h40v-20h20v-30h30v30h20v-50h25v-20h15v20h25v50h20v-40h30v-30h20v30h30v40h40v-60h20v-20h15v20h20v60h30v-30h20v-40h25v40h20v30h50v-80h20v-10h10v10h20v80h40v-20h30v-50h20v50h30v20h60v-40h20v-60h30v60h20v40h40v-30h20v-20h15v20h20v30h30v-50h25v50h30v-40h20v-70h30v70h20v40h50v-20h20v-30h25v30h20v20h40v-80h20v-30h15v30h20v80h30v-10h20v10h80V200z" fill="currentColor" className="text-white"/>
+          {/* Building windows (warm glowing dots) */}
+          <div className="absolute bottom-[80px] left-0 right-0 h-[120px] pointer-events-none">
+            {[
+              { l: "8%", b: "20px", w: 2, h: 2 }, { l: "9%", b: "35px", w: 2, h: 2 },
+              { l: "10%", b: "50px", w: 2, h: 2 }, { l: "11%", b: "30px", w: 2, h: 2 },
+              { l: "25%", b: "40px", w: 2, h: 3 }, { l: "26%", b: "60px", w: 2, h: 2 },
+              { l: "27%", b: "25px", w: 2, h: 2 }, { l: "28%", b: "75px", w: 2, h: 2 },
+              { l: "45%", b: "30px", w: 2, h: 2 }, { l: "46%", b: "55px", w: 2, h: 3 },
+              { l: "47%", b: "70px", w: 2, h: 2 }, { l: "48%", b: "85px", w: 2, h: 2 },
+              { l: "65%", b: "25px", w: 2, h: 2 }, { l: "66%", b: "45px", w: 2, h: 2 },
+              { l: "67%", b: "60px", w: 2, h: 3 }, { l: "68%", b: "35px", w: 2, h: 2 },
+              { l: "82%", b: "30px", w: 2, h: 2 }, { l: "83%", b: "50px", w: 2, h: 2 },
+              { l: "84%", b: "70px", w: 2, h: 2 }, { l: "85%", b: "40px", w: 2, h: 3 },
+            ].map((win, i) => (
+              <div
+                key={`win-${i}`}
+                className="absolute rounded-[1px] bg-amber-300/40"
+                style={{ left: win.l, bottom: win.b, width: win.w, height: win.h }}
+              />
+            ))}
+          </div>
+          <svg viewBox="0 0 1440 220" fill="none" className="w-full" preserveAspectRatio="none" style={{ height: 180 }}>
+            <path
+              d="M0 220V160h30v-15h15v-35h10v-20h8v20h10v35h15v-25h12v-40h8v-15h6v15h8v40h12v25h20v-50h10v-25h8v25h10v50h25v-30h15v-20h10v-60h8v-10h6v10h8v60h10v20h15v30h30v-45h12v-30h10v30h12v45h20v-20h15v-55h10v-35h8v35h10v55h15v20h25v-65h10v-15h6v15h10v65h20v-25h12v-40h10v40h12v25h30v-70h10v-25h8v25h10v70h20v-15h15v-45h10v-30h8v30h10v45h15v15h25v-80h10v-20h6v20h10v80h20v-35h12v-25h10v25h12v35h30v-55h10v-40h8v40h10v55h25v-20h15v-30h10v30h15v20h25v-45h10v-15h8v15h10v45h20v-60h10v-35h8v35h10v60h20v-25h12v-15h10v15h12v25h40V220z"
+              fill="rgba(255,255,255,0.08)"
+            />
+            <path
+              d="M0 220V175h45v-20h20v-30h10v-25h8v25h10v30h20v-15h15v-35h10v-20h8v20h10v35h15v15h30v-40h12v-20h10v20h12v40h25v-55h10v-30h8v30h10v55h20v-20h15v-45h10v-25h8v25h10v45h15v20h35v-35h10v-20h8v20h10v35h25v-50h12v-30h10v30h12v50h20v-15h15v-40h10v40h15v15h30v-60h10v-20h8v20h10v60h25v-25h12v-30h10v30h12v25h30v-45h10v-15h8v15h10v45h25v-35h15v-20h10v20h15v35h20v-50h10v-20h6v20h10v50h35v-30h10v-15h8v15h10v30h30v-40h12v-25h10v25h12v40h40V220z"
+              fill="rgba(255,255,255,0.05)"
+            />
           </svg>
         </div>
 
