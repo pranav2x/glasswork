@@ -221,16 +221,16 @@ export default function LandingPage() {
           </motion.div>
 
           {/* Three Bento Cards */}
-          <div className="mt-14 grid w-full max-w-5xl grid-cols-1 gap-5 px-4 sm:grid-cols-3 sm:px-0">
+          <div className="mt-14 grid w-full max-w-4xl grid-cols-1 gap-5 px-4 sm:grid-cols-3 sm:px-0">
 
             {/* Card 1: Your Score */}
             <motion.div
-              className="card-tilt rounded-[20px] border border-warm-200/50 bg-white p-8 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
+              className="card-tilt cursor-pointer rounded-[20px] border border-warm-200/50 bg-white p-6 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6, ease: easeOut }}
             >
-              <div className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-[#D4A017]/10 px-3 py-1">
+              <div className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-[#D4A017]/10 px-3 py-1">
                 <TrendingUp className="h-3 w-3 text-[#D4A017]" />
                 <span className="font-body text-[11px] font-semibold text-[#D4A017]">Your score</span>
               </div>
@@ -255,12 +255,12 @@ export default function LandingPage() {
 
             {/* Card 2: Analyze Sources (center, slightly elevated) */}
             <motion.div
-              className="card-tilt card-tilt-center rounded-[20px] border border-warm-200/50 bg-white p-8 shadow-[0_4px_32px_rgba(0,0,0,0.06)] sm:-mt-5"
+              className="card-tilt card-tilt-center cursor-pointer rounded-[20px] border border-warm-200/50 bg-white p-6 shadow-[0_4px_32px_rgba(0,0,0,0.06)] sm:-mt-5"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.75, ease: easeOut }}
             >
-              <h3 className="font-body mb-7 text-center text-[17px] font-semibold text-warm-800">Analyze sources</h3>
+              <h3 className="font-body mb-6 text-center text-[16px] font-semibold text-warm-800">Analyze sources</h3>
               {/* Source icons with connecting lines — like Earnwave's hub */}
               <div className="relative mx-auto">
                 {/* Connection lines behind icons */}
@@ -296,12 +296,12 @@ export default function LandingPage() {
 
             {/* Card 3: AI Insights — chat bubbles */}
             <motion.div
-              className="card-tilt card-tilt-right rounded-[20px] border border-warm-200/50 bg-white p-8 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
+              className="card-tilt card-tilt-right cursor-pointer rounded-[20px] border border-warm-200/50 bg-white p-6 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.9, ease: easeOut }}
             >
-              <div className="mb-5 flex items-center gap-2">
+              <div className="mb-4 flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-warm-100">
                   <MessageSquare className="h-4 w-4 text-warm-600" />
                 </div>
