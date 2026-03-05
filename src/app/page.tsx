@@ -454,20 +454,28 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── About Section ── */}
-      <section id="about" className="relative bg-white py-36 sm:py-48">
+      {/* ── About + Product Preview (combined) ── */}
+      <section id="about" className="relative bg-white py-24 sm:py-32">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="grid items-center gap-20 lg:grid-cols-2">
+          {/* Two-column: About left, Product Preview right */}
+          <div className="grid items-center gap-12 lg:grid-cols-2">
 
-            {/* Left: GitHub-style contribution graph */}
+            {/* Left: About — tagline + contribution graph */}
             <motion.div
-              className="flex justify-center"
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, ease: easeOut }}
             >
-              <div className="relative">
+              <h2 className="font-myflora text-[2.25rem] leading-[1.12] tracking-tight text-warm-900 sm:text-[2.75rem]">
+                Where group work is as transparent as glass.
+              </h2>
+              <p className="mt-4 max-w-md text-[15px] leading-[1.7] text-warm-500">
+                See exactly who showed up — scores, contributions, all in one clean dashboard.
+              </p>
+
+              {/* Contribution graph */}
+              <div className="mt-10 relative inline-block">
                 <div className="grid grid-cols-7 gap-[5px]">
                   {Array.from({ length: 49 }, (_, i) => {
                     const intensity = [
@@ -488,7 +496,7 @@ export default function LandingPage() {
                     return (
                       <div
                         key={i}
-                        className={`h-9 w-9 rounded-[4px] ${colors[intensity]} sm:h-11 sm:w-11 transition-colors`}
+                        className={`h-7 w-7 rounded-[4px] ${colors[intensity]} sm:h-9 sm:w-9 transition-colors`}
                       />
                     );
                   })}
@@ -499,93 +507,60 @@ export default function LandingPage() {
               </div>
             </motion.div>
 
-            {/* Right: Editorial text */}
+            {/* Right: Product Preview browser frame */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.1, ease: easeOut }}
             >
-              <h2 className="font-myflora text-[2.5rem] leading-[1.12] tracking-tight text-warm-900 sm:text-[3rem]">
-                Where group work is as transparent as glass.
-              </h2>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+              <div className="relative overflow-hidden rounded-2xl border border-warm-200 bg-white shadow-[0_12px_48px_rgba(0,0,0,0.08)]">
+                <div className="flex items-center gap-2 border-b border-warm-100 bg-warm-50 px-4 py-3">
+                  <div className="flex gap-1.5">
+                    <div className="h-3 w-3 rounded-full bg-warm-300" />
+                    <div className="h-3 w-3 rounded-full bg-warm-200" />
+                    <div className="h-3 w-3 rounded-full bg-warm-200" />
+                  </div>
+                  <div className="mx-auto flex h-6 w-48 items-center justify-center rounded-md bg-warm-100 text-[11px] text-warm-400">
+                    glasswork.app
+                  </div>
+                </div>
 
-      {/* ── Screenshots / Product Preview ── */}
-      <section className="bg-white py-32 sm:py-40">
-        <div className="mx-auto max-w-5xl px-6">
-          <motion.div
-            className="mb-16"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="font-myflora text-[2.5rem] tracking-tight text-warm-900 sm:text-[3rem]">
-              See exactly who showed up
-            </h2>
-            <p className="mt-4 max-w-md text-[17px] leading-[1.7] text-warm-500">
-              Your group members&apos; scores, their exact contributions,
-              all in one clean dashboard.
-            </p>
-          </motion.div>
-
-          {/* Browser frame */}
-          <motion.div
-            className="relative overflow-hidden rounded-2xl border border-warm-200 bg-white shadow-[0_12px_48px_rgba(0,0,0,0.08)]"
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-          >
-            <div className="flex items-center gap-2 border-b border-warm-100 bg-warm-50 px-4 py-3">
-              <div className="flex gap-1.5">
-                <div className="h-3 w-3 rounded-full bg-warm-300" />
-                <div className="h-3 w-3 rounded-full bg-warm-200" />
-                <div className="h-3 w-3 rounded-full bg-warm-200" />
-              </div>
-              <div className="mx-auto flex h-6 w-48 items-center justify-center rounded-md bg-warm-100 text-[11px] text-warm-400">
-                glasswork.app
-              </div>
-            </div>
-
-            <div className="relative h-[420px] overflow-hidden bg-[#FAFAF8]">
-              {/* Results view - static showcase */}
-              <div className="flex h-full flex-col p-5">
-                <div className="mb-1 text-[11px] text-warm-400">facebook/react</div>
-                <div className="mb-5 text-[16px] font-bold text-warm-800">Analysis Results</div>
-                <div className="grid flex-1 grid-cols-3 gap-4">
-                  {[
-                    { name: "Aaryan Verma", score: 172, tier: "LOCKED IN", pct: "86%", hm: HEATMAP_DATA.alex, avatar: "/animepfp.jpeg", tierColor: "bg-[#D4A017] text-white" },
-                    { name: "Rohan Bedi", score: 118, tier: "MID", pct: "59%", hm: HEATMAP_DATA.sarah, avatar: "/catpj.jpeg", tierColor: "bg-[#5BA8C8]/20 text-[#5BA8C8]" },
-                    { name: "Jackie Lin", score: 34, tier: "SELLING", pct: "17%", hm: HEATMAP_DATA.mike, avatar: "/voidman.jpeg", tierColor: "bg-warm-200 text-warm-400" },
-                  ].map((c) => (
-                    <div key={c.name} className="flex flex-col rounded-2xl border border-warm-200/40 bg-white/60 p-4">
-                      <Image src={c.avatar} alt={c.name} width={40} height={40} className="mb-3 h-10 w-10 rounded-full object-cover" />
-                      <div className="text-[12px] font-semibold text-warm-700">{c.name}</div>
-                      <div className="mt-1 text-[32px] font-bold leading-none text-warm-900">{c.score}</div>
-                      <div className={`mt-2 w-fit rounded-full px-2 py-0.5 text-[8px] font-bold ${c.tierColor}`}>
-                        {c.tier}
-                      </div>
-                      <div className="mt-3 grid grid-cols-7 gap-[2px]">
-                        {c.hm.map((v, i) => (
-                          <div key={i} className={`aspect-square rounded-[2px] ${v ? "bg-warm-400" : "bg-warm-100"}`} />
-                        ))}
-                      </div>
-                      <div className="mt-3">
-                        <div className="h-1.5 overflow-hidden rounded-full bg-warm-100">
-                          <div className="h-full rounded-full bg-gradient-to-r from-[#5BA8C8] to-[#D4A017]" style={{ width: c.pct }} />
+                <div className="relative h-[420px] overflow-hidden bg-[#FAFAF8]">
+                  <div className="flex h-full flex-col p-5">
+                    <div className="mb-1 text-[11px] text-warm-400">facebook/react</div>
+                    <div className="mb-5 text-[16px] font-bold text-warm-800">Analysis Results</div>
+                    <div className="grid flex-1 grid-cols-3 gap-4">
+                      {[
+                        { name: "Aaryan Verma", score: 172, tier: "LOCKED IN", pct: "86%", hm: HEATMAP_DATA.alex, avatar: "/animepfp.jpeg", tierColor: "bg-[#D4A017] text-white" },
+                        { name: "Rohan Bedi", score: 118, tier: "MID", pct: "59%", hm: HEATMAP_DATA.sarah, avatar: "/catpj.jpeg", tierColor: "bg-[#5BA8C8]/20 text-[#5BA8C8]" },
+                        { name: "Jackie Lin", score: 34, tier: "SELLING", pct: "17%", hm: HEATMAP_DATA.mike, avatar: "/voidman.jpeg", tierColor: "bg-warm-200 text-warm-400" },
+                      ].map((c) => (
+                        <div key={c.name} className="flex flex-col rounded-2xl border border-warm-200/40 bg-white/60 p-4">
+                          <Image src={c.avatar} alt={c.name} width={40} height={40} className="mb-3 h-10 w-10 rounded-full object-cover" />
+                          <div className="text-[12px] font-semibold text-warm-700">{c.name}</div>
+                          <div className="mt-1 text-[32px] font-bold leading-none text-warm-900">{c.score}</div>
+                          <div className={`mt-2 w-fit rounded-full px-2 py-0.5 text-[8px] font-bold ${c.tierColor}`}>
+                            {c.tier}
+                          </div>
+                          <div className="mt-3 grid grid-cols-7 gap-[2px]">
+                            {c.hm.map((v, i) => (
+                              <div key={i} className={`aspect-square rounded-[2px] ${v ? "bg-warm-400" : "bg-warm-100"}`} />
+                            ))}
+                          </div>
+                          <div className="mt-3">
+                            <div className="h-1.5 overflow-hidden rounded-full bg-warm-100">
+                              <div className="h-full rounded-full bg-gradient-to-r from-[#5BA8C8] to-[#D4A017]" style={{ width: c.pct }} />
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
