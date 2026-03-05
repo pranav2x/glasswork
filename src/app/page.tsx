@@ -376,6 +376,84 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Input Section — Where users actually try it ── */}
+      <section className="bg-[#F9F7F4] py-20 sm:py-28">
+        <div className="mx-auto max-w-xl px-6">
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: easeOut }}
+          >
+            <h2 className="font-myflora text-[2.5rem] leading-[1.1] tracking-tight text-warm-900 sm:text-[3rem]">
+              Try it yourself
+            </h2>
+            <p className="mt-4 text-[15px] text-warm-500">
+              Paste a GitHub repo or Google Doc link and see who actually did the work.
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="mt-10"
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+          >
+            <div className="rounded-[20px] border border-warm-200/50 bg-white p-7 shadow-[0_4px_32px_rgba(0,0,0,0.06)]">
+              <div className="relative flex items-center gap-2 rounded-xl border border-warm-200 bg-warm-50/50 p-2 transition-all focus-within:border-warm-400 focus-within:bg-white">
+                <div className="ml-2 flex shrink-0 items-center gap-1.5">
+                  <Github className="h-4 w-4 text-warm-400" />
+                  <span className="text-warm-300 text-[10px]">/</span>
+                  <FileText className="h-4 w-4 text-warm-400" />
+                </div>
+                <div className="relative min-w-0 flex-1">
+                  <input
+                    type="text"
+                    value={repoInput}
+                    onChange={(e) => { setRepoInput(e.target.value); setError(null); }}
+                    onFocus={() => setInputFocused(true)}
+                    onBlur={() => setInputFocused(false)}
+                    onKeyDown={(e) => e.key === "Enter" && handleRepoAnalyze()}
+                    className="relative z-10 w-full bg-transparent py-2 text-[14px] text-warm-800 placeholder:text-warm-400 focus:outline-none"
+                  />
+                  {!repoInput && !inputFocused && (
+                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px]">
+                      <TypewriterPlaceholder isVisible={!repoInput && !inputFocused} />
+                    </div>
+                  )}
+                  {!repoInput && inputFocused && (
+                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px] text-warm-400">
+                      owner/repo or Google Doc link
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={handleRepoAnalyze}
+                  disabled={isSubmitting || !repoInput.trim()}
+                  className="shrink-0 rounded-lg bg-warm-900 px-4 py-2 text-[13px] font-semibold text-white transition-all duration-200 hover:bg-warm-800 disabled:opacity-30"
+                >
+                  {isSubmitting ? "..." : "Analyze"}
+                </button>
+              </div>
+              {error && <p className="mt-2 text-[12px] text-red-500">{error}</p>}
+
+              <div className="mt-3 flex items-center gap-3">
+                <button
+                  onClick={handleQuickDemo}
+                  disabled={isSubmitting}
+                  className="flex items-center gap-1 text-[13px] text-warm-400 transition-colors hover:text-warm-600 disabled:opacity-50"
+                >
+                  Try facebook/react
+                  <ArrowRight className="h-3 w-3" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ── About Section ── */}
       <section id="about" className="relative bg-white py-36 sm:py-48">
         <div className="mx-auto max-w-6xl px-6">
@@ -505,85 +583,6 @@ export default function LandingPage() {
                     </div>
                   ))}
                 </div>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── Input Section — Where users actually try it ── */}
-      <section className="bg-[#F9F7F4] py-32 sm:py-40">
-        <div className="mx-auto max-w-xl px-6">
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: easeOut }}
-          >
-            <h2 className="font-myflora text-[2.5rem] leading-[1.1] tracking-tight text-warm-900 sm:text-[3rem]">
-              Try it yourself
-            </h2>
-            <p className="mt-4 text-[15px] text-warm-500">
-              Paste a GitHub repo or Google Doc link and see who actually did the work.
-            </p>
-          </motion.div>
-
-          <motion.div
-            className="mt-10"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-          >
-            <div className="rounded-[20px] border border-warm-200/50 bg-white p-7 shadow-[0_4px_32px_rgba(0,0,0,0.06)]">
-              {/* Input */}
-              <div className="relative flex items-center gap-2 rounded-xl border border-warm-200 bg-warm-50/50 p-2 transition-all focus-within:border-warm-400 focus-within:bg-white">
-                <div className="ml-2 flex shrink-0 items-center gap-1.5">
-                  <Github className="h-4 w-4 text-warm-400" />
-                  <span className="text-warm-300 text-[10px]">/</span>
-                  <FileText className="h-4 w-4 text-warm-400" />
-                </div>
-                <div className="relative min-w-0 flex-1">
-                  <input
-                    type="text"
-                    value={repoInput}
-                    onChange={(e) => { setRepoInput(e.target.value); setError(null); }}
-                    onFocus={() => setInputFocused(true)}
-                    onBlur={() => setInputFocused(false)}
-                    onKeyDown={(e) => e.key === "Enter" && handleRepoAnalyze()}
-                    className="relative z-10 w-full bg-transparent py-2 text-[14px] text-warm-800 placeholder:text-warm-400 focus:outline-none"
-                  />
-                  {!repoInput && !inputFocused && (
-                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px]">
-                      <TypewriterPlaceholder isVisible={!repoInput && !inputFocused} />
-                    </div>
-                  )}
-                  {!repoInput && inputFocused && (
-                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px] text-warm-400">
-                      owner/repo or Google Doc link
-                    </div>
-                  )}
-                </div>
-                <button
-                  onClick={handleRepoAnalyze}
-                  disabled={isSubmitting || !repoInput.trim()}
-                  className="shrink-0 rounded-lg bg-warm-900 px-4 py-2 text-[13px] font-semibold text-white transition-all duration-200 hover:bg-warm-800 disabled:opacity-30"
-                >
-                  {isSubmitting ? "..." : "Analyze"}
-                </button>
-              </div>
-              {error && <p className="mt-2 text-[12px] text-red-500">{error}</p>}
-
-              <div className="mt-3 flex items-center gap-3">
-                <button
-                  onClick={handleQuickDemo}
-                  disabled={isSubmitting}
-                  className="flex items-center gap-1 text-[13px] text-warm-400 transition-colors hover:text-warm-600 disabled:opacity-50"
-                >
-                  Try facebook/react
-                  <ArrowRight className="h-3 w-3" />
-                </button>
               </div>
             </div>
           </motion.div>
