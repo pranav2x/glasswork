@@ -352,17 +352,17 @@ export default function LandingPage() {
         <div className="flex animate-scroll-left gap-6" style={{ width: "max-content" }}>
           {[
             "Aaryan added 4,000 lines of code. Jackie added a comma.",
-            "Mike was carrying hard with 189. Sarah barely showed up.",
-            "Priya wrote the entire backend. Marcus changed the README font.",
-            "Tyler and Aisha were neck and neck at 165 each. Everyone else? Selling.",
-            "Sam solo-carried the auth microservice. Score: 200/200.",
-            "Zoe started strong but fell off week two. Eli picked up the slack.",
+            "Rohan wrote the entire backend. Jackie changed the README font.",
+            "Aaryan was carrying hard with 172. Rohan had 118. Jackie? Selling at 34.",
+            "Aaryan solo-carried the auth microservice. Score: 172/200.",
+            "Rohan started strong but fell off week two. Aaryan picked up the slack.",
+            "Jackie added a comma and called it a day. Aaryan rewrote the whole module.",
             "Aaryan added 4,000 lines of code. Jackie added a comma.",
-            "Mike was carrying hard with 189. Sarah barely showed up.",
-            "Priya wrote the entire backend. Marcus changed the README font.",
-            "Tyler and Aisha were neck and neck at 165 each. Everyone else? Selling.",
-            "Sam solo-carried the auth microservice. Score: 200/200.",
-            "Zoe started strong but fell off week two. Eli picked up the slack.",
+            "Rohan wrote the entire backend. Jackie changed the README font.",
+            "Aaryan was carrying hard with 172. Rohan had 118. Jackie? Selling at 34.",
+            "Aaryan solo-carried the auth microservice. Score: 172/200.",
+            "Rohan started strong but fell off week two. Aaryan picked up the slack.",
+            "Jackie added a comma and called it a day. Aaryan rewrote the whole module.",
           ].map((summary, i) => (
             <div
               key={i}
