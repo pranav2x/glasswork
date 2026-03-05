@@ -652,36 +652,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Final CTA ── */}
-      <section className="relative overflow-hidden bg-white py-40 sm:py-48">
-        <div className="mx-auto max-w-3xl px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: easeOut }}
-          >
-            <h2 className="font-myflora text-[2.75rem] leading-[1.1] tracking-tight text-warm-900 sm:text-[3.5rem]">
-              Your grades deserve
-              <br />
-              <em>transparency</em>
-            </h2>
-            <p className="mt-6 text-[17px] leading-[1.7] text-warm-500">
-              Stop guessing. Start knowing. Glasswork shows you
-              exactly who did what.
-            </p>
-
-            <button
-              onClick={handleGetStarted}
-              className="mt-10 inline-flex items-center gap-2 rounded-full bg-warm-900 px-8 py-4 text-[15px] font-semibold text-white shadow-layered transition-all duration-200 hover:scale-[1.03] hover:bg-warm-800 active:scale-[0.97]"
-            >
-              {isAuthenticated ? "Go to workspace" : "Get started free"}
-              <ArrowRight className="h-4 w-4" />
-            </button>
-          </motion.div>
-        </div>
-      </section>
-
       {/* ── Footer ── */}
       <footer className="border-t border-warm-200 bg-[#F9F7F4] px-6 py-10">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
