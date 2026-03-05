@@ -74,11 +74,11 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="animate-modal-overlay absolute inset-0 backdrop-blur-[2px]"
+        className="animate-modal-overlay absolute inset-0 bg-warm-900/10 backdrop-blur-[3px]"
         onClick={onClose}
       />
 
-      <div className="animate-modal-enter relative w-full max-w-md rounded-2xl border border-warm-200 bg-white p-8 shadow-layered-lg">
+      <div className="animate-modal-enter relative w-full max-w-md rounded-2xl border border-white/40 bg-white/80 backdrop-blur-2xl p-8 shadow-layered-lg">
         <button
           onClick={onClose}
           className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-all duration-200 hover:bg-warm-100 hover:text-warm-600"

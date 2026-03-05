@@ -689,9 +689,14 @@ export default function LandingPage() {
             <img src="/logo.png" alt="Glasswork" className="h-5 w-5 rounded-lg object-contain opacity-50" />
             <span className="font-myflora text-[14px] text-warm-400">Glasswork</span>
           </div>
-          <p className="text-[12px] text-warm-400">
-            Built by a 16-year-old who was always locked in.
-          </p>
+          <div className="flex items-center gap-6">
+            <p className="text-[12px] text-warm-400">
+              Built by a 16-year-old who was always locked in.
+            </p>
+            <Link href="/privacy" className="text-[12px] text-warm-400 underline underline-offset-2 transition-colors hover:text-warm-600">
+              Privacy Policy
+            </Link>
+          </div>
         </div>
       </footer>
     </div>

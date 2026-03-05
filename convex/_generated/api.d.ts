@@ -16,6 +16,7 @@ import type * as generateSummary from "../generateSummary.js";
 import type * as googleApi from "../googleApi.js";
 import type * as googleDrive from "../googleDrive.js";
 import type * as http from "../http.js";
+import type * as notifications from "../notifications.js";
 import type * as scoring from "../scoring.js";
 import type * as users from "../users.js";
 
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   googleApi: typeof googleApi;
   googleDrive: typeof googleDrive;
   http: typeof http;
+  notifications: typeof notifications;
   scoring: typeof scoring;
   users: typeof users;
 }>;
