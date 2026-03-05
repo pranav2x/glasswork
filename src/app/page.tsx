@@ -123,9 +123,6 @@ export default function LandingPage() {
             <span onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })} className="cursor-pointer font-myflora text-[14px] font-medium text-warm-500 transition-colors duration-300 hover:text-warm-800">
               About
             </span>
-            <span onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })} className="cursor-pointer font-myflora text-[14px] font-medium text-warm-500 transition-colors duration-300 hover:text-warm-800">
-              How it works
-            </span>
           </div>
 
           <button
@@ -435,65 +432,6 @@ export default function LandingPage() {
                 Where group work is as transparent as glass.
               </h2>
             </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── How It Works ── */}
-      <section id="how-it-works" className="relative bg-[#F9F7F4] py-32 sm:py-44">
-        <div className="mx-auto max-w-5xl px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: easeOut }}
-          >
-            <h2 className="font-myflora text-[2.75rem] leading-[1.12] tracking-tight text-warm-900 sm:text-[3.5rem]">
-              Every group project has someone who does nothing{" "}
-              <span className="text-warm-400">
-                and someone who does everything.
-              </span>
-            </h2>
-
-            <p className="mt-8 font-myflora text-[1.75rem] text-warm-700 sm:text-[2.25rem]">
-              You already know who. Now prove it.
-            </p>
-          </motion.div>
-
-          {/* Feature cards */}
-          <div className="mt-24 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                icon: <Eye className="h-5 w-5" />,
-                title: "See through repos",
-                desc: "Every commit, every line change, every contributor scored fairly.",
-              },
-              {
-                icon: <FileText className="h-5 w-5" />,
-                title: "See through docs",
-                desc: "Google Docs revision history analyzed to see who actually wrote what.",
-              },
-              {
-                icon: <Users className="h-5 w-5" />,
-                title: "Fair share scores",
-                desc: "Each contributor gets a score from 0 to 200. No hiding behind others' work.",
-              },
-            ].map((feature, i) => (
-              <motion.div
-                key={feature.title}
-                className="card-tilt group rounded-[20px] border border-warm-200/50 bg-white p-8 shadow-[0_4px_32px_rgba(0,0,0,0.04)]"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.1 }}
-              >
-                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-warm-100 text-warm-600 transition-all duration-300 group-hover:bg-warm-200 group-hover:text-warm-800">
-                  {feature.icon}
-                </div>
-                <h3 className="text-[16px] font-semibold text-warm-800">{feature.title}</h3>
-                <p className="mt-2 text-[14px] leading-relaxed text-warm-500">{feature.desc}</p>
-              </motion.div>
-            ))}
           </div>
         </div>
       </section>
