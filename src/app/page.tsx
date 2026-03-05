@@ -114,16 +114,16 @@ export default function LandingPage() {
         }`}>
           <Link href="/" className="flex items-center gap-2.5">
             <img src="/logo.png" alt="Glasswork" className="h-6 w-6 rounded-lg object-contain" />
-            <span className={`font-myflora text-[15px] font-medium transition-colors duration-500 ${scrolled ? "text-warm-900" : "text-warm-800"}`}>
+            <span className={`font-myflora text-[18px] font-semibold transition-colors duration-500 ${scrolled ? "text-warm-900" : "text-warm-800"}`}>
               Glasswork
             </span>
           </Link>
 
           <div className="hidden items-center gap-8 sm:flex">
-            <span onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })} className="cursor-pointer font-myflora text-[15px] text-warm-500 transition-colors duration-300 hover:text-warm-800">
+            <span onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })} className="cursor-pointer font-myflora text-[14px] font-medium text-warm-500 transition-colors duration-300 hover:text-warm-800">
               About
             </span>
-            <span onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })} className="cursor-pointer font-myflora text-[15px] text-warm-500 transition-colors duration-300 hover:text-warm-800">
+            <span onClick={() => document.getElementById("how-it-works")?.scrollIntoView({ behavior: "smooth" })} className="cursor-pointer font-myflora text-[14px] font-medium text-warm-500 transition-colors duration-300 hover:text-warm-800">
               How it works
             </span>
           </div>
