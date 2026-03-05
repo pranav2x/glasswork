@@ -418,7 +418,7 @@ export default function LandingPage() {
                     );
                   })}
                 </div>
-                <div className="absolute -right-3 -top-3 z-10 rounded-lg border border-warm-200 bg-white px-3 py-1.5 shadow-sm">
+                <div className="absolute -right-3 -top-8 z-10 rounded-lg border border-warm-200 bg-white px-3 py-1.5 shadow-sm">
                   <span className="text-[11px] font-semibold text-warm-700">172 contributions</span>
                 </div>
               </div>
