@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { GitBranch, FileText, ArrowUpRight } from "lucide-react";
 import { GlassPanel } from "@/components/GlassPanel";
 import { TierBadge } from "@/components/TierBadge";
@@ -17,6 +18,7 @@ interface ProjectCardProps {
       name: string;
       score: number;
       tier: "carry" | "solid" | "ghost";
+      avatarUrl?: string;
     } | null;
     contributorCount: number;
   };
@@ -54,8 +56,19 @@ export function ProjectCard({ analysis }: ProjectCardProps) {
         <div className="mt-4 flex items-center gap-2">
           <div className="flex -space-x-1.5">
             {topContributor && (
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-200 text-[9px] font-bold text-warm-600 ring-2 ring-white">
-                {getInitials(topContributor.name)}
+              <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-warm-200 text-[9px] font-bold text-warm-600 ring-2 ring-white">
+                {topContributor.avatarUrl ? (
+                  <Image
+                    src={topContributor.avatarUrl}
+                    alt={topContributor.name}
+                    width={28}
+                    height={28}
+                    className="h-full w-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  getInitials(topContributor.name)
+                )}
               </div>
             )}
             {contributorCount > 1 && (

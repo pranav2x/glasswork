@@ -77,6 +77,18 @@ export const listAnalyses = query({
               )
             : null;
 
+        // Enrich top contributor with avatar from users table if needed
+        let avatarUrl = topContributor?.avatarUrl;
+        if (topContributor && !avatarUrl && topContributor.emailOrHandle?.includes("@")) {
+          const matchedUser = await ctx.db
+            .query("users")
+            .withIndex("email", (q) => q.eq("email", topContributor.emailOrHandle!))
+            .first();
+          if (matchedUser?.image) {
+            avatarUrl = matchedUser.image;
+          }
+        }
+
         return {
           ...analysis,
           summary: analysis.summary,
@@ -85,6 +97,7 @@ export const listAnalyses = query({
                 name: topContributor.name,
                 score: topContributor.score,
                 tier: topContributor.tier,
+                avatarUrl: avatarUrl,
               }
             : null,
           contributorCount: contributors.length,

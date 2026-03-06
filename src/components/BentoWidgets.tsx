@@ -91,38 +91,47 @@ export function BentoActivityHeatmap({
     ...activityByMonth.map((m) => m.docsCount + m.reposCount),
     1
   );
+  const hasAnyActivity = activityByMonth.some((m) => m.docsCount + m.reposCount > 0);
 
   return (
     <GlassPanel hoverable className={cn("flex flex-col p-6", className)}>
       <p className="text-[12px] font-medium text-warm-400 mb-4">Activity</p>
-      <div className="flex flex-1 items-end gap-2">
-        {activityByMonth.map((m) => {
-          const total = m.docsCount + m.reposCount;
-          const height = Math.max(8, (total / maxActivity) * 100);
-          return (
-            <div key={m.month} className="flex flex-1 flex-col items-center gap-1.5">
-              <div className="w-full flex flex-col items-stretch gap-[2px]" style={{ height: `${height}%` }}>
-                {m.reposCount > 0 && (
-                  <div
-                    className="rounded-t-sm bg-[#5BA8C8]"
-                    style={{ flex: m.reposCount }}
-                  />
-                )}
-                {m.docsCount > 0 && (
-                  <div
-                    className="rounded-b-sm bg-[#D4A017]"
-                    style={{ flex: m.docsCount }}
-                  />
-                )}
-                {total === 0 && (
-                  <div className="h-full rounded-sm bg-warm-200" />
-                )}
+      {!hasAnyActivity ? (
+        <div className="flex flex-1 items-center justify-center">
+          <p className="text-[12px] text-warm-400 text-center">
+            Run analyses to see your activity chart
+          </p>
+        </div>
+      ) : (
+        <div className="flex flex-1 items-end gap-2">
+          {activityByMonth.map((m) => {
+            const total = m.docsCount + m.reposCount;
+            const height = Math.max(12, (total / maxActivity) * 100);
+            return (
+              <div key={m.month} className="flex flex-1 flex-col items-center gap-1.5">
+                <div className="w-full flex flex-col items-stretch gap-[2px]" style={{ height: `${height}%` }}>
+                  {m.reposCount > 0 && (
+                    <div
+                      className="rounded-t-sm bg-[#5BA8C8]"
+                      style={{ flex: m.reposCount }}
+                    />
+                  )}
+                  {m.docsCount > 0 && (
+                    <div
+                      className="rounded-b-sm bg-[#D4A017]"
+                      style={{ flex: m.docsCount }}
+                    />
+                  )}
+                  {total === 0 && (
+                    <div className="h-full rounded-sm bg-warm-200/60" />
+                  )}
+                </div>
+                <span className="text-[9px] text-warm-400">{m.month.slice(0, 3)}</span>
               </div>
-              <span className="text-[9px] text-warm-400">{m.month.slice(0, 3)}</span>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
       <div className="mt-3 flex items-center gap-4">
         <div className="flex items-center gap-1.5">
           <div className="h-2 w-2 rounded-full bg-[#5BA8C8]" />
@@ -151,9 +160,9 @@ export function BentoCarryStreak({
       <Flame
         className={cn(
           "h-8 w-8 transition-colors",
-          isHot ? "text-[#D4A017]" : "text-warm-300"
+          isHot ? "text-red-500" : "text-warm-300"
         )}
-        fill={isHot ? "#D4A017" : "none"}
+        fill={isHot ? "#ef4444" : "none"}
       />
       <div className="mt-2 font-body text-[2.5rem] font-bold leading-none text-warm-900">
         {streak}

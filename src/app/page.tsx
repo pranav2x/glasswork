@@ -140,38 +140,34 @@ export default function LandingPage() {
         {/* Soft warm gradient background */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#F4F1ED] via-[#EDE8E1] to-[#E8E2DA]" />
 
-        {/* Wave/curtain shapes — left side (Earnwave-style prominent curtains) */}
-        <div className="wave-left absolute left-0 top-0 h-full w-[30%] pointer-events-none">
+        {/* Wave/curtain shapes — left side (subtle decorative curtains) */}
+        <div className="wave-left absolute left-0 top-0 h-full w-[18%] pointer-events-none opacity-60">
           <svg viewBox="0 0 400 1000" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full" preserveAspectRatio="none">
-            {/* Outer curtain — darker */}
             <path
               d="M0 0 L360 0 Q300 200 320 400 Q340 600 260 800 Q200 900 360 1000 L0 1000 Z"
               fill="#DDD6CA"
-              fillOpacity="0.7"
+              fillOpacity="0.6"
             />
-            {/* Inner curtain — lighter, slightly offset */}
             <path
               d="M0 0 L280 0 Q220 180 240 360 Q260 540 200 720 Q140 860 280 1000 L0 1000 Z"
               fill="#E5DED3"
-              fillOpacity="0.5"
+              fillOpacity="0.4"
             />
           </svg>
         </div>
 
         {/* Wave/curtain shapes — right side */}
-        <div className="wave-right absolute right-0 top-0 h-full w-[30%] pointer-events-none">
+        <div className="wave-right absolute right-0 top-0 h-full w-[18%] pointer-events-none opacity-60">
           <svg viewBox="0 0 400 1000" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full" preserveAspectRatio="none">
-            {/* Outer curtain — darker */}
             <path
               d="M400 0 L40 0 Q100 200 80 400 Q60 600 140 800 Q200 900 40 1000 L400 1000 Z"
               fill="#DDD6CA"
-              fillOpacity="0.7"
+              fillOpacity="0.6"
             />
-            {/* Inner curtain — lighter */}
             <path
               d="M400 0 L120 0 Q180 180 160 360 Q140 540 200 720 Q260 860 120 1000 L400 1000 Z"
               fill="#E5DED3"
-              fillOpacity="0.5"
+              fillOpacity="0.4"
             />
           </svg>
         </div>
@@ -199,22 +195,61 @@ export default function LandingPage() {
             Glasswork analyzes GitHub repos and Google Docs to show exactly who contributed — and who didn&apos;t.
           </motion.p>
 
-          {/* Decorative dots / indicator line */}
+          {/* Hero Input — Try it immediately */}
           <motion.div
-            className="mt-10 flex items-center gap-3"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-10 w-full max-w-xl px-4"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.45, ease: easeOut }}
           >
-            <div className="h-[3px] w-6 rounded-full bg-warm-300" />
-            <div className="h-2 w-2 rounded-full bg-warm-400" />
-            <div className="h-[3px] w-10 rounded-full bg-warm-300" />
-            <div className="flex h-6 w-6 items-center justify-center rounded-full border border-warm-300">
-              <div className="h-1.5 w-1.5 rounded-full bg-warm-400" />
+            <div className="rounded-[20px] border border-warm-200/50 bg-white/80 backdrop-blur-sm p-5 shadow-[0_4px_32px_rgba(0,0,0,0.06)]">
+              <div className="relative flex items-center gap-2 rounded-xl border border-warm-200 bg-warm-50/50 p-2 transition-all focus-within:border-warm-400 focus-within:bg-white">
+                <div className="ml-2 flex shrink-0 items-center gap-1.5">
+                  <Github className="h-4 w-4 text-warm-400" />
+                  <span className="text-warm-300 text-[10px]">/</span>
+                  <FileText className="h-4 w-4 text-warm-400" />
+                </div>
+                <div className="relative min-w-0 flex-1">
+                  <input
+                    type="text"
+                    value={repoInput}
+                    onChange={(e) => { setRepoInput(e.target.value); setError(null); }}
+                    onFocus={() => setInputFocused(true)}
+                    onBlur={() => setInputFocused(false)}
+                    onKeyDown={(e) => e.key === "Enter" && handleRepoAnalyze()}
+                    className="relative z-10 w-full bg-transparent py-2 text-[14px] text-warm-800 placeholder:text-warm-400 focus:outline-none"
+                  />
+                  {!repoInput && !inputFocused && (
+                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px]">
+                      <TypewriterPlaceholder isVisible={!repoInput && !inputFocused} />
+                    </div>
+                  )}
+                  {!repoInput && inputFocused && (
+                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px] text-warm-400">
+                      owner/repo or Google Doc link
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={handleRepoAnalyze}
+                  disabled={isSubmitting || !repoInput.trim()}
+                  className="shrink-0 rounded-lg bg-warm-900 px-4 py-2 text-[13px] font-semibold text-white transition-all duration-200 hover:bg-warm-800 disabled:opacity-30"
+                >
+                  {isSubmitting ? "..." : "Analyze"}
+                </button>
+              </div>
+              {error && <p className="mt-2 text-[12px] text-red-500">{error}</p>}
+              <div className="mt-2 flex items-center gap-3">
+                <button
+                  onClick={handleQuickDemo}
+                  disabled={isSubmitting}
+                  className="flex items-center gap-1 text-[13px] text-warm-400 transition-colors hover:text-warm-600 disabled:opacity-50"
+                >
+                  Try facebook/react
+                  <ArrowRight className="h-3 w-3" />
+                </button>
+              </div>
             </div>
-            <div className="h-[3px] w-10 rounded-full bg-warm-300" />
-            <div className="h-2 w-2 rounded-full bg-warm-400" />
-            <div className="h-[3px] w-6 rounded-full bg-warm-300" />
           </motion.div>
 
           {/* Three Bento Cards */}
@@ -323,7 +358,7 @@ export default function LandingPage() {
 
           {/* CTA below cards */}
           <motion.div
-            className="mt-12 flex flex-col items-center gap-4"
+            className="mt-12"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 1.1, ease: easeOut }}
@@ -334,14 +369,6 @@ export default function LandingPage() {
             >
               {isAuthenticated ? "Go to workspace" : "Get started free"}
               <ArrowRight className="h-4 w-4" />
-            </button>
-            <button
-              onClick={handleQuickDemo}
-              disabled={isSubmitting}
-              className="flex items-center gap-1 text-[13px] text-warm-400 transition-colors hover:text-warm-600 disabled:opacity-50"
-            >
-              Try a demo with facebook/react
-              <ArrowRight className="h-3 w-3" />
             </button>
           </motion.div>
         </div>
@@ -376,83 +403,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Input Section — Where users actually try it ── */}
-      <section className="bg-[#F9F7F4] py-20 sm:py-28">
-        <div className="mx-auto max-w-xl px-6">
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: easeOut }}
-          >
-            <h2 className="font-myflora text-[2.5rem] leading-[1.1] tracking-tight text-warm-900 sm:text-[3rem]">
-              Try it yourself
-            </h2>
-            <p className="mt-4 text-[15px] text-warm-500">
-              Paste a GitHub repo or Google Doc link and see who actually did the work.
-            </p>
-          </motion.div>
-
-          <motion.div
-            className="mt-10"
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-          >
-            <div className="rounded-[20px] border border-warm-200/50 bg-white p-7 shadow-[0_4px_32px_rgba(0,0,0,0.06)]">
-              <div className="relative flex items-center gap-2 rounded-xl border border-warm-200 bg-warm-50/50 p-2 transition-all focus-within:border-warm-400 focus-within:bg-white">
-                <div className="ml-2 flex shrink-0 items-center gap-1.5">
-                  <Github className="h-4 w-4 text-warm-400" />
-                  <span className="text-warm-300 text-[10px]">/</span>
-                  <FileText className="h-4 w-4 text-warm-400" />
-                </div>
-                <div className="relative min-w-0 flex-1">
-                  <input
-                    type="text"
-                    value={repoInput}
-                    onChange={(e) => { setRepoInput(e.target.value); setError(null); }}
-                    onFocus={() => setInputFocused(true)}
-                    onBlur={() => setInputFocused(false)}
-                    onKeyDown={(e) => e.key === "Enter" && handleRepoAnalyze()}
-                    className="relative z-10 w-full bg-transparent py-2 text-[14px] text-warm-800 placeholder:text-warm-400 focus:outline-none"
-                  />
-                  {!repoInput && !inputFocused && (
-                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px]">
-                      <TypewriterPlaceholder isVisible={!repoInput && !inputFocused} />
-                    </div>
-                  )}
-                  {!repoInput && inputFocused && (
-                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px] text-warm-400">
-                      owner/repo or Google Doc link
-                    </div>
-                  )}
-                </div>
-                <button
-                  onClick={handleRepoAnalyze}
-                  disabled={isSubmitting || !repoInput.trim()}
-                  className="shrink-0 rounded-lg bg-warm-900 px-4 py-2 text-[13px] font-semibold text-white transition-all duration-200 hover:bg-warm-800 disabled:opacity-30"
-                >
-                  {isSubmitting ? "..." : "Analyze"}
-                </button>
-              </div>
-              {error && <p className="mt-2 text-[12px] text-red-500">{error}</p>}
-
-              <div className="mt-3 flex items-center gap-3">
-                <button
-                  onClick={handleQuickDemo}
-                  disabled={isSubmitting}
-                  className="flex items-center gap-1 text-[13px] text-warm-400 transition-colors hover:text-warm-600 disabled:opacity-50"
-                >
-                  Try facebook/react
-                  <ArrowRight className="h-3 w-3" />
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      {/* Try It Yourself section moved to hero — this spacer keeps scroll anchors working */}
 
       {/* ── About + Product Preview (combined) ── */}
       <section id="about" className="relative bg-white py-24 sm:py-32">
@@ -517,9 +468,9 @@ export default function LandingPage() {
               <div className="relative overflow-hidden rounded-2xl border border-warm-200 bg-white shadow-[0_12px_48px_rgba(0,0,0,0.08)]">
                 <div className="flex items-center gap-2 border-b border-warm-100 bg-warm-50 px-4 py-3">
                   <div className="flex gap-1.5">
-                    <div className="h-3 w-3 rounded-full bg-warm-300" />
-                    <div className="h-3 w-3 rounded-full bg-warm-200" />
-                    <div className="h-3 w-3 rounded-full bg-warm-200" />
+                    <div className="h-3 w-3 rounded-full bg-[#FF5F57]" />
+                    <div className="h-3 w-3 rounded-full bg-[#FEBC2E]" />
+                    <div className="h-3 w-3 rounded-full bg-[#28C840]" />
                   </div>
                   <div className="mx-auto flex h-6 w-48 items-center justify-center rounded-md bg-warm-100 text-[11px] text-warm-400">
                     glasswork.app

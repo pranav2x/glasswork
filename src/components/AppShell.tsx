@@ -217,35 +217,101 @@ function Sidebar() {
   );
 }
 
-/* ─── User Avatar ─── */
+/* ─── User Avatar with Settings Dropdown ─── */
 
 function UserAvatar() {
+  const { signOut } = useAuthActions();
   const user = useQuery(api.users.getCurrentUser);
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const close = useCallback(() => setOpen(false), []);
+  useClickOutside(ref, close);
 
   return (
-    <div className="flex items-center gap-2.5">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm-200 ring-2 ring-white">
-        {user?.image ? (
-          <Image
-            src={user.image}
-            alt={user?.name ?? "Profile"}
-            width={36}
-            height={36}
-            className="h-full w-full object-cover"
-            referrerPolicy="no-referrer"
-          />
-        ) : (
-          <span className="text-[11px] font-semibold text-warm-600">
-            {getInitials(user?.name)}
-          </span>
-        )}
-      </div>
-      <div className="hidden min-w-0 lg:block">
-        <p className="truncate text-[13px] font-semibold text-warm-800">
-          {user?.name ?? "User"}
-        </p>
-        <p className="truncate text-[10px] text-warm-400">Analyst</p>
-      </div>
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 transition-colors hover:bg-warm-100/60"
+      >
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm-200 ring-2 ring-white">
+          {user?.image ? (
+            <Image
+              src={user.image}
+              alt={user?.name ?? "Profile"}
+              width={36}
+              height={36}
+              className="h-full w-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <span className="text-[11px] font-semibold text-warm-600">
+              {getInitials(user?.name)}
+            </span>
+          )}
+        </div>
+        <div className="hidden min-w-0 lg:block">
+          <p className="truncate text-[13px] font-semibold text-warm-800">
+            {user?.name ?? "User"}
+          </p>
+          <p className="truncate text-[10px] text-warm-400">Analyst</p>
+        </div>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full z-50 mt-2 min-w-[220px] overflow-hidden rounded-2xl border border-warm-200/50 bg-white/90 backdrop-blur-xl shadow-lg">
+          {user && (
+            <div className="flex items-center gap-3 border-b border-warm-100 px-4 py-3.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm-100">
+                {user.image ? (
+                  <Image
+                    src={user.image}
+                    alt={user.name ?? "Profile"}
+                    width={32}
+                    height={32}
+                    className="h-full w-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <span className="text-[11px] font-semibold text-warm-600">
+                    {getInitials(user.name)}
+                  </span>
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-[13px] font-semibold text-warm-900">
+                  {user.name ?? "Account"}
+                </p>
+                {user.email && (
+                  <p className="truncate text-[11px] text-warm-500">
+                    {user.email}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+          <div className="py-1.5">
+            <Link
+              href="/app/settings"
+              onClick={() => setOpen(false)}
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] font-medium text-warm-500 transition-colors hover:bg-warm-50 hover:text-warm-700"
+            >
+              <Settings className="h-3.5 w-3.5" />
+              Settings
+            </Link>
+            <button
+              onClick={() => {
+                setOpen(false);
+                void signOut();
+              }}
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] font-medium text-warm-500 transition-colors hover:bg-warm-50 hover:text-danger"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Sign out
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -254,7 +320,7 @@ function UserAvatar() {
 
 function DashboardTopBar() {
   return (
-    <header className="sticky top-0 z-20 bg-white/60 backdrop-blur-xl border-b border-white/[0.25]">
+    <header className="sticky top-0 z-20 bg-[#FFF8F0]/80 backdrop-blur-xl border-b border-warm-200/30">
       <div className="flex h-14 items-center justify-between px-6">
         {/* Left: Brand (hidden on lg where sidebar shows it) */}
         <Link
