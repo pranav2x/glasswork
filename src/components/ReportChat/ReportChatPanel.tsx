@@ -1,13 +1,16 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   PenLine,
   GraduationCap,
   ArrowUp,
   Trash2,
+  AtSign,
+  ChevronUp,
+  Infinity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -40,12 +43,28 @@ export function ReportChatPanel({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);
+  const [agentDropdownOpen, setAgentDropdownOpen] = useState(false);
+  const agentDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!userScrolled) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, userScrolled]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        agentDropdownRef.current &&
+        !agentDropdownRef.current.contains(e.target as Node)
+      ) {
+        setAgentDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleScroll = () => {
     const el = scrollAreaRef.current;
@@ -68,6 +87,10 @@ export function ReportChatPanel({
       handleSend();
     }
   };
+
+  const activeToolLabel = activeTool
+    ? TOOLS.find((t) => t.id === activeTool)?.label ?? "Agent"
+    : "Agent";
 
   return (
     <div className="flex h-[calc(100vh-120px)] flex-col rounded-2xl border border-warm-200/60 bg-white shadow-card">
@@ -146,49 +169,121 @@ export function ReportChatPanel({
         )}
       </div>
 
-      {/* Input area */}
+      {/* Input area — ChatGPT-style */}
       <div className="px-4 pb-4">
         <div className="rounded-2xl border border-warm-200/80 bg-warm-50/30 transition-all focus-within:border-warm-300 focus-within:bg-white">
-          {/* Text input */}
-          <div className="px-4 pt-3 pb-2">
-            <input
+          {/* Top section: @ Add Context + textarea */}
+          <div className="px-4 pt-3">
+            <button className="mb-2 flex items-center gap-1.5 rounded-lg border border-warm-200/80 bg-white px-2.5 py-1 text-[12px] font-medium text-warm-500 transition-colors hover:border-warm-300 hover:text-warm-700">
+              <AtSign className="h-3 w-3" />
+              Add Context
+            </button>
+            <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Imagine, plan, write anything..."
               disabled={isStreaming}
-              className="w-full bg-transparent text-[13px] text-warm-900 placeholder:text-warm-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+              rows={1}
+              className="w-full resize-none bg-transparent text-[13px] text-warm-900 placeholder:text-warm-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
+              style={{ minHeight: "24px", maxHeight: "120px" }}
+              onInput={(e) => {
+                const target = e.target as HTMLTextAreaElement;
+                target.style.height = "24px";
+                target.style.height = `${Math.min(target.scrollHeight, 120)}px`;
+              }}
             />
           </div>
 
-          {/* Bottom row: tools + send */}
-          <div className="flex items-center justify-between px-3 pb-2.5">
-            <div className="flex items-center gap-1">
-              {TOOLS.map((tool) => {
-                const Icon = tool.icon;
-                const isActive = activeTool === tool.id;
-                return (
-                  <button
-                    key={tool.id}
-                    onClick={() => toggleTool(tool.id)}
+          {/* Bottom row: pills + send */}
+          <div className="flex items-center justify-between px-3 pb-2.5 pt-1">
+            <div className="flex items-center gap-1.5">
+              {/* Agent mode pill with dropdown */}
+              <div ref={agentDropdownRef} className="relative">
+                <button
+                  onClick={() => setAgentDropdownOpen((o) => !o)}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-medium transition-all",
+                    activeTool
+                      ? "bg-warm-800 text-white"
+                      : "bg-warm-100 text-warm-600 hover:bg-warm-200"
+                  )}
+                >
+                  <Infinity className="h-3.5 w-3.5" />
+                  <span>{activeToolLabel}</span>
+                  <ChevronUp
                     className={cn(
-                      "flex items-center gap-1.5 rounded-lg px-2 py-1 text-[11px] font-medium transition-all",
-                      isActive
-                        ? "bg-warm-200/60 text-warm-800"
-                        : "text-warm-400 hover:bg-warm-100 hover:text-warm-600"
+                      "h-3 w-3 transition-transform",
+                      agentDropdownOpen ? "rotate-0" : "rotate-180"
                     )}
-                  >
-                    <Icon className="h-3 w-3" />
-                    <span className="hidden min-[400px]:inline">{tool.label}</span>
-                  </button>
-                );
-              })}
+                  />
+                </button>
+
+                <AnimatePresence>
+                  {agentDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 4 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute bottom-full left-0 z-50 mb-1.5 w-48 rounded-xl border border-warm-200 bg-white p-1 shadow-lg"
+                    >
+                      {/* None / default option */}
+                      <button
+                        onClick={() => {
+                          if (activeTool) toggleTool(activeTool);
+                          setAgentDropdownOpen(false);
+                        }}
+                        className={cn(
+                          "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[12px] font-medium transition-colors",
+                          !activeTool
+                            ? "bg-warm-100 text-warm-800"
+                            : "text-warm-500 hover:bg-warm-50 hover:text-warm-700"
+                        )}
+                      >
+                        <Infinity className="h-3.5 w-3.5" />
+                        Default
+                      </button>
+                      {TOOLS.map((tool) => {
+                        const Icon = tool.icon;
+                        const isActive = activeTool === tool.id;
+                        return (
+                          <button
+                            key={tool.id}
+                            onClick={() => {
+                              toggleTool(tool.id);
+                              setAgentDropdownOpen(false);
+                            }}
+                            className={cn(
+                              "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[12px] font-medium transition-colors",
+                              isActive
+                                ? "bg-warm-100 text-warm-800"
+                                : "text-warm-500 hover:bg-warm-50 hover:text-warm-700"
+                            )}
+                          >
+                            <Icon className="h-3.5 w-3.5" />
+                            {tool.label}
+                          </button>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Model pill */}
+              <div className="flex items-center gap-1 rounded-full bg-warm-100 px-3 py-1 text-[12px] font-medium text-warm-600">
+                <span>Gemini Pro</span>
+                <ChevronUp className="h-3 w-3 rotate-180" />
+              </div>
             </div>
+
+            {/* Send button */}
             <button
               onClick={handleSend}
               disabled={!input.trim() || isStreaming}
               className={cn(
-                "flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-all",
+                "flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all",
                 input.trim() && !isStreaming
                   ? "bg-warm-900 text-white"
                   : "bg-warm-200/60 text-warm-400"
