@@ -1,7 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
+import { useConvexAuth } from "convex/react";
+import { useAuthActions } from "@convex-dev/auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../../convex/_generated/api";
 import { CheckCircle2 } from "lucide-react";
@@ -11,6 +14,10 @@ function validateEmail(email: string): boolean {
 }
 
 export default function WaitlistPage() {
+  const router = useRouter();
+  const { isAuthenticated } = useConvexAuth();
+  const { signIn } = useAuthActions();
+
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -19,6 +26,13 @@ export default function WaitlistPage() {
 
   const joinWaitlist = useMutation(api.waitlist.join);
   const waitlistCount = useQuery(api.waitlist.getCount);
+
+  // Owner bypass: if signed in, go straight to the app
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/app");
+    }
+  }, [isAuthenticated, router]);
 
   const handleSubmit = useCallback(async () => {
     if (!validateEmail(email)) {
@@ -142,6 +156,16 @@ export default function WaitlistPage() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Owner access — subtle, won't be noticed */}
+        <div className="mt-10 flex justify-center">
+          <button
+            onClick={() => signIn("google", { redirectTo: "/app" })}
+            className="font-body text-[11px] text-warm-200 hover:text-warm-400 transition-colors"
+          >
+            ·
+          </button>
+        </div>
       </motion.div>
     </div>
   );
