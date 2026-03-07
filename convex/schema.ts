@@ -79,4 +79,10 @@ export default defineSchema({
   })
     .index("by_userId", ["userId"])
     .index("by_userId_read", ["userId", "read"]),
+
+  waitlist: defineTable({
+    email: v.string(),
+    name: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_email", ["email"]),
 });
