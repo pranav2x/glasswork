@@ -20,12 +20,13 @@ interface ProjectCardProps {
       tier: "carry" | "solid" | "ghost";
       avatarUrl?: string;
     } | null;
+    topContributors?: { name: string; avatarUrl?: string }[];
     contributorCount: number;
   };
 }
 
 export function ProjectCard({ analysis }: ProjectCardProps) {
-  const { _id, title, sourceType, createdAt, topContributor, contributorCount } = analysis;
+  const { _id, title, sourceType, createdAt, topContributor, topContributors, contributorCount } = analysis;
 
   return (
     <Link href={`/results/${_id}`}>
@@ -55,25 +56,28 @@ export function ProjectCard({ analysis }: ProjectCardProps) {
         {/* Group info */}
         <div className="mt-4 flex items-center gap-2">
           <div className="flex -space-x-1.5">
-            {topContributor && (
-              <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-warm-200 text-[9px] font-bold text-warm-600 ring-2 ring-white">
-                {topContributor.avatarUrl ? (
+            {(topContributors ?? (topContributor ? [topContributor] : [])).map((c, i) => (
+              <div
+                key={i}
+                className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-warm-200 text-[9px] font-bold text-warm-600 ring-2 ring-white"
+              >
+                {c.avatarUrl ? (
                   <Image
-                    src={topContributor.avatarUrl}
-                    alt={topContributor.name}
+                    src={c.avatarUrl}
+                    alt={c.name}
                     width={28}
                     height={28}
                     className="h-full w-full object-cover"
                     referrerPolicy="no-referrer"
                   />
                 ) : (
-                  getInitials(topContributor.name)
+                  getInitials(c.name)
                 )}
               </div>
-            )}
-            {contributorCount > 1 && (
+            ))}
+            {contributorCount > (topContributors?.length ?? 1) && (
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-warm-100 text-[9px] font-medium text-warm-500 ring-2 ring-white">
-                +{contributorCount - 1}
+                +{contributorCount - (topContributors?.length ?? 1)}
               </div>
             )}
           </div>

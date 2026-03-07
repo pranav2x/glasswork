@@ -89,6 +89,22 @@ export const listAnalyses = query({
           }
         }
 
+        // Enrich top 4 contributors with avatars
+        const sorted = [...contributors].sort((a, b) => b.score - a.score);
+        const topContributors = await Promise.all(
+          sorted.slice(0, 4).map(async (c) => {
+            let url = c.avatarUrl;
+            if (!url && c.emailOrHandle?.includes("@")) {
+              const u = await ctx.db
+                .query("users")
+                .withIndex("email", (q) => q.eq("email", c.emailOrHandle!))
+                .first();
+              if (u?.image) url = u.image;
+            }
+            return { name: c.name, avatarUrl: url };
+          })
+        );
+
         return {
           ...analysis,
           summary: analysis.summary,
@@ -100,6 +116,7 @@ export const listAnalyses = query({
                 avatarUrl: avatarUrl,
               }
             : null,
+          topContributors,
           contributorCount: contributors.length,
         };
       })

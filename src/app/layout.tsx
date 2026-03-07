@@ -39,8 +39,8 @@ export const metadata: Metadata = {
   description:
     "Analyze Google Docs and GitHub repos to see who actually contributed.",
   icons: {
-    icon: "/icon.png",
-    apple: "/icon.png",
+    icon: "/logo.png",
+    apple: "/logo.png",
   },
   openGraph: {
     title: "Glasswork",

@@ -14,6 +14,7 @@ import {
   Home,
   Inbox,
   FolderKanban,
+  ClipboardList,
   Settings,
   LogOut,
 } from "lucide-react";
@@ -171,6 +172,7 @@ function Sidebar() {
     pathname === "/app" || pathname.startsWith("/results");
   const isInboxActive = pathname === "/app/inbox";
   const isProjectsActive = pathname === "/app/projects";
+  const isReportsActive = pathname.startsWith("/app/reports");
 
   return (
     <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col border-r border-white/[0.25] bg-[#FFF5EB]/[0.12] backdrop-blur-[20px] lg:w-[200px]">
@@ -206,6 +208,12 @@ function Sidebar() {
           label="Projects"
           href="/app/projects"
           isActive={isProjectsActive}
+        />
+        <SidebarNavItem
+          icon={ClipboardList}
+          label="Report"
+          href="/app/reports"
+          isActive={isReportsActive}
         />
       </nav>
 

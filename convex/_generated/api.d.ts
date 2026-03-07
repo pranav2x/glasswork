@@ -19,6 +19,7 @@ import type * as http from "../http.js";
 import type * as notifications from "../notifications.js";
 import type * as scoring from "../scoring.js";
 import type * as users from "../users.js";
+import type * as waitlist from "../waitlist.js";
 
 import type {
   ApiFromModules,
@@ -38,6 +39,7 @@ declare const fullApi: ApiFromModules<{
   notifications: typeof notifications;
   scoring: typeof scoring;
   users: typeof users;
+  waitlist: typeof waitlist;
 }>;
 
 /**

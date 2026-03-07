@@ -14,7 +14,7 @@ const FILTERS = [
   { label: "All", value: "all" },
   { label: "GitHub", value: "github" },
   { label: "Google Docs", value: "docs" },
-  { label: "My LOCKED IN", value: "carry" },
+  { label: "Locked In", value: "carry" },
 ] as const;
 
 type FilterValue = (typeof FILTERS)[number]["value"];

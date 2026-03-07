@@ -14,6 +14,7 @@ import {
   Flame,
   Inbox,
   CheckCheck,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Id } from "../../../../convex/_generated/dataModel";
@@ -46,6 +47,7 @@ function InboxPage() {
   const notifications = useQuery(api.notifications.listNotifications, {});
   const markRead = useMutation(api.notifications.markRead);
   const markAllRead = useMutation(api.notifications.markAllRead);
+  const deleteNotification = useMutation(api.notifications.deleteNotification);
 
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
@@ -121,45 +123,54 @@ function InboxPage() {
             const colorClass = NOTIFICATION_COLORS[n.type] || "text-warm-500 bg-warm-100";
 
             return (
-              <button
-                key={n._id}
-                onClick={() => handleClick(n._id, n.analysisId ?? undefined)}
-                className={cn(
-                  "w-full text-left transition-all duration-200",
-                  !n.read && "relative"
-                )}
-              >
-                <GlassPanel className={cn(
-                  "flex items-start gap-4 p-4",
-                  !n.read && "border-[#D4A017]/20"
-                )}>
-                  {/* Unread dot */}
-                  {!n.read && (
-                    <div className="absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-[#D4A017]" />
-                  )}
+              <div key={n._id} className={cn("relative", !n.read && "relative")}>
+                <button
+                  onClick={() => handleClick(n._id, n.analysisId ?? undefined)}
+                  className="w-full text-left transition-all duration-200"
+                >
+                  <GlassPanel className={cn(
+                    "flex items-start gap-4 p-4 pr-12",
+                    !n.read && "border-[#D4A017]/20"
+                  )}>
+                    {/* Unread dot */}
+                    {!n.read && (
+                      <div className="absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-[#D4A017]" />
+                    )}
 
-                  {/* Icon */}
-                  <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", colorClass)}>
-                    <IconComponent className="h-5 w-5" />
-                  </div>
+                    {/* Icon */}
+                    <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", colorClass)}>
+                      <IconComponent className="h-5 w-5" />
+                    </div>
 
-                  {/* Content */}
-                  <div className="min-w-0 flex-1">
-                    <p className={cn(
-                      "text-[13px] text-warm-800",
-                      !n.read ? "font-semibold" : "font-medium"
-                    )}>
-                      {n.title}
-                    </p>
-                    <p className="mt-0.5 text-[12px] text-warm-500">{n.body}</p>
-                  </div>
+                    {/* Content */}
+                    <div className="min-w-0 flex-1">
+                      <p className={cn(
+                        "text-[13px] text-warm-800",
+                        !n.read ? "font-semibold" : "font-medium"
+                      )}>
+                        {n.title}
+                      </p>
+                      <p className="mt-0.5 text-[12px] text-warm-500">{n.body}</p>
+                    </div>
 
-                  {/* Time */}
-                  <span className="shrink-0 text-[11px] text-warm-400">
-                    {formatTimeAgo(n.createdAt)}
-                  </span>
-                </GlassPanel>
-              </button>
+                    {/* Time */}
+                    <span className="shrink-0 text-[11px] text-warm-400">
+                      {formatTimeAgo(n.createdAt)}
+                    </span>
+                  </GlassPanel>
+                </button>
+                {/* Delete button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void deleteNotification({ notificationId: n._id });
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-lg text-warm-300 transition-colors hover:bg-warm-100 hover:text-warm-600"
+                  title="Delete"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
             );
           })}
         </div>

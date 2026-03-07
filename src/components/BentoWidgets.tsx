@@ -4,6 +4,7 @@ import { motion, useSpring, useMotionValue, useTransform } from "framer-motion";
 import { useEffect } from "react";
 import { GlassPanel } from "@/components/GlassPanel";
 import { TierBadge } from "@/components/TierBadge";
+import { ActivityChart } from "@/components/DashboardWidgets";
 import { Flame, ArrowUpRight, GitBranch, FileText, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { formatTimeAgo } from "@/lib/formatters";
@@ -79,7 +80,7 @@ export function BentoAIFeed({
   );
 }
 
-/* ─── 3. Activity Heatmap Widget ─── */
+/* ─── 3. Activity Chart Widget ─── */
 export function BentoActivityHeatmap({
   activityByMonth,
   className,
@@ -87,60 +88,15 @@ export function BentoActivityHeatmap({
   activityByMonth: { month: string; docsCount: number; reposCount: number }[];
   className?: string;
 }) {
-  const maxActivity = Math.max(
-    ...activityByMonth.map((m) => m.docsCount + m.reposCount),
-    1
-  );
-  const hasAnyActivity = activityByMonth.some((m) => m.docsCount + m.reposCount > 0);
+  const months = activityByMonth.map((m) => m.month.slice(0, 3));
+  const docsData = activityByMonth.map((m) => m.docsCount);
+  const reposData = activityByMonth.map((m) => m.reposCount);
 
   return (
     <GlassPanel hoverable className={cn("flex flex-col p-6", className)}>
-      <p className="text-[12px] font-medium text-warm-400 mb-4">Activity</p>
-      {!hasAnyActivity ? (
-        <div className="flex flex-1 items-center justify-center">
-          <p className="text-[12px] text-warm-400 text-center">
-            Run analyses to see your activity chart
-          </p>
-        </div>
-      ) : (
-        <div className="flex flex-1 items-end gap-2">
-          {activityByMonth.map((m) => {
-            const total = m.docsCount + m.reposCount;
-            const height = Math.max(12, (total / maxActivity) * 100);
-            return (
-              <div key={m.month} className="flex flex-1 flex-col items-center gap-1.5">
-                <div className="w-full flex flex-col items-stretch gap-[2px]" style={{ height: `${height}%` }}>
-                  {m.reposCount > 0 && (
-                    <div
-                      className="rounded-t-sm bg-[#5BA8C8]"
-                      style={{ flex: m.reposCount }}
-                    />
-                  )}
-                  {m.docsCount > 0 && (
-                    <div
-                      className="rounded-b-sm bg-[#D4A017]"
-                      style={{ flex: m.docsCount }}
-                    />
-                  )}
-                  {total === 0 && (
-                    <div className="h-full rounded-sm bg-warm-200/60" />
-                  )}
-                </div>
-                <span className="text-[9px] text-warm-400">{m.month.slice(0, 3)}</span>
-              </div>
-            );
-          })}
-        </div>
-      )}
-      <div className="mt-3 flex items-center gap-4">
-        <div className="flex items-center gap-1.5">
-          <div className="h-2 w-2 rounded-full bg-[#5BA8C8]" />
-          <span className="text-[9px] text-warm-400">Repos</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="h-2 w-2 rounded-full bg-[#D4A017]" />
-          <span className="text-[9px] text-warm-400">Docs</span>
-        </div>
+      <p className="text-[12px] font-medium text-warm-400 mb-3">Activity</p>
+      <div className="flex-1 min-h-0">
+        <ActivityChart months={months} docsData={docsData} reposData={reposData} />
       </div>
     </GlassPanel>
   );
@@ -154,15 +110,16 @@ export function BentoCarryStreak({
   streak: number;
   className?: string;
 }) {
-  const isHot = streak >= 5;
+  const isActive = streak > 0;
   return (
     <GlassPanel hoverable className={cn("flex flex-col items-center justify-center p-6", className)}>
       <Flame
         className={cn(
           "h-8 w-8 transition-colors",
-          isHot ? "text-red-500" : "text-warm-300"
+          isActive ? "text-red-500" : "text-warm-200"
         )}
-        fill={isHot ? "#ef4444" : "none"}
+        fill={isActive ? "#ef4444" : "none"}
+        strokeWidth={isActive ? 1.5 : 1}
       />
       <div className="mt-2 font-body text-[2.5rem] font-bold leading-none text-warm-900">
         {streak}

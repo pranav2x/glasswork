@@ -80,6 +80,21 @@ export const markAllRead = mutation({
 });
 
 /**
+ * Delete a single notification for the current user.
+ */
+export const deleteNotification = mutation({
+  args: { notificationId: v.id("notifications") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return;
+    const notification = await ctx.db.get(args.notificationId);
+    if (notification?.userId === userId) {
+      await ctx.db.delete(args.notificationId);
+    }
+  },
+});
+
+/**
  * Internal: create a notification (called from analysis pipeline).
  */
 export const createNotification = internalMutation({
