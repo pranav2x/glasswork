@@ -541,7 +541,7 @@ function ReportsPage() {
       )}
 
       {analysisId ? (
-        <div className="flex gap-6">
+        <div className="flex items-start gap-6">
           {/* Report content — 70% */}
           <div className="min-w-0 flex-[70]">
             <ReportView
@@ -550,10 +550,10 @@ function ReportsPage() {
             />
           </div>
 
-          {/* Chat panel — 30%, always visible */}
+          {/* Chat panel — 30%, height matches left content */}
           {reportContext && (
-            <div className="hidden flex-[30] lg:block" style={{ minWidth: 320, maxWidth: 440 }}>
-              <div className="sticky top-6">
+            <div className="hidden flex-[30] self-stretch lg:block" style={{ minWidth: 320, maxWidth: 440 }}>
+              <div className="sticky top-6 h-[calc(100vh-48px)]">
                 <ReportChatPanel reportContext={reportContext} />
               </div>
             </div>

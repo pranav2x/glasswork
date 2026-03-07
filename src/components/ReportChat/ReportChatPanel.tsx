@@ -102,7 +102,7 @@ export function ReportChatPanel({
     : "Agent";
 
   return (
-    <div className="flex h-[calc(100vh-120px)] flex-col rounded-2xl border border-warm-200/60 bg-white shadow-card">
+    <div className="flex h-full flex-col rounded-2xl border border-warm-200/60 bg-[#F9F3F1] shadow-card">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-3.5">
         <span className="text-[14px] font-semibold text-warm-900">
@@ -180,7 +180,7 @@ export function ReportChatPanel({
 
       {/* Input area — ChatGPT-style */}
       <div className="px-4 pb-4">
-        <div className="rounded-2xl border border-warm-200/80 bg-warm-50/30 transition-all focus-within:border-warm-300 focus-within:bg-white">
+        <div className="rounded-2xl border border-warm-200/80 bg-white/60 transition-all focus-within:border-warm-300 focus-within:bg-white">
           {/* Top section: @ Add Context + textarea */}
           <div className="px-4 pt-3">
             <button className="mb-2 flex items-center gap-1.5 rounded-lg border border-warm-200/80 bg-white px-2.5 py-1 text-[12px] font-medium text-warm-500 transition-colors hover:border-warm-300 hover:text-warm-700">
