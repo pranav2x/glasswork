@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useCallback } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { useConvexAuth } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../../convex/_generated/api";
@@ -14,8 +12,6 @@ function validateEmail(email: string): boolean {
 }
 
 export default function WaitlistPage() {
-  const router = useRouter();
-  const { isAuthenticated } = useConvexAuth();
   const { signIn } = useAuthActions();
 
   const [email, setEmail] = useState("");
@@ -26,13 +22,6 @@ export default function WaitlistPage() {
 
   const joinWaitlist = useMutation(api.waitlist.join);
   const waitlistCount = useQuery(api.waitlist.getCount);
-
-  // Owner bypass: if signed in, go straight to the app
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/app");
-    }
-  }, [isAuthenticated, router]);
 
   const handleSubmit = useCallback(async () => {
     if (!validateEmail(email)) {
