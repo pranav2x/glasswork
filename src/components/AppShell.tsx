@@ -254,7 +254,6 @@ function UserAvatar() {
           <p className="truncate text-[13px] font-semibold text-warm-800">
             {user?.name ?? "User"}
           </p>
-          <p className="truncate text-[10px] text-warm-400">Analyst</p>
         </div>
       </button>
 
