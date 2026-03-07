@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useMutation, useQuery } from "convex/react";
+import { useConvexAuth } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../../convex/_generated/api";
 import { CheckCircle2 } from "lucide-react";
@@ -13,6 +15,14 @@ function validateEmail(email: string): boolean {
 
 export default function WaitlistPage() {
   const { signIn } = useAuthActions();
+  const { isAuthenticated, isLoading } = useConvexAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace("/app");
+    }
+  }, [isAuthenticated, isLoading, router]);
 
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");

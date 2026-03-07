@@ -111,7 +111,9 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
 
   const chartW = width - padL - padR;
   const chartH = height - padT - padB;
-  const maxVal = Math.max(...docsData, ...reposData, 1) * 1.1;
+  const rawMax = Math.max(...docsData, ...reposData, 1);
+  const maxVal = rawMax * 1.15;
+  const yTicks = rawMax <= 3 ? rawMax : 4;
 
   const getX = (i: number) => padL + (i / Math.max(months.length - 1, 1)) * chartW;
   const getY = (v: number) => padT + chartH - (v / maxVal) * chartH;
@@ -152,17 +154,31 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
           </linearGradient>
         </defs>
 
-        {[0, 0.25, 0.5, 0.75, 1].map((pct, i) => (
-          <line
-            key={i}
-            x1={padL}
-            y1={padT + chartH * (1 - pct)}
-            x2={width - padR}
-            y2={padT + chartH * (1 - pct)}
-            stroke="#F0F0F0"
-            strokeWidth="0.5"
-          />
-        ))}
+        {Array.from({ length: yTicks + 1 }, (_, i) => i / yTicks).map((pct, i) => {
+          const yVal = Math.round(rawMax * pct);
+          return (
+            <g key={i}>
+              <line
+                x1={padL + 16}
+                y1={padT + chartH * (1 - pct)}
+                x2={width - padR}
+                y2={padT + chartH * (1 - pct)}
+                stroke="#F0F0F0"
+                strokeWidth="0.5"
+              />
+              <text
+                x={padL + 12}
+                y={padT + chartH * (1 - pct) + 3}
+                textAnchor="end"
+                fontSize="8"
+                fill="#C0C0C0"
+                fontFamily="inherit"
+              >
+                {yVal}
+              </text>
+            </g>
+          );
+        })}
 
         <path d={areaPath} fill="url(#docsAreaGrad)" />
 

@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { getInitials } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
+import { useMutation } from "convex/react";
 import {
   ArrowLeft,
   Sparkles,
@@ -20,6 +21,7 @@ import {
   FolderKanban,
   FileText,
   Github,
+  Trash2,
 } from "lucide-react";
 
 // ─── Insight computation ───────────────────────────────────────────────────
@@ -322,12 +324,7 @@ function ReportView({ analysisId }: { analysisId: string }) {
             <div className="flex items-center gap-2">
               <Badge
                 variant="outline"
-                className={cn(
-                  "text-[11px] font-medium",
-                  isDoc
-                    ? "border-docs-accent/30 bg-docs-accent/[0.08] text-docs-accent"
-                    : "border-repo-accent/30 bg-repo-accent/[0.08] text-repo-accent"
-                )}
+                className="text-[11px] font-medium border-warm-200 bg-warm-100/50 text-warm-500"
               >
                 {isDoc ? "Google Doc" : "GitHub Repo"}
               </Badge>
@@ -345,11 +342,11 @@ function ReportView({ analysisId }: { analysisId: string }) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05, duration: 0.4 }}
-          className="rounded-2xl border-l-2 border-l-brand/30 bg-white/55 p-5 shadow-card backdrop-blur-xl"
+          className="rounded-2xl border border-white/50 bg-white/55 p-5 shadow-card backdrop-blur-xl"
         >
           <div className="mb-2 flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-brand" />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-brand">
+            <Sparkles className="h-4 w-4 text-warm-400" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-warm-500">
               AI Insight
             </span>
           </div>
@@ -407,6 +404,7 @@ function ReportView({ analysisId }: { analysisId: string }) {
 function ProjectPicker() {
   const router = useRouter();
   const analyses = useQuery(api.analyses.listAnalyses, {});
+  const deleteAnalysis = useMutation(api.analyses.deleteAnalysis);
 
   if (analyses === undefined) {
     return (
@@ -437,34 +435,45 @@ function ProjectPicker() {
       {ready.map((analysis, i) => {
         const isDoc = analysis.sourceType === "google_doc";
         return (
-          <motion.button
+          <motion.div
             key={analysis._id}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05, duration: 0.35 }}
-            onClick={() => router.push(`/app/reports?id=${analysis._id}`)}
-            className="flex items-start gap-3 rounded-2xl border border-white/50 bg-white/55 p-4 text-left shadow-card backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover"
+            className="relative group"
           >
-            <div
-              className={cn(
-                "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
-                isDoc ? "bg-docs-accent/10" : "bg-repo-accent/10"
-              )}
+            <button
+              onClick={() => router.push(`/app/reports?id=${analysis._id}`)}
+              className="flex w-full items-start gap-3 rounded-2xl border border-white/50 bg-white/55 p-4 text-left shadow-card backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover"
             >
-              {isDoc ? (
-                <FileText className="h-4 w-4 text-docs-accent" />
-              ) : (
-                <Github className="h-4 w-4 text-repo-accent" />
-              )}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-[13px] font-semibold text-warm-900">{analysis.title}</p>
-              <p className="mt-0.5 text-[11px] text-warm-400">
-                {analysis.contributorCount} contributor{analysis.contributorCount !== 1 ? "s" : ""}
-                {analysis.topContributor ? ` · Top: ${analysis.topContributor.name}` : ""}
-              </p>
-            </div>
-          </motion.button>
+              <div
+                className={cn(
+                  "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+                  isDoc ? "bg-docs-accent/10" : "bg-repo-accent/10"
+                )}
+              >
+                {isDoc ? (
+                  <FileText className="h-4 w-4 text-docs-accent" />
+                ) : (
+                  <Github className="h-4 w-4 text-repo-accent" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[13px] font-semibold text-warm-900">{analysis.title}</p>
+                <p className="mt-0.5 text-[11px] text-warm-400">
+                  {analysis.contributorCount} contributor{analysis.contributorCount !== 1 ? "s" : ""}
+                  {analysis.topContributor ? ` · Top: ${analysis.topContributor.name}` : ""}
+                </p>
+              </div>
+            </button>
+            <button
+              onClick={() => deleteAnalysis({ analysisId: analysis._id as any })}
+              className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-lg text-warm-300 opacity-0 transition-all duration-150 group-hover:opacity-100 hover:bg-red-50 hover:text-red-500"
+              title="Delete report"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </motion.div>
         );
       })}
     </div>

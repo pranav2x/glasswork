@@ -327,7 +327,7 @@ function UserAvatar() {
 
 function DashboardTopBar() {
   return (
-    <header className="sticky top-0 z-20 bg-[#FFF8F0]/80 backdrop-blur-xl border-b border-warm-200/30">
+    <header className="sticky top-0 z-20 bg-[#FDF3E8]/80 backdrop-blur-xl border-b border-warm-200/30">
       <div className="flex h-14 items-center justify-between px-6">
         {/* Left: Brand (hidden on lg where sidebar shows it) */}
         <Link

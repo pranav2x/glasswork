@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { GitBranch, FileText, ArrowUpRight } from "lucide-react";
+import { GitBranch, FileText, ArrowUpRight, Trash2 } from "lucide-react";
+import { useMutation } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { Id } from "../../convex/_generated/dataModel";
 import { GlassPanel } from "@/components/GlassPanel";
 import { TierBadge } from "@/components/TierBadge";
 import { formatTimeAgo, getInitials } from "@/lib/formatters";
@@ -27,8 +30,10 @@ interface ProjectCardProps {
 
 export function ProjectCard({ analysis }: ProjectCardProps) {
   const { _id, title, sourceType, createdAt, topContributor, topContributors, contributorCount } = analysis;
+  const deleteAnalysis = useMutation(api.analyses.deleteAnalysis);
 
   return (
+    <div className="relative group">
     <Link href={`/results/${_id}`}>
       <GlassPanel hoverable className="group flex h-full flex-col p-6">
         {/* Header: title + source icon + time */}
@@ -100,5 +105,17 @@ export function ProjectCard({ analysis }: ProjectCardProps) {
         )}
       </GlassPanel>
     </Link>
+    <button
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        deleteAnalysis({ analysisId: _id as Id<"analyses"> });
+      }}
+      className="absolute right-2 bottom-2 z-10 flex h-7 w-7 items-center justify-center rounded-lg text-warm-300 opacity-0 transition-all duration-150 group-hover:opacity-100 hover:bg-red-50 hover:text-red-500"
+      title="Delete project"
+    >
+      <Trash2 className="h-3.5 w-3.5" />
+    </button>
+    </div>
   );
 }

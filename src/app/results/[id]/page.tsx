@@ -154,12 +154,7 @@ export default function ResultsPage() {
             <div className="flex items-center gap-3">
               <Badge
                 variant="outline"
-                className={cn(
-                  "text-[11px] font-medium",
-                  isDoc
-                    ? "border-docs-accent/30 bg-docs-accent/[0.08] text-docs-accent"
-                    : "border-repo-accent/30 bg-repo-accent/[0.08] text-repo-accent"
-                )}
+                className="text-[11px] font-medium border-warm-200 bg-warm-100/50 text-warm-500"
               >
                 {isDoc ? "Google Doc" : "GitHub Repo"}
               </Badge>
@@ -169,9 +164,9 @@ export default function ResultsPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Link href={`/app/analytics?analysis=${analysisId}`}>
+              <Link href={`/app/reports?id=${analysisId}`}>
                 <GlassButton variant="ghost" size="sm">
-                  Analytics
+                  Report
                 </GlassButton>
               </Link>
               <Link href="/app">
