@@ -4,6 +4,14 @@ import { useState, useCallback, useRef } from "react";
 
 export type ToolType = "deep_research" | "canvas" | "guided_learning";
 
+export type GeminiModel = "gemini-2.0-flash" | "gemini-2.5-pro-preview-06-05" | "gemini-2.5-flash-preview-05-20";
+
+export const GEMINI_MODELS: { id: GeminiModel; label: string }[] = [
+  { id: "gemini-2.0-flash", label: "Gemini 2.0 Flash" },
+  { id: "gemini-2.5-flash-preview-05-20", label: "Gemini 2.5 Flash" },
+  { id: "gemini-2.5-pro-preview-06-05", label: "Gemini 2.5 Pro" },
+];
+
 export type ChatMessage = {
   id: string;
   role: "user" | "assistant";
@@ -31,6 +39,7 @@ export function useChatMessages() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [activeTool, setActiveTool] = useState<ToolType | null>(null);
+  const [activeModel, setActiveModel] = useState<GeminiModel>("gemini-2.0-flash");
   const abortRef = useRef<AbortController | null>(null);
 
   const sendMessage = useCallback(
@@ -66,6 +75,7 @@ export function useChatMessages() {
             messages: allMessages,
             reportContext,
             tool: activeTool,
+            model: activeModel,
           }),
           signal: abortController.signal,
         });
@@ -106,7 +116,7 @@ export function useChatMessages() {
         abortRef.current = null;
       }
     },
-    [messages, activeTool]
+    [messages, activeTool, activeModel]
   );
 
   const clearChat = useCallback(() => {
@@ -119,5 +129,5 @@ export function useChatMessages() {
     setActiveTool((prev) => (prev === tool ? null : tool));
   }, []);
 
-  return { messages, isStreaming, activeTool, sendMessage, clearChat, toggleTool };
+  return { messages, isStreaming, activeTool, activeModel, sendMessage, clearChat, toggleTool, setActiveModel };
 }

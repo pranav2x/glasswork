@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import {
   useChatMessages,
+  GEMINI_MODELS,
   type ReportContext,
   type ToolType,
 } from "./useChatMessages";
@@ -37,14 +38,16 @@ export function ReportChatPanel({
 }: {
   reportContext: ReportContext;
 }) {
-  const { messages, isStreaming, activeTool, sendMessage, clearChat, toggleTool } =
+  const { messages, isStreaming, activeTool, activeModel, sendMessage, clearChat, toggleTool, setActiveModel } =
     useChatMessages();
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);
   const [agentDropdownOpen, setAgentDropdownOpen] = useState(false);
+  const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
   const agentDropdownRef = useRef<HTMLDivElement>(null);
+  const modelDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!userScrolled) {
@@ -52,7 +55,7 @@ export function ReportChatPanel({
     }
   }, [messages, userScrolled]);
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -60,6 +63,12 @@ export function ReportChatPanel({
         !agentDropdownRef.current.contains(e.target as Node)
       ) {
         setAgentDropdownOpen(false);
+      }
+      if (
+        modelDropdownRef.current &&
+        !modelDropdownRef.current.contains(e.target as Node)
+      ) {
+        setModelDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -271,10 +280,50 @@ export function ReportChatPanel({
                 </AnimatePresence>
               </div>
 
-              {/* Model pill */}
-              <div className="flex items-center gap-1 rounded-full bg-warm-100 px-3 py-1 text-[12px] font-medium text-warm-600">
-                <span>Gemini Pro</span>
-                <ChevronUp className="h-3 w-3 rotate-180" />
+              {/* Model pill with dropdown */}
+              <div ref={modelDropdownRef} className="relative">
+                <button
+                  onClick={() => setModelDropdownOpen((o) => !o)}
+                  className="flex items-center gap-1.5 rounded-full bg-warm-100 px-3 py-1 text-[12px] font-medium text-warm-600 transition-colors hover:bg-warm-200"
+                >
+                  <span>{GEMINI_MODELS.find((m) => m.id === activeModel)?.label ?? "Gemini 2.0 Flash"}</span>
+                  <ChevronUp
+                    className={cn(
+                      "h-3 w-3 transition-transform",
+                      modelDropdownOpen ? "rotate-0" : "rotate-180"
+                    )}
+                  />
+                </button>
+
+                <AnimatePresence>
+                  {modelDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 4 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute bottom-full left-0 z-50 mb-1.5 w-48 rounded-xl border border-warm-200 bg-white p-1 shadow-lg"
+                    >
+                      {GEMINI_MODELS.map((model) => (
+                        <button
+                          key={model.id}
+                          onClick={() => {
+                            setActiveModel(model.id);
+                            setModelDropdownOpen(false);
+                          }}
+                          className={cn(
+                            "flex w-full items-center rounded-lg px-3 py-2 text-left text-[12px] font-medium transition-colors",
+                            activeModel === model.id
+                              ? "bg-warm-100 text-warm-800"
+                              : "text-warm-500 hover:bg-warm-50 hover:text-warm-700"
+                          )}
+                        >
+                          {model.label}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
 

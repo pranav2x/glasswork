@@ -26,7 +26,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { messages, reportContext, tool } = await req.json();
+    const { messages, reportContext, tool, model } = await req.json();
+
+    const geminiModel = model || "gemini-2.0-flash";
 
     const systemInstruction = buildSystemPrompt(reportContext, tool);
 
@@ -38,7 +40,7 @@ export async function POST(req: NextRequest) {
     );
 
     const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?alt=sse&key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
