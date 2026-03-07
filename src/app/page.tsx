@@ -1,37 +1,36 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { useConvexAuth, useMutation } from "convex/react";
-import { useAuthActions } from "@convex-dev/auth/react";
-import { motion } from "framer-motion";
+import { useMutation, useQuery } from "convex/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../../convex/_generated/api";
-import { Github, ArrowRight, FileText, Eye, Users, BarChart3, MessageSquare, TrendingUp } from "lucide-react";
-import { TypewriterPlaceholder } from "@/components/TypewriterPlaceholder";
+import { ArrowRight, CheckCircle2, Users, Eye, BarChart3, TrendingUp, MessageSquare, Github, FileText } from "lucide-react";
+import { toast } from "sonner";
 
-/* ─── Pre-seeded data for the results preview card ─── */
+const easeOut = [0.22, 1, 0.36, 1] as const;
+
+/* ─── Pre-seeded heatmap data for product preview ─── */
 const HEATMAP_DATA = {
   alex:  [1,0,1,1,0,1,0, 1,1,0,1,1,1,0],
   sarah: [0,1,0,1,0,0,1, 1,0,1,0,1,0,1],
   mike:  [0,0,1,0,0,0,1, 0,0,0,1,0,0,0],
 };
 
-/* ─── Framer Motion stagger config ─── */
-const easeOut = [0.22, 1, 0.36, 1] as const;
+function validateEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+}
 
-export default function LandingPage() {
-  const router = useRouter();
-  const { isAuthenticated } = useConvexAuth();
-  const { signIn } = useAuthActions();
-  const createAnalysis = useMutation(api.analyses.createAnalysis);
-
-  const [repoInput, setRepoInput] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [inputFocused, setInputFocused] = useState(false);
+export default function WaitlistPage() {
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [scrolled, setScrolled] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [joined, setJoined] = useState<{ position: number; alreadyJoined: boolean } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const joinWaitlist = useMutation(api.waitlist.join);
+  const waitlistCount = useQuery(api.waitlist.getCount);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -39,68 +38,33 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handleGetStarted = useCallback(async () => {
-    if (isAuthenticated) {
-      router.push("/app");
+  const handleSubmit = useCallback(async () => {
+    if (!validateEmail(email)) {
+      setError("Enter a valid email address");
       return;
     }
-    try {
-      await signIn("google", { redirectTo: "/app" });
-    } catch (err) {
-      console.error("Sign in failed:", err);
-    }
-  }, [isAuthenticated, router, signIn]);
-
-  function detectInput(raw: string): { type: "google_doc" | "github_repo"; id: string } | null {
-    const trimmed = raw.trim();
-    const gdoc = trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    if (gdoc) return { type: "google_doc", id: gdoc[1] };
-    const ghUrl = trimmed.match(/github\.com\/([a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+)/);
-    if (ghUrl) return { type: "github_repo", id: ghUrl[1].replace(/\.git$/, "") };
-    if (/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(trimmed)) return { type: "github_repo", id: trimmed };
-    return null;
-  }
-
-  const handleRepoAnalyze = useCallback(async () => {
-    const detected = detectInput(repoInput);
-    if (!detected) {
-      setError('Paste a Google Doc link or a GitHub repo (e.g. "facebook/react")');
-      return;
-    }
-    if (!isAuthenticated) {
-      try { await signIn("google", { redirectTo: "/app" }); } catch {}
-      return;
-    }
-    setIsSubmitting(true);
+    setSubmitting(true);
     setError(null);
     try {
-      const title = detected.type === "github_repo" ? detected.id : "Google Doc";
-      const analysisId = await createAnalysis({ sourceType: detected.type, sourceId: detected.id, title });
-      router.push(`/results/${analysisId}`);
+      const result = await joinWaitlist({ email, name: name || undefined });
+      setJoined(result);
+      if (result.alreadyJoined) {
+        toast("You're already on the list!", { description: `You're #${result.position} in line.` });
+      } else {
+        toast.success("You're on the waitlist!");
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create analysis");
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
-  }, [repoInput, isAuthenticated, signIn, createAnalysis, router]);
+  }, [email, name, joinWaitlist]);
 
-  const handleQuickDemo = useCallback(async () => {
-    setRepoInput("facebook/react");
-    if (!isAuthenticated) {
-      try { await signIn("google", { redirectTo: "/app" }); } catch {}
-      return;
-    }
-    setIsSubmitting(true);
-    setError(null);
-    try {
-      const analysisId = await createAnalysis({ sourceType: "github_repo", sourceId: "facebook/react", title: "facebook/react" });
-      router.push(`/results/${analysisId}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create analysis");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [isAuthenticated, signIn, createAnalysis, router]);
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSubmit();
+  };
+
+  const displayCount = waitlistCount ?? 0;
 
   return (
     <div className="min-h-screen bg-[#F4F1ED] overflow-x-hidden">
@@ -120,67 +84,65 @@ export default function LandingPage() {
           </Link>
 
           <div className="hidden items-center gap-8 sm:flex">
-            <span onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })} className="cursor-pointer font-myflora text-[14px] font-medium text-warm-500 transition-colors duration-300 hover:text-warm-800">
+            <span
+              onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })}
+              className="cursor-pointer font-myflora text-[14px] font-medium text-warm-500 transition-colors duration-300 hover:text-warm-800"
+            >
               About
             </span>
           </div>
 
           <button
-            onClick={handleGetStarted}
+            onClick={() => document.getElementById("waitlist-form")?.scrollIntoView({ behavior: "smooth" })}
             className="flex items-center gap-1.5 rounded-full border border-warm-800 bg-warm-900 px-5 py-2 text-[13px] font-semibold text-white transition-all duration-300 hover:bg-warm-800 active:scale-[0.97]"
           >
-            {isAuthenticated ? "Dashboard" : "Sign up"}
+            Join waitlist
           </button>
         </div>
       </nav>
 
-      {/* ── Hero Section — Earnwave-inspired ── */}
+      {/* ── Hero Section ── */}
       <section className="relative min-h-screen overflow-hidden">
 
-        {/* Soft warm gradient background */}
+        {/* Warm gradient background */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#F4F1ED] via-[#EDE8E1] to-[#E8E2DA]" />
 
-        {/* Wave/curtain shapes — left side (subtle decorative curtains) */}
+        {/* Wave decorations — left */}
         <div className="wave-left absolute left-0 top-0 h-full w-[18%] pointer-events-none opacity-60">
           <svg viewBox="0 0 400 1000" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full" preserveAspectRatio="none">
-            <path
-              d="M0 0 L360 0 Q300 200 320 400 Q340 600 260 800 Q200 900 360 1000 L0 1000 Z"
-              fill="#DDD6CA"
-              fillOpacity="0.6"
-            />
-            <path
-              d="M0 0 L280 0 Q220 180 240 360 Q260 540 200 720 Q140 860 280 1000 L0 1000 Z"
-              fill="#E5DED3"
-              fillOpacity="0.4"
-            />
+            <path d="M0 0 L360 0 Q300 200 320 400 Q340 600 260 800 Q200 900 360 1000 L0 1000 Z" fill="#DDD6CA" fillOpacity="0.6" />
+            <path d="M0 0 L280 0 Q220 180 240 360 Q260 540 200 720 Q140 860 280 1000 L0 1000 Z" fill="#E5DED3" fillOpacity="0.4" />
           </svg>
         </div>
 
-        {/* Wave/curtain shapes — right side */}
+        {/* Wave decorations — right */}
         <div className="wave-right absolute right-0 top-0 h-full w-[18%] pointer-events-none opacity-60">
           <svg viewBox="0 0 400 1000" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full" preserveAspectRatio="none">
-            <path
-              d="M400 0 L40 0 Q100 200 80 400 Q60 600 140 800 Q200 900 40 1000 L400 1000 Z"
-              fill="#DDD6CA"
-              fillOpacity="0.6"
-            />
-            <path
-              d="M400 0 L120 0 Q180 180 160 360 Q140 540 200 720 Q260 860 120 1000 L400 1000 Z"
-              fill="#E5DED3"
-              fillOpacity="0.4"
-            />
+            <path d="M400 0 L40 0 Q100 200 80 400 Q60 600 140 800 Q200 900 40 1000 L400 1000 Z" fill="#DDD6CA" fillOpacity="0.6" />
+            <path d="M400 0 L120 0 Q180 180 160 360 Q140 540 200 720 Q260 860 120 1000 L400 1000 Z" fill="#E5DED3" fillOpacity="0.4" />
           </svg>
         </div>
 
         {/* Hero content */}
         <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 pt-24 pb-16">
 
+          {/* Coming soon badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: easeOut }}
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-warm-300/60 bg-white/60 px-4 py-1.5 backdrop-blur-sm"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-[#D4A017] animate-pulse" />
+            <span className="font-body text-[12px] font-medium text-warm-600">Coming soon — join the waitlist</span>
+          </motion.div>
+
           {/* Headline */}
           <motion.h1
             className="font-myflora text-center text-[3.5rem] leading-[1.05] tracking-tight text-warm-900 sm:text-[4.5rem] md:text-[5.5rem]"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: easeOut }}
+            transition={{ duration: 1, ease: easeOut, delay: 0.1 }}
           >
             See through the work.
           </motion.h1>
@@ -190,66 +152,122 @@ export default function LandingPage() {
             className="mt-5 max-w-lg text-center text-[1rem] leading-relaxed text-warm-500 sm:text-[1.15rem]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.2, ease: easeOut }}
+            transition={{ duration: 0.9, delay: 0.25, ease: easeOut }}
           >
-            Glasswork analyzes GitHub repos and Google Docs to show exactly who contributed — and who didn&apos;t.
+            Glasswork analyzes GitHub repos and Google Docs to show exactly who contributed — and who didn&apos;t. Be the first to know when we launch.
           </motion.p>
 
-          {/* Hero Input — Try it immediately */}
+          {/* Waitlist count */}
+          {displayCount > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4, ease: easeOut }}
+              className="mt-5 flex items-center gap-2"
+            >
+              <div className="flex -space-x-2">
+                {["#D4A017", "#5BA8C8", "#8B7355"].map((color, i) => (
+                  <div
+                    key={i}
+                    className="h-6 w-6 rounded-full border-2 border-[#F4F1ED]"
+                    style={{ backgroundColor: color, opacity: 0.8 }}
+                  />
+                ))}
+              </div>
+              <span className="font-body text-[13px] text-warm-500">
+                <span className="font-semibold text-warm-800">{displayCount}</span> {displayCount === 1 ? "person" : "people"} already waiting
+              </span>
+            </motion.div>
+          )}
+
+          {/* Waitlist form */}
           <motion.div
-            className="mt-10 w-full max-w-xl px-4"
+            id="waitlist-form"
+            className="mt-10 w-full max-w-md px-4"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.45, ease: easeOut }}
           >
-            <div className="rounded-[20px] border border-warm-200/50 bg-white/80 backdrop-blur-sm p-5 shadow-[0_4px_32px_rgba(0,0,0,0.06)]">
-              <div className="relative flex items-center gap-2 rounded-xl border border-warm-200 bg-warm-50/50 p-2 transition-all focus-within:border-warm-400 focus-within:bg-white">
-                <div className="ml-2 flex shrink-0 items-center gap-1.5">
-                  <Github className="h-4 w-4 text-warm-400" />
-                  <span className="text-warm-300 text-[10px]">/</span>
-                  <FileText className="h-4 w-4 text-warm-400" />
-                </div>
-                <div className="relative min-w-0 flex-1">
-                  <input
-                    type="text"
-                    value={repoInput}
-                    onChange={(e) => { setRepoInput(e.target.value); setError(null); }}
-                    onFocus={() => setInputFocused(true)}
-                    onBlur={() => setInputFocused(false)}
-                    onKeyDown={(e) => e.key === "Enter" && handleRepoAnalyze()}
-                    className="relative z-10 w-full bg-transparent py-2 text-[14px] text-warm-800 placeholder:text-warm-400 focus:outline-none"
-                  />
-                  {!repoInput && !inputFocused && (
-                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px]">
-                      <TypewriterPlaceholder isVisible={!repoInput && !inputFocused} />
-                    </div>
-                  )}
-                  {!repoInput && inputFocused && (
-                    <div className="pointer-events-none absolute inset-0 flex items-center text-[14px] text-warm-400">
-                      owner/repo or Google Doc link
-                    </div>
-                  )}
-                </div>
-                <button
-                  onClick={handleRepoAnalyze}
-                  disabled={isSubmitting || !repoInput.trim()}
-                  className="shrink-0 rounded-lg bg-warm-900 px-4 py-2 text-[13px] font-semibold text-white transition-all duration-200 hover:bg-warm-800 disabled:opacity-30"
+            <AnimatePresence mode="wait">
+              {!joined ? (
+                <motion.div
+                  key="form"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className="rounded-[20px] border border-warm-200/50 bg-white/80 backdrop-blur-sm p-5 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
                 >
-                  {isSubmitting ? "..." : "Analyze"}
-                </button>
-              </div>
-              {error && <p className="mt-2 text-[12px] text-red-500">{error}</p>}
-              <div className="mt-2 flex items-center gap-3">
-                <button
-                  onClick={handleQuickDemo}
-                  disabled={isSubmitting}
-                  className="flex items-center gap-1 text-[13px] text-warm-400 transition-colors hover:text-warm-600 disabled:opacity-50"
+                  <p className="font-body mb-4 text-[13px] font-medium text-warm-600">
+                    Reserve your spot — free, no spam.
+                  </p>
+
+                  <div className="space-y-2.5">
+                    <input
+                      type="text"
+                      placeholder="Your name (optional)"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      className="w-full rounded-xl border border-warm-200 bg-warm-50/50 px-4 py-2.5 text-[14px] text-warm-800 placeholder:text-warm-400 focus:border-warm-400 focus:bg-white focus:outline-none transition-colors"
+                    />
+                    <input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={(e) => { setEmail(e.target.value); setError(null); }}
+                      onKeyDown={handleKeyDown}
+                      className="w-full rounded-xl border border-warm-200 bg-warm-50/50 px-4 py-2.5 text-[14px] text-warm-800 placeholder:text-warm-400 focus:border-warm-400 focus:bg-white focus:outline-none transition-colors"
+                    />
+                  </div>
+
+                  {error && (
+                    <p className="mt-2 text-[12px] text-red-500">{error}</p>
+                  )}
+
+                  <button
+                    onClick={handleSubmit}
+                    disabled={submitting || !email.trim()}
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-warm-900 py-3 text-[14px] font-semibold text-white transition-all duration-200 hover:bg-warm-800 disabled:opacity-40 active:scale-[0.98]"
+                  >
+                    {submitting ? (
+                      <span className="flex items-center gap-2">
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                        Joining…
+                      </span>
+                    ) : (
+                      <>
+                        Get early access
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="rounded-[20px] border border-warm-200/50 bg-white/80 backdrop-blur-sm p-6 shadow-[0_4px_32px_rgba(0,0,0,0.06)] text-center"
                 >
-                  Try facebook/react
-                  <ArrowRight className="h-3 w-3" />
-                </button>
-              </div>
-            </div>
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#D4A017]/10">
+                    <CheckCircle2 className="h-6 w-6 text-[#D4A017]" />
+                  </div>
+                  <h3 className="font-myflora text-[1.4rem] text-warm-900">
+                    {joined.alreadyJoined ? "You're already in!" : "You're on the list."}
+                  </h3>
+                  <p className="mt-2 font-body text-[14px] text-warm-500">
+                    You&apos;re <span className="font-semibold text-warm-800">#{joined.position}</span> in line.
+                    We&apos;ll email you when Glasswork is ready.
+                  </p>
+                  <button
+                    onClick={() => setJoined(null)}
+                    className="mt-4 font-body text-[12px] text-warm-400 underline underline-offset-2 transition-colors hover:text-warm-600"
+                  >
+                    Add another email
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
 
           {/* Three Bento Cards */}
@@ -257,7 +275,7 @@ export default function LandingPage() {
 
             {/* Card 1: Your Score */}
             <motion.div
-              className="card-tilt cursor-pointer rounded-[20px] border border-warm-200/50 bg-white p-6 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
+              className="rounded-[20px] border border-warm-200/50 bg-white p-6 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6, ease: easeOut }}
@@ -270,7 +288,6 @@ export default function LandingPage() {
                 172
               </div>
               <p className="font-body mt-1.5 text-[13px] text-warm-400">out of 200</p>
-              {/* Mini sparkline chart — warm gradient bars */}
               <div className="mt-6 flex items-end gap-[4px] h-[52px]">
                 {[28, 42, 35, 58, 48, 68, 62, 78, 72, 88, 82, 96].map((h, i) => (
                   <div
@@ -287,15 +304,13 @@ export default function LandingPage() {
 
             {/* Card 2: Analyze Sources (center, slightly elevated) */}
             <motion.div
-              className="card-tilt card-tilt-center cursor-pointer rounded-[20px] border border-warm-200/50 bg-white p-6 shadow-[0_4px_32px_rgba(0,0,0,0.06)] sm:-mt-5"
+              className="rounded-[20px] border border-warm-200/50 bg-white p-6 shadow-[0_4px_32px_rgba(0,0,0,0.06)] sm:-mt-5"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.75, ease: easeOut }}
             >
               <h3 className="font-body mb-6 text-center text-[16px] font-semibold text-warm-800">Analyze sources</h3>
-              {/* Source icons with connecting lines — like Earnwave's hub */}
               <div className="relative mx-auto">
-                {/* Connection lines behind icons */}
                 <svg className="absolute inset-0 h-full w-full" viewBox="0 0 200 120" fill="none">
                   <line x1="50" y1="40" x2="100" y2="40" stroke="#E5E5E5" strokeWidth="1.5" />
                   <line x1="100" y1="40" x2="150" y2="40" stroke="#E5E5E5" strokeWidth="1.5" />
@@ -326,9 +341,9 @@ export default function LandingPage() {
               </div>
             </motion.div>
 
-            {/* Card 3: AI Insights — chat bubbles */}
+            {/* Card 3: AI Insights */}
             <motion.div
-              className="card-tilt card-tilt-right cursor-pointer rounded-[20px] border border-warm-200/50 bg-white p-6 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
+              className="rounded-[20px] border border-warm-200/50 bg-white p-6 shadow-[0_4px_32px_rgba(0,0,0,0.06)]"
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.9, ease: easeOut }}
@@ -338,7 +353,6 @@ export default function LandingPage() {
                   <MessageSquare className="h-4 w-4 text-warm-600" />
                 </div>
               </div>
-              {/* Chat-style AI summary bubbles */}
               <div className="space-y-3">
                 <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-warm-100 px-4 py-3">
                   <p className="font-body text-[12px] leading-relaxed text-warm-600">Who carried the React project?</p>
@@ -364,17 +378,17 @@ export default function LandingPage() {
             transition={{ duration: 0.7, delay: 1.1, ease: easeOut }}
           >
             <button
-              onClick={handleGetStarted}
+              onClick={() => document.getElementById("waitlist-form")?.scrollIntoView({ behavior: "smooth" })}
               className="flex items-center gap-2 rounded-full bg-warm-900 px-8 py-3.5 text-[14px] font-semibold text-white shadow-layered transition-all duration-300 hover:bg-warm-800 hover:scale-[1.02] active:scale-[0.97]"
             >
-              {isAuthenticated ? "Go to workspace" : "Get started free"}
+              Claim your spot
               <ArrowRight className="h-4 w-4" />
             </button>
           </motion.div>
         </div>
       </section>
 
-      {/* ── Social Proof Strip — scrolling AI summaries ── */}
+      {/* ── Social Proof Strip ── */}
       <section className="overflow-hidden bg-[#F4F1ED] py-6">
         <div className="flex animate-scroll-left gap-6" style={{ width: "max-content" }}>
           {[
@@ -403,15 +417,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Try It Yourself section moved to hero — this spacer keeps scroll anchors working */}
-
-      {/* ── About + Product Preview (combined) ── */}
+      {/* ── About + Product Preview ── */}
       <section id="about" className="relative bg-white py-24 sm:py-32">
         <div className="mx-auto max-w-6xl px-6">
-          {/* Two-column: About left, Product Preview right */}
           <div className="grid items-center gap-12 lg:grid-cols-2">
 
-            {/* Left: About — tagline + contribution graph */}
+            {/* Left: About */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -422,7 +433,7 @@ export default function LandingPage() {
                 Where group work is as transparent as glass.
               </h2>
               <p className="mt-4 max-w-md text-[15px] leading-[1.7] text-warm-500">
-                See exactly who showed up — scores, contributions, all in one clean dashboard.
+                See exactly who showed up — scores, contributions, all in one clean dashboard. Built for professors, team leads, and anyone tired of guessing who actually did the work.
               </p>
 
               {/* Contribution graph */}
@@ -438,17 +449,9 @@ export default function LandingPage() {
                       0,0,1,2,2,1,0,
                       0,0,0,1,1,0,0,
                     ][i];
-                    const colors = [
-                      "bg-warm-200",
-                      "bg-[#D4A017]/30",
-                      "bg-[#D4A017]/60",
-                      "bg-[#D4A017]",
-                    ];
+                    const colors = ["bg-warm-200", "bg-[#D4A017]/30", "bg-[#D4A017]/60", "bg-[#D4A017]"];
                     return (
-                      <div
-                        key={i}
-                        className={`h-7 w-7 rounded-[4px] ${colors[intensity]} sm:h-9 sm:w-9 transition-colors`}
-                      />
+                      <div key={i} className={`h-7 w-7 rounded-[4px] ${colors[intensity]} sm:h-9 sm:w-9 transition-colors`} />
                     );
                   })}
                 </div>
@@ -473,7 +476,7 @@ export default function LandingPage() {
                     <div className="h-3 w-3 rounded-full bg-[#28C840]" />
                   </div>
                   <div className="mx-auto flex h-6 w-48 items-center justify-center rounded-md bg-warm-100 text-[11px] text-warm-400">
-                    glasswork.app
+                    glasswork.me
                   </div>
                 </div>
 
@@ -483,17 +486,15 @@ export default function LandingPage() {
                     <div className="mb-5 text-[16px] font-bold text-warm-800">Analysis Results</div>
                     <div className="grid flex-1 grid-cols-3 gap-4">
                       {[
-                        { name: "Aaryan Verma", score: 172, tier: "LOCKED IN", pct: "86%", hm: HEATMAP_DATA.alex, avatar: "/animepfp.jpeg", tierColor: "bg-[#D4A017] text-white" },
-                        { name: "Rohan Bedi", score: 118, tier: "MID", pct: "59%", hm: HEATMAP_DATA.sarah, avatar: "/catpj.jpeg", tierColor: "bg-[#5BA8C8]/20 text-[#5BA8C8]" },
-                        { name: "Jackie Lin", score: 34, tier: "SELLING", pct: "17%", hm: HEATMAP_DATA.mike, avatar: "/voidman.jpeg", tierColor: "bg-warm-200 text-warm-400" },
+                        { name: "Aaryan Verma", score: 172, tier: "LOCKED IN", pct: "86%", hm: HEATMAP_DATA.alex, tierColor: "bg-[#D4A017] text-white" },
+                        { name: "Rohan Bedi", score: 118, tier: "MID", pct: "59%", hm: HEATMAP_DATA.sarah, tierColor: "bg-[#5BA8C8]/20 text-[#5BA8C8]" },
+                        { name: "Jackie Lin", score: 34, tier: "SELLING", pct: "17%", hm: HEATMAP_DATA.mike, tierColor: "bg-warm-200 text-warm-400" },
                       ].map((c) => (
                         <div key={c.name} className="flex flex-col rounded-2xl border border-warm-200/40 bg-white/60 p-4">
-                          <Image src={c.avatar} alt={c.name} width={40} height={40} className="mb-3 h-10 w-10 rounded-full object-cover" />
+                          <div className="mb-3 h-10 w-10 rounded-full bg-warm-200" />
                           <div className="text-[12px] font-semibold text-warm-700">{c.name}</div>
                           <div className="mt-1 text-[32px] font-bold leading-none text-warm-900">{c.score}</div>
-                          <div className={`mt-2 w-fit rounded-full px-2 py-0.5 text-[8px] font-bold ${c.tierColor}`}>
-                            {c.tier}
-                          </div>
+                          <div className={`mt-2 w-fit rounded-full px-2 py-0.5 text-[8px] font-bold ${c.tierColor}`}>{c.tier}</div>
                           <div className="mt-3 grid grid-cols-7 gap-[2px]">
                             {c.hm.map((v, i) => (
                               <div key={i} className={`aspect-square rounded-[2px] ${v ? "bg-warm-400" : "bg-warm-100"}`} />
@@ -513,6 +514,34 @@ export default function LandingPage() {
             </motion.div>
           </div>
         </div>
+      </section>
+
+      {/* ── Bottom CTA ── */}
+      <section className="bg-[#F4F1ED] py-20 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: easeOut }}
+          className="mx-auto max-w-lg px-6"
+        >
+          <h2 className="font-myflora text-[2rem] leading-tight text-warm-900 sm:text-[2.5rem]">
+            Be first in line.
+          </h2>
+          <p className="mt-3 font-body text-[15px] text-warm-500">
+            We&apos;re launching soon. Join the waitlist now and get early access before anyone else.
+          </p>
+          <button
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              setTimeout(() => document.getElementById("waitlist-form")?.scrollIntoView({ behavior: "smooth" }), 100);
+            }}
+            className="mt-8 flex items-center gap-2 mx-auto rounded-full bg-warm-900 px-8 py-3.5 text-[14px] font-semibold text-white shadow-layered transition-all duration-300 hover:bg-warm-800 hover:scale-[1.02] active:scale-[0.97]"
+          >
+            Join the waitlist
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </motion.div>
       </section>
 
       {/* ── Footer ── */}
