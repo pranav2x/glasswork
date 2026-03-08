@@ -22,9 +22,9 @@ type ContributorFeedback = {
 };
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ error: "Gemini API key not configured" }, { status: 500 });
+    return NextResponse.json({ error: "Anthropic API key not configured" }, { status: 500 });
   }
 
   try {
@@ -90,38 +90,50 @@ Respond in this EXACT JSON format (no markdown, no code fences, just raw JSON):
   ]
 }`;
 
-    // Call Gemini API
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { inlineData: { mimeType, data: base64 } },
-                { text: prompt },
-              ],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 4096,
-          },
-        }),
-      }
-    );
+    // Build content blocks — use document type for PDFs, image for images, or fall back to text
+    const contentBlocks: unknown[] = [];
 
-    if (!geminiResponse.ok) {
-      const errText = await geminiResponse.text();
-      console.error("Gemini API error:", errText);
-      return NextResponse.json({ error: "Gemini API request failed" }, { status: 502 });
+    if (mimeType === "application/pdf") {
+      contentBlocks.push({
+        type: "document",
+        source: { type: "base64", media_type: mimeType, data: base64 },
+      });
+    } else if (mimeType.startsWith("image/")) {
+      contentBlocks.push({
+        type: "image",
+        source: { type: "base64", media_type: mimeType, data: base64 },
+      });
+    } else {
+      // For text-based files, decode and include as text
+      const textContent = Buffer.from(bytes).toString("utf-8");
+      contentBlocks.push({ type: "text", text: `[Rubric file content — ${file.name}]:\n${textContent}` });
     }
 
-    const geminiData = await geminiResponse.json();
-    const rawText =
-      geminiData?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    contentBlocks.push({ type: "text", text: prompt });
+
+    const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 4096,
+        messages: [{ role: "user", content: contentBlocks }],
+        temperature: 0.3,
+      }),
+    });
+
+    if (!claudeResponse.ok) {
+      const errText = await claudeResponse.text();
+      console.error("Claude API error:", errText);
+      return NextResponse.json({ error: "Claude API request failed" }, { status: 502 });
+    }
+
+    const claudeData = await claudeResponse.json();
+    const rawText = claudeData?.content?.[0]?.text ?? "";
 
     // Extract JSON from the response (handle possible markdown fences)
     let jsonStr = rawText.trim();

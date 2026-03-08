@@ -4,12 +4,12 @@ import { useState, useCallback, useRef, useEffect } from "react";
 
 export type ToolType = "deep_research" | "canvas" | "guided_learning";
 
-export type GeminiModel = "gemini-3-flash-preview" | "gemini-3-pro-preview" | "gemini-3.1-pro-preview";
+export type ClaudeModel = "claude-sonnet-4-6" | "claude-opus-4-6" | "claude-haiku-4-5-20251001";
 
-export const GEMINI_MODELS: { id: GeminiModel; label: string }[] = [
-  { id: "gemini-3-flash-preview", label: "Gemini 3 Flash" },
-  { id: "gemini-3-pro-preview", label: "Gemini 3 Pro" },
-  { id: "gemini-3.1-pro-preview", label: "Gemini 3.1 Pro" },
+export const CLAUDE_MODELS: { id: ClaudeModel; label: string }[] = [
+  { id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6" },
+  { id: "claude-opus-4-6", label: "Claude Opus 4.6" },
+  { id: "claude-haiku-4-5-20251001", label: "Claude Haiku 4.5" },
 ];
 
 export type ChatMessage = {
@@ -70,7 +70,7 @@ export function useChatMessages(reportTitle: string) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [activeTool, setActiveTool] = useState<ToolType | null>(null);
-  const [activeModel, setActiveModel] = useState<GeminiModel>("gemini-3-flash-preview");
+  const [activeModel, setActiveModel] = useState<ClaudeModel>("claude-sonnet-4-6");
   const abortRef = useRef<AbortController | null>(null);
 
   // Load conversations from localStorage on mount / title change

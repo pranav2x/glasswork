@@ -2,24 +2,35 @@ import { NextRequest } from "next/server";
 
 export const maxDuration = 60;
 
-type ChatMessage = {
-  role: "user" | "model";
-  parts: { text: string }[];
-};
-
 const TOOL_INSTRUCTIONS: Record<string, string> = {
   deep_research: `MODE: Deep Research
 You are performing an exhaustive, multi-paragraph analysis. Examine statistical outliers, cross-contributor patterns, temporal trends in activity data, and potential root causes for performance gaps. Provide data-backed insights with specific numbers. Be thorough and analytical.`,
   canvas: `MODE: Canvas
 You are helping the user draft or edit written feedback, improvement plans, or reports for their team. Format your response as polished, editable content with clear sections and headers. Use professional academic language suitable for sharing with team members or instructors.`,
   guided_learning: `MODE: Guided Learning
-You are a tutor helping the user understand their team's performance. Use Socratic questioning - ask the user thought-provoking questions about their team dynamics, guide them to discover insights themselves, and explain metrics and patterns step by step. Be encouraging but honest. After each explanation, ask a follow-up question to deepen understanding.`,
+You are a tutor helping the user understand their team's performance through guided discovery.
+
+FORMAT YOUR RESPONSES WITH CLEAR STRUCTURE:
+- Use **bold** headers for each section
+- Use bullet points and numbered lists
+- Keep paragraphs short (2-3 sentences max)
+- Use markdown formatting throughout
+
+APPROACH:
+1. Start by acknowledging what the user asked about
+2. Break down the relevant data into digestible pieces with clear formatting
+3. Use Socratic questioning — ask thought-provoking questions about team dynamics
+4. Guide the user to discover insights themselves rather than just stating facts
+5. Explain metrics and patterns step by step with specific numbers
+6. End with 1-2 follow-up questions to deepen understanding
+
+Be encouraging but honest. Make the learning experience interactive and well-structured.`,
 };
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: "Gemini API key not configured" }), {
+    return new Response(JSON.stringify({ error: "Anthropic API key not configured" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
@@ -28,51 +39,54 @@ export async function POST(req: NextRequest) {
   try {
     const { messages, reportContext, tool, model } = await req.json();
 
-    const geminiModel = model || "gemini-3-flash-preview";
+    const claudeModel = model || "claude-sonnet-4-6";
 
-    const systemInstruction = buildSystemPrompt(reportContext, tool);
+    const systemPrompt = buildSystemPrompt(reportContext, tool);
 
-    const geminiMessages: ChatMessage[] = messages.map(
+    const claudeMessages = messages.map(
       (m: { role: string; content: string }) => ({
-        role: m.role === "user" ? "user" : "model",
-        parts: [{ text: m.content }],
+        role: m.role === "user" ? "user" : "assistant",
+        content: m.content,
       })
     );
 
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:streamGenerateContent?alt=sse&key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemInstruction }] },
-          contents: geminiMessages,
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 4096,
-          },
-        }),
-      }
-    );
+    const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: claudeModel,
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: claudeMessages,
+        temperature: 0.7,
+        stream: true,
+      }),
+    });
 
-    if (!geminiResponse.ok) {
-      const errText = await geminiResponse.text();
-      console.error("Gemini API error:", errText);
-      let userMessage = "Gemini API request failed. Please try again.";
-      if (geminiResponse.status === 429) {
+    if (!claudeResponse.ok) {
+      const errText = await claudeResponse.text();
+      console.error("Claude API error:", claudeModel, errText);
+      let userMessage = "Claude API request failed. Please try again.";
+      if (claudeResponse.status === 429) {
         userMessage = "Rate limit reached — too many requests. Please wait a moment and try again.";
-      } else if (geminiResponse.status === 403) {
-        userMessage = "API key is invalid or doesn't have access to this model.";
+      } else if (claudeResponse.status === 403) {
+        userMessage = `This model (${claudeModel}) is not available. Try switching to a different model.`;
+      } else if (claudeResponse.status === 404) {
+        userMessage = `Model "${claudeModel}" was not found. Try switching to a different model.`;
       }
       return new Response(JSON.stringify({ error: userMessage }), {
-        status: geminiResponse.status,
+        status: claudeResponse.status,
         headers: { "Content-Type": "application/json" },
       });
     }
 
     const stream = new ReadableStream({
       async start(controller) {
-        const reader = geminiResponse.body?.getReader();
+        const reader = claudeResponse.body?.getReader();
         if (!reader) {
           controller.close();
           return;
@@ -96,9 +110,9 @@ export async function POST(req: NextRequest) {
                 if (!jsonStr || jsonStr === "[DONE]") continue;
                 try {
                   const parsed = JSON.parse(jsonStr);
-                  const text = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
-                  if (text) {
-                    controller.enqueue(new TextEncoder().encode(text));
+                  // Claude streaming: content_block_delta events contain the text
+                  if (parsed.type === "content_block_delta" && parsed.delta?.text) {
+                    controller.enqueue(new TextEncoder().encode(parsed.delta.text));
                   }
                 } catch {
                   // skip malformed chunks

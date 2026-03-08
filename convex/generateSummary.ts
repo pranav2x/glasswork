@@ -63,8 +63,8 @@ Tier definitions:
 
 Write 2-3 sentences about what happened. Use the actual names. Use the words Locked In, Mid, and Selling naturally in the sentences. Write like a real person texting a friend about a group project, not like a formal report. Short sentences. No em dashes. No semicolons. No bullet points. No markdown. Keep it casual and a little funny.`;
 
-      // 3. Call the Gemini API
-      const apiKey = process.env.GEMINI_API_KEY;
+      // 3. Call the Claude API
+      const apiKey = process.env.ANTHROPIC_API_KEY;
       if (!apiKey) {
         // Fallback to template-based summary if no API key
         const topContributor = sorted[0];
@@ -93,33 +93,29 @@ Write 2-3 sentences about what happened. Use the actual names. Use the words Loc
 
       const systemInstruction = "You write short, casual, human-sounding takes on group project contributions. You sound like a 17 year old who just saw the stats. No em dashes. No semicolons. No formal language. Just real talk.";
 
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            system_instruction: {
-              parts: [{ text: systemInstruction }],
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: "claude-haiku-4-5-20251001",
+          max_tokens: 200,
+          system: systemInstruction,
+          messages: [
+            {
+              role: "user",
+              content: prompt,
             },
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: prompt }],
-              },
-            ],
-            generationConfig: {
-              maxOutputTokens: 200,
-              temperature: 0.7,
-            },
-          }),
-        }
-      );
+          ],
+          temperature: 0.7,
+        }),
+      });
 
       if (!response.ok) {
-        console.error("Gemini API error:", response.status, await response.text());
+        console.error("Claude API error:", response.status, await response.text());
         // Fall back to template
         const topContributor = sorted[0];
         const summary = `${topContributor.name} led this ${isRepo ? "repo" : "doc"} with a score of ${topContributor.score}. Pure MVP behavior.`;
@@ -131,7 +127,7 @@ Write 2-3 sentences about what happened. Use the actual names. Use the words Loc
       }
 
       const data = await response.json();
-      const summary = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      const summary = data.content?.[0]?.text?.trim();
 
       if (summary) {
         await ctx.runMutation(internal.analyses.updateSummary, {

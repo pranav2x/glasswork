@@ -74,7 +74,7 @@ export default function PrivacyPage() {
             <ul className="mt-3 list-disc space-y-2 pl-5">
               <li>To authenticate you and associate analyses with your account.</li>
               <li>To compute and display contribution scores for repos and docs you submit.</li>
-              <li>To generate AI-powered summaries of contribution patterns using the Gemini API.</li>
+              <li>To generate AI-powered summaries of contribution patterns using the Claude API.</li>
               <li>We do <strong>not</strong> sell your data to third parties.</li>
               <li>We do <strong>not</strong> use your data for advertising.</li>
             </ul>
@@ -108,15 +108,15 @@ export default function PrivacyPage() {
                 .
               </li>
               <li>
-                <strong>Google Gemini API</strong> — used to generate AI summaries. Data sent to
-                Gemini is governed by{" "}
+                <strong>Anthropic Claude API</strong> — used to generate AI summaries. Data sent to
+                Claude is governed by{" "}
                 <a
-                  href="https://ai.google.dev/gemini-api/terms"
+                  href="https://www.anthropic.com/policies/terms-of-service"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline underline-offset-2 hover:text-warm-900"
                 >
-                  Google AI terms
+                  Anthropic&apos;s Terms of Service
                 </a>
                 .
               </li>

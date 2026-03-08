@@ -17,11 +17,12 @@ import {
   MessageSquare,
   User,
   FileText,
+  Upload,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   useChatMessages,
-  GEMINI_MODELS,
+  CLAUDE_MODELS,
   type ReportContext,
   type ToolType,
 } from "./useChatMessages";
@@ -90,8 +91,8 @@ function expandMentions(text: string, ctx: ReportContext): string {
 }
 
 function renderWithMentions(text: string): React.ReactNode {
-  // Split text on @mentions and render them as blue spans
-  const parts = text.split(/(@\w[\w\s]*?)(?=\s@|\s*$|[.,!?])/g);
+  // Match @Name patterns — capture just the @Name portion as a blue link
+  const parts = text.split(/(@[A-Z][a-zA-Z]*(?:\s[A-Z][a-zA-Z]*)*)/g);
   return parts.map((part, i) => {
     if (part.startsWith("@")) {
       return (
@@ -100,7 +101,7 @@ function renderWithMentions(text: string): React.ReactNode {
         </span>
       );
     }
-    return part;
+    return <span key={i}>{part}</span>;
   });
 }
 
@@ -141,6 +142,9 @@ export function ReportChatPanel({
   const [mentionQuery, setMentionQuery] = useState("");
   const [mentionIndex, setMentionIndex] = useState(0);
   const mentionRef = useRef<HTMLDivElement>(null);
+  const [rubricText, setRubricText] = useState<string | null>(null);
+  const [rubricName, setRubricName] = useState<string | null>(null);
+  const rubricInputRef = useRef<HTMLInputElement>(null);
 
   const allMentionItems = useMemo(() => buildMentionItems(reportContext), [reportContext]);
 
@@ -192,11 +196,28 @@ export function ReportChatPanel({
     setUserScrolled(!isAtBottom);
   };
 
+  const handleRubricUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string;
+      setRubricText(text);
+      setRubricName(file.name);
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
   const handleSend = () => {
     const trimmed = input.trim();
     if (!trimmed || isStreaming) return;
     // Expand @mentions into full context before sending to API
-    const expanded = expandMentions(trimmed, reportContext);
+    let expanded = expandMentions(trimmed, reportContext);
+    // Attach rubric context if uploaded
+    if (rubricText) {
+      expanded = `${expanded}\n\n[Rubric Context — "${rubricName}":\n${rubricText}]`;
+    }
     setInput("");
     setUserScrolled(false);
     setMentionOpen(false);
@@ -307,8 +328,8 @@ export function ReportChatPanel({
   };
 
   const activeToolLabel = activeTool
-    ? TOOLS.find((t) => t.id === activeTool)?.label ?? "Agent"
-    : "Agent";
+    ? TOOLS.find((t) => t.id === activeTool)?.label ?? "Canvas"
+    : "Canvas";
 
   return (
     <div className="flex h-full flex-col rounded-2xl border border-warm-200/60 bg-white shadow-card">
@@ -523,15 +544,45 @@ export function ReportChatPanel({
             )}
           </AnimatePresence>
 
-          {/* Top section: @ Add Context + textarea */}
+          {/* Top section: @ Add Context + Upload Rubric + textarea */}
           <div className="px-4 pt-3">
-            <button
-              onClick={openMentionFromButton}
-              className="mb-2 flex items-center gap-1.5 rounded-lg border border-warm-200/80 bg-white px-2.5 py-1 text-[12px] font-medium text-warm-500 transition-colors hover:border-warm-300 hover:text-warm-700"
-            >
-              <AtSign className="h-3 w-3" />
-              Add Context
-            </button>
+            <div className="mb-2 flex items-center gap-1.5">
+              <button
+                onClick={openMentionFromButton}
+                className="flex items-center gap-1.5 rounded-lg border border-warm-200/80 bg-white px-2.5 py-1 text-[12px] font-medium text-warm-500 transition-colors hover:border-warm-300 hover:text-warm-700"
+              >
+                <AtSign className="h-3 w-3" />
+                Add Context
+              </button>
+              <button
+                onClick={() => rubricInputRef.current?.click()}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[12px] font-medium transition-colors",
+                  rubricText
+                    ? "border-docs-accent/30 bg-docs-accent/5 text-docs-accent"
+                    : "border-warm-200/80 bg-white text-warm-500 hover:border-warm-300 hover:text-warm-700"
+                )}
+              >
+                <Upload className="h-3 w-3" />
+                {rubricText ? rubricName : "Upload Rubric"}
+              </button>
+              {rubricText && (
+                <button
+                  onClick={() => { setRubricText(null); setRubricName(null); }}
+                  className="flex h-5 w-5 items-center justify-center rounded text-warm-400 hover:text-red-400"
+                  title="Remove rubric"
+                >
+                  <span className="text-[14px] leading-none">&times;</span>
+                </button>
+              )}
+              <input
+                ref={rubricInputRef}
+                type="file"
+                accept=".txt,.md,.pdf,.docx,.csv"
+                onChange={handleRubricUpload}
+                className="hidden"
+              />
+            </div>
             <textarea
               ref={textareaRef}
               value={input}
@@ -631,7 +682,7 @@ export function ReportChatPanel({
                   onClick={() => setModelDropdownOpen((o) => !o)}
                   className="flex items-center gap-1.5 rounded-full bg-warm-100 px-3 py-1 text-[12px] font-medium text-warm-600 transition-colors hover:bg-warm-200"
                 >
-                  <span>{GEMINI_MODELS.find((m) => m.id === activeModel)?.label ?? "Gemini 2.0 Flash"}</span>
+                  <span>{CLAUDE_MODELS.find((m) => m.id === activeModel)?.label ?? "Claude Sonnet 4.6"}</span>
                   <ChevronUp
                     className={cn(
                       "h-3 w-3 transition-transform",
@@ -649,7 +700,7 @@ export function ReportChatPanel({
                       transition={{ duration: 0.15 }}
                       className="absolute bottom-full left-0 z-50 mb-1.5 w-48 rounded-xl border border-warm-200 bg-white p-1 shadow-lg"
                     >
-                      {GEMINI_MODELS.map((model) => (
+                      {CLAUDE_MODELS.map((model) => (
                         <button
                           key={model.id}
                           onClick={() => {
