@@ -29,7 +29,7 @@ import {
 
 const TOOLS: { id: ToolType; label: string; icon: typeof Search }[] = [
   { id: "deep_research", label: "Deep Research", icon: Search },
-  { id: "canvas", label: "Canvas", icon: PenLine },
+  { id: "canvas", label: "Draft", icon: PenLine },
   { id: "guided_learning", label: "Guided Learning", icon: GraduationCap },
 ];
 
@@ -144,6 +144,8 @@ export function ReportChatPanel({
   const mentionRef = useRef<HTMLDivElement>(null);
   const [rubricText, setRubricText] = useState<string | null>(null);
   const [rubricName, setRubricName] = useState<string | null>(null);
+  const [rubricBase64, setRubricBase64] = useState<string | null>(null);
+  const [rubricMimeType, setRubricMimeType] = useState<string | null>(null);
   const rubricInputRef = useRef<HTMLInputElement>(null);
 
   const allMentionItems = useMemo(() => buildMentionItems(reportContext), [reportContext]);
@@ -199,13 +201,35 @@ export function ReportChatPanel({
   const handleRubricUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const text = ev.target?.result as string;
-      setRubricText(text);
-      setRubricName(file.name);
-    };
-    reader.readAsText(file);
+    const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+    if (isPdf) {
+      // Read PDF as base64 for native document handling
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const arrayBuffer = ev.target?.result as ArrayBuffer;
+        const bytes = new Uint8Array(arrayBuffer);
+        let binary = "";
+        for (let i = 0; i < bytes.length; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        setRubricBase64(btoa(binary));
+        setRubricMimeType("application/pdf");
+        setRubricText(null);
+        setRubricName(file.name);
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      // Read text-based files normally
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const text = ev.target?.result as string;
+        setRubricText(text);
+        setRubricBase64(null);
+        setRubricMimeType(null);
+        setRubricName(file.name);
+      };
+      reader.readAsText(file);
+    }
     e.target.value = "";
   };
 
@@ -214,15 +238,17 @@ export function ReportChatPanel({
     if (!trimmed || isStreaming) return;
     // Expand @mentions into full context before sending to API
     let expanded = expandMentions(trimmed, reportContext);
-    // Attach rubric context if uploaded
+    // Attach text rubric context inline (non-PDF files)
     if (rubricText) {
       expanded = `${expanded}\n\n[Rubric Context — "${rubricName}":\n${rubricText}]`;
     }
     setInput("");
     setUserScrolled(false);
     setMentionOpen(false);
+    // Pass rubric data for PDF files so the API can use native document handling
+    const rubricData = rubricBase64 ? { base64: rubricBase64, mimeType: rubricMimeType!, name: rubricName! } : undefined;
     // Pass original text as displayContent so user sees clean message
-    sendMessage(expanded, reportContext, trimmed);
+    sendMessage(expanded, reportContext, trimmed, rubricData);
   };
 
   const insertMention = (item: MentionItem) => {
@@ -328,8 +354,8 @@ export function ReportChatPanel({
   };
 
   const activeToolLabel = activeTool
-    ? TOOLS.find((t) => t.id === activeTool)?.label ?? "Canvas"
-    : "Canvas";
+    ? TOOLS.find((t) => t.id === activeTool)?.label ?? "Chat"
+    : "Chat";
 
   return (
     <div className="flex h-full flex-col rounded-2xl border border-warm-200/60 bg-white shadow-card">
@@ -558,17 +584,17 @@ export function ReportChatPanel({
                 onClick={() => rubricInputRef.current?.click()}
                 className={cn(
                   "flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[12px] font-medium transition-colors",
-                  rubricText
+                  (rubricText || rubricBase64)
                     ? "border-docs-accent/30 bg-docs-accent/5 text-docs-accent"
                     : "border-warm-200/80 bg-white text-warm-500 hover:border-warm-300 hover:text-warm-700"
                 )}
               >
                 <Upload className="h-3 w-3" />
-                {rubricText ? rubricName : "Upload Rubric"}
+                {(rubricText || rubricBase64) ? rubricName : "Upload Rubric"}
               </button>
-              {rubricText && (
+              {(rubricText || rubricBase64) && (
                 <button
-                  onClick={() => { setRubricText(null); setRubricName(null); }}
+                  onClick={() => { setRubricText(null); setRubricBase64(null); setRubricMimeType(null); setRubricName(null); }}
                   className="flex h-5 w-5 items-center justify-center rounded text-warm-400 hover:text-red-400"
                   title="Remove rubric"
                 >

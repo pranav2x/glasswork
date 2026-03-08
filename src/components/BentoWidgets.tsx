@@ -93,9 +93,9 @@ export function BentoActivityHeatmap({
   const reposData = activityByMonth.map((m) => m.reposCount);
 
   return (
-    <GlassPanel hoverable className={cn("flex flex-col p-6", className)}>
+    <GlassPanel hoverable className={cn("flex flex-col overflow-hidden p-6", className)}>
       <p className="text-[12px] font-medium text-warm-400 mb-3">Activity</p>
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 overflow-hidden">
         <ActivityChart months={months} docsData={docsData} reposData={reposData} />
       </div>
     </GlassPanel>

@@ -420,7 +420,7 @@ function ReportView({
           </motion.div>
 
           {/* Per-Contributor Cards Grid */}
-          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {contributors.map((c, i) => (
               <ContributorReportRow
                 key={c._id}
@@ -537,18 +537,18 @@ function ReportsPage() {
       )}
 
       {analysisId ? (
-        <div className="flex items-start gap-5">
-          {/* Report content — 65% with matching border */}
-          <div className="min-w-0 flex-[65] rounded-2xl border border-warm-200/60 bg-white/40 p-5">
+        <div className="flex items-stretch gap-5">
+          {/* Report content — 70% with matching border */}
+          <div className="min-w-0 flex-[70] rounded-2xl border border-warm-200/60 bg-white/40 p-5">
             <ReportView
               analysisId={analysisId}
               onReportContext={setReportContext}
             />
           </div>
 
-          {/* Chat panel — 35%, sticky, aligned */}
+          {/* Chat panel — 30%, sticky, aligned to same height */}
           {reportContext && (
-            <div className="hidden flex-[35] lg:block" style={{ minWidth: 320, maxWidth: 440 }}>
+            <div className="hidden flex-[30] lg:block" style={{ minWidth: 320, maxWidth: 420 }}>
               <div className="sticky top-[80px] h-[calc(100vh-128px)]">
                 <ReportChatPanel reportContext={reportContext} />
               </div>

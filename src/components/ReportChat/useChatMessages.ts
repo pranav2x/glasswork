@@ -96,7 +96,7 @@ export function useChatMessages(reportTitle: string) {
   }, [messages, activeConvoId, isStreaming, reportTitle]);
 
   const sendMessage = useCallback(
-    async (content: string, reportContext: ReportContext, displayContent?: string) => {
+    async (content: string, reportContext: ReportContext, displayContent?: string, rubricData?: { base64: string; mimeType: string; name: string }) => {
       // Auto-create conversation on first message
       let convoId = activeConvoId;
       if (!convoId) {
@@ -148,6 +148,7 @@ export function useChatMessages(reportTitle: string) {
             reportContext,
             tool: activeTool,
             model: activeModel,
+            rubricData: rubricData || undefined,
           }),
           signal: abortController.signal,
         });

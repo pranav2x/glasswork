@@ -39,7 +39,7 @@ const config: Config = {
           dark: "#5548D9",
           muted: "rgba(108, 99, 255, 0.08)",
         },
-        "docs-accent": "#6C63FF",
+        "docs-accent": "#4285F4",
         "repo-accent": "#2DA44E",
         danger: "#E53935",
         carry: "#404040",

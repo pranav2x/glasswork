@@ -39,11 +39,11 @@ export function ProjectCard({ analysis }: ProjectCardProps) {
         {/* Header: title + source icon + time */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-warm-100">
+            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${sourceType === "github_repo" ? "bg-repo-accent/10" : "bg-docs-accent/10"}`}>
               {sourceType === "github_repo" ? (
-                <GitBranch className="h-4 w-4 text-warm-500" />
+                <GitBranch className="h-4 w-4 text-repo-accent" />
               ) : (
-                <FileText className="h-4 w-4 text-warm-500" />
+                <FileText className="h-4 w-4 text-docs-accent" />
               )}
             </div>
             <div className="min-w-0">

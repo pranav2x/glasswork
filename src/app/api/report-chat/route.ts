@@ -37,17 +37,33 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { messages, reportContext, tool, model } = await req.json();
+    const { messages, reportContext, tool, model, rubricData } = await req.json();
 
     const claudeModel = model || "claude-sonnet-4-6";
 
     const systemPrompt = buildSystemPrompt(reportContext, tool);
 
     const claudeMessages = messages.map(
-      (m: { role: string; content: string }) => ({
-        role: m.role === "user" ? "user" : "assistant",
-        content: m.content,
-      })
+      (m: { role: string; content: string }, i: number) => {
+        const isLastUser = m.role === "user" && i === messages.length - 1;
+        // Attach PDF rubric as a document block on the last user message
+        if (isLastUser && rubricData?.base64) {
+          return {
+            role: "user",
+            content: [
+              {
+                type: "document",
+                source: { type: "base64", media_type: rubricData.mimeType, data: rubricData.base64 },
+              },
+              { type: "text", text: `[Attached rubric: ${rubricData.name}]\n\n${m.content}` },
+            ],
+          };
+        }
+        return {
+          role: m.role === "user" ? "user" : "assistant",
+          content: m.content,
+        };
+      }
     );
 
     const claudeResponse = await fetch("https://api.anthropic.com/v1/messages", {
