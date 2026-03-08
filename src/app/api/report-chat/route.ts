@@ -58,8 +58,14 @@ export async function POST(req: NextRequest) {
     if (!geminiResponse.ok) {
       const errText = await geminiResponse.text();
       console.error("Gemini API error:", errText);
-      return new Response(JSON.stringify({ error: "Gemini API request failed" }), {
-        status: 502,
+      let userMessage = "Gemini API request failed. Please try again.";
+      if (geminiResponse.status === 429) {
+        userMessage = "Rate limit reached — too many requests. Please wait a moment and try again.";
+      } else if (geminiResponse.status === 403) {
+        userMessage = "API key is invalid or doesn't have access to this model.";
+      }
+      return new Response(JSON.stringify({ error: userMessage }), {
+        status: geminiResponse.status,
         headers: { "Content-Type": "application/json" },
       });
     }

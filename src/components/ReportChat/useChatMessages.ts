@@ -81,7 +81,8 @@ export function useChatMessages() {
         });
 
         if (!res.ok) {
-          throw new Error("Chat request failed");
+          const errData = await res.json().catch(() => null);
+          throw new Error(errData?.error || "Chat request failed");
         }
 
         const reader = res.body?.getReader();
@@ -104,10 +105,11 @@ export function useChatMessages() {
         }
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
+        const errorMessage = (err as Error).message || "Something went wrong. Please try again.";
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantMsg.id
-              ? { ...m, content: "Sorry, something went wrong. Please try again." }
+              ? { ...m, content: errorMessage }
               : m
           )
         );
