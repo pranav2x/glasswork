@@ -155,11 +155,11 @@ export function BentoRecentProjects({
           analyses.map((a) => (
             <Link key={a._id} href={`/results/${a._id}`}>
               <div className="group flex items-center gap-3 rounded-xl p-2.5 transition-colors hover:bg-warm-100/50">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-warm-100">
+                <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg", a.sourceType === "github_repo" ? "bg-repo-accent/10" : "bg-docs-accent/10")}>
                   {a.sourceType === "github_repo" ? (
-                    <GitBranch className="h-3.5 w-3.5 text-warm-500" />
+                    <GitBranch className="h-3.5 w-3.5 text-repo-accent" />
                   ) : (
-                    <FileText className="h-3.5 w-3.5 text-warm-500" />
+                    <FileText className="h-3.5 w-3.5 text-docs-accent" />
                   )}
                 </div>
                 <div className="min-w-0 flex-1">

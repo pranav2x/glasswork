@@ -537,18 +537,18 @@ function ReportsPage() {
       )}
 
       {analysisId ? (
-        <div className="flex items-stretch gap-5">
-          {/* Report content — 70% with matching border */}
-          <div className="min-w-0 flex-[70] rounded-2xl border border-warm-200/60 bg-white/40 p-5">
+        <div className="flex items-stretch gap-4">
+          {/* Report content — takes all available space */}
+          <div className="min-w-0 flex-1 rounded-2xl border border-warm-200/60 bg-white/40 p-5">
             <ReportView
               analysisId={analysisId}
               onReportContext={setReportContext}
             />
           </div>
 
-          {/* Chat panel — 30%, sticky, aligned to same height */}
+          {/* Chat panel — fixed width, sticky */}
           {reportContext && (
-            <div className="hidden flex-[30] lg:block" style={{ minWidth: 320, maxWidth: 420 }}>
+            <div className="hidden lg:block" style={{ width: 360, minWidth: 360 }}>
               <div className="sticky top-[80px] h-[calc(100vh-128px)]">
                 <ReportChatPanel reportContext={reportContext} />
               </div>

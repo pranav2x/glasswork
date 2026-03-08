@@ -130,7 +130,7 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
   ].join(" ");
 
   return (
-    <div>
+    <div className="flex h-full flex-col">
       <div className="mb-2 flex items-center gap-4">
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-brand" />
@@ -146,11 +146,11 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
         </div>
       </div>
 
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full">
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full flex-1" preserveAspectRatio="xMidYMid meet">
         <defs>
           <linearGradient id="docsAreaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#6C63FF" stopOpacity="0.12" />
-            <stop offset="100%" stopColor="#6C63FF" stopOpacity="0" />
+            <stop offset="0%" stopColor="#4285F4" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="#4285F4" stopOpacity="0" />
           </linearGradient>
         </defs>
 
@@ -185,7 +185,7 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
         <polyline
           points={docsPoints}
           fill="none"
-          stroke="#6C63FF"
+          stroke="#4285F4"
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -202,7 +202,7 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
         />
 
         {docsData.map((v, i) => (
-          <circle key={`d-${i}`} cx={getX(i)} cy={getY(v)} r="2.5" fill="#6C63FF" />
+          <circle key={`d-${i}`} cx={getX(i)} cy={getY(v)} r="2.5" fill="#4285F4" />
         ))}
         {reposData.map((v, i) => (
           <circle

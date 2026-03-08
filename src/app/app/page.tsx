@@ -146,10 +146,10 @@ function DashboardPage() {
               className="md:col-span-1 md:row-span-2 lg:col-start-4 lg:row-start-1"
             />
 
-            {/* Activity Heatmap */}
+            {/* Activity Heatmap — spans 2 cols to fill empty space */}
             <BentoActivityHeatmap
               activityByMonth={activityByMonth}
-              className="md:col-span-1 md:row-span-1"
+              className="md:col-span-2 md:row-span-1"
             />
 
             {/* Carry Streak */}
