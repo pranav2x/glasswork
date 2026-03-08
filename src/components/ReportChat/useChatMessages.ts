@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
 export type ToolType = "deep_research" | "canvas" | "guided_learning";
 
@@ -16,6 +16,13 @@ export type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   content: string;
+};
+
+export type Conversation = {
+  id: string;
+  preview: string;
+  createdAt: number;
+  messages: ChatMessage[];
 };
 
 export type ReportContext = {
@@ -35,15 +42,78 @@ export type ReportContext = {
   ghostCount: number;
 };
 
-export function useChatMessages() {
+function storageKey(reportTitle: string) {
+  return `glasswork-chats-${reportTitle.replace(/\s+/g, "-").toLowerCase()}`;
+}
+
+function loadConversations(reportTitle: string): Conversation[] {
+  try {
+    const raw = localStorage.getItem(storageKey(reportTitle));
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveConversations(reportTitle: string, convos: Conversation[]) {
+  try {
+    localStorage.setItem(storageKey(reportTitle), JSON.stringify(convos.slice(0, 20)));
+  } catch {
+    // localStorage full — silently fail
+  }
+}
+
+export function useChatMessages(reportTitle: string) {
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConvoId, setActiveConvoId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [activeTool, setActiveTool] = useState<ToolType | null>(null);
   const [activeModel, setActiveModel] = useState<GeminiModel>("gemini-2.0-flash");
   const abortRef = useRef<AbortController | null>(null);
 
+  // Load conversations from localStorage on mount / title change
+  useEffect(() => {
+    const loaded = loadConversations(reportTitle);
+    setConversations(loaded);
+    setActiveConvoId(null);
+    setMessages([]);
+  }, [reportTitle]);
+
+  // Persist messages to the active conversation whenever they change
+  useEffect(() => {
+    if (!activeConvoId || messages.length === 0 || isStreaming) return;
+    setConversations((prev) => {
+      const updated = prev.map((c) =>
+        c.id === activeConvoId
+          ? { ...c, messages, preview: messages.find((m) => m.role === "user")?.content || c.preview }
+          : c
+      );
+      saveConversations(reportTitle, updated);
+      return updated;
+    });
+  }, [messages, activeConvoId, isStreaming, reportTitle]);
+
   const sendMessage = useCallback(
     async (content: string, reportContext: ReportContext) => {
+      // Auto-create conversation on first message
+      let convoId = activeConvoId;
+      if (!convoId) {
+        convoId = crypto.randomUUID();
+        const newConvo: Conversation = {
+          id: convoId,
+          preview: content,
+          createdAt: Date.now(),
+          messages: [],
+        };
+        setActiveConvoId(convoId);
+        setConversations((prev) => {
+          const updated = [newConvo, ...prev];
+          saveConversations(reportTitle, updated);
+          return updated;
+        });
+      }
+
       const userMsg: ChatMessage = {
         id: crypto.randomUUID(),
         role: "user",
@@ -118,18 +188,54 @@ export function useChatMessages() {
         abortRef.current = null;
       }
     },
-    [messages, activeTool, activeModel]
+    [messages, activeTool, activeModel, activeConvoId, reportTitle]
   );
 
-  const clearChat = useCallback(() => {
+  const newChat = useCallback(() => {
     abortRef.current?.abort();
+    setActiveConvoId(null);
     setMessages([]);
     setIsStreaming(false);
   }, []);
+
+  const loadConversation = useCallback((convoId: string) => {
+    const convo = conversations.find((c) => c.id === convoId);
+    if (convo) {
+      abortRef.current?.abort();
+      setActiveConvoId(convo.id);
+      setMessages(convo.messages);
+      setIsStreaming(false);
+    }
+  }, [conversations]);
+
+  const deleteConversation = useCallback((convoId: string) => {
+    setConversations((prev) => {
+      const updated = prev.filter((c) => c.id !== convoId);
+      saveConversations(reportTitle, updated);
+      return updated;
+    });
+    if (activeConvoId === convoId) {
+      setActiveConvoId(null);
+      setMessages([]);
+    }
+  }, [activeConvoId, reportTitle]);
 
   const toggleTool = useCallback((tool: ToolType) => {
     setActiveTool((prev) => (prev === tool ? null : tool));
   }, []);
 
-  return { messages, isStreaming, activeTool, activeModel, sendMessage, clearChat, toggleTool, setActiveModel };
+  return {
+    messages,
+    isStreaming,
+    activeTool,
+    activeModel,
+    conversations,
+    activeConvoId,
+    sendMessage,
+    newChat,
+    loadConversation,
+    deleteConversation,
+    toggleTool,
+    setActiveModel,
+  };
 }

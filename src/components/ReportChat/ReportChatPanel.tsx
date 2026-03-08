@@ -10,7 +10,10 @@ import {
   Trash2,
   AtSign,
   ChevronUp,
+  ChevronDown,
   Infinity,
+  Plus,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -38,16 +41,31 @@ export function ReportChatPanel({
 }: {
   reportContext: ReportContext;
 }) {
-  const { messages, isStreaming, activeTool, activeModel, sendMessage, clearChat, toggleTool, setActiveModel } =
-    useChatMessages();
+  const {
+    messages,
+    isStreaming,
+    activeTool,
+    activeModel,
+    conversations,
+    activeConvoId,
+    sendMessage,
+    newChat,
+    loadConversation,
+    deleteConversation,
+    toggleTool,
+    setActiveModel,
+  } = useChatMessages(reportContext.title);
+
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);
   const [agentDropdownOpen, setAgentDropdownOpen] = useState(false);
   const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
+  const [convoDropdownOpen, setConvoDropdownOpen] = useState(false);
   const agentDropdownRef = useRef<HTMLDivElement>(null);
   const modelDropdownRef = useRef<HTMLDivElement>(null);
+  const convoDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!userScrolled) {
@@ -69,6 +87,12 @@ export function ReportChatPanel({
         !modelDropdownRef.current.contains(e.target as Node)
       ) {
         setModelDropdownOpen(false);
+      }
+      if (
+        convoDropdownRef.current &&
+        !convoDropdownRef.current.contains(e.target as Node)
+      ) {
+        setConvoDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -103,18 +127,97 @@ export function ReportChatPanel({
 
   return (
     <div className="flex h-full flex-col rounded-2xl border border-warm-200/60 bg-[#F9F3F1] shadow-card">
-      {/* Header */}
+      {/* Header with conversation switcher */}
       <div className="flex items-center justify-between px-5 py-3.5">
-        <span className="text-[14px] font-semibold text-warm-900">
-          {reportContext.title}
-        </span>
+        <div ref={convoDropdownRef} className="relative min-w-0 flex-1">
+          <button
+            onClick={() => setConvoDropdownOpen((o) => !o)}
+            className="flex items-center gap-1.5 rounded-lg px-1 py-0.5 transition-colors hover:bg-warm-200/40"
+          >
+            <span className="truncate text-[14px] font-semibold text-warm-900">
+              {reportContext.title}
+            </span>
+            <ChevronDown
+              className={cn(
+                "h-3.5 w-3.5 shrink-0 text-warm-400 transition-transform",
+                convoDropdownOpen && "rotate-180"
+              )}
+            />
+          </button>
+
+          <AnimatePresence>
+            {convoDropdownOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15 }}
+                className="absolute left-0 top-full z-50 mt-1 w-64 rounded-xl border border-warm-200 bg-white p-1.5 shadow-lg"
+              >
+                {/* New chat button */}
+                <button
+                  onClick={() => {
+                    newChat();
+                    setConvoDropdownOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[12px] font-medium text-warm-600 transition-colors hover:bg-warm-50 hover:text-warm-800"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  New conversation
+                </button>
+
+                {conversations.length > 0 && (
+                  <div className="my-1 h-px bg-warm-100" />
+                )}
+
+                {/* Past conversations */}
+                <div className="max-h-48 overflow-y-auto">
+                  {conversations.map((convo) => (
+                    <div
+                      key={convo.id}
+                      className={cn(
+                        "group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors",
+                        activeConvoId === convo.id
+                          ? "bg-warm-100 text-warm-800"
+                          : "text-warm-500 hover:bg-warm-50 hover:text-warm-700"
+                      )}
+                    >
+                      <button
+                        onClick={() => {
+                          loadConversation(convo.id);
+                          setConvoDropdownOpen(false);
+                        }}
+                        className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                      >
+                        <MessageSquare className="h-3 w-3 shrink-0" />
+                        <span className="truncate text-[12px] font-medium">
+                          {convo.preview}
+                        </span>
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteConversation(convo.id);
+                        }}
+                        className="shrink-0 rounded p-0.5 text-warm-300 opacity-0 transition-all hover:text-red-400 group-hover:opacity-100"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
         {messages.length > 0 && (
           <button
-            onClick={clearChat}
-            className="rounded-lg p-1.5 text-warm-300 transition-colors hover:bg-warm-50 hover:text-warm-500"
-            title="Clear chat"
+            onClick={newChat}
+            className="ml-2 rounded-lg p-1.5 text-warm-300 transition-colors hover:bg-warm-200/40 hover:text-warm-500"
+            title="New chat"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Plus className="h-3.5 w-3.5" />
           </button>
         )}
       </div>
@@ -178,7 +281,7 @@ export function ReportChatPanel({
         )}
       </div>
 
-      {/* Input area — ChatGPT-style */}
+      {/* Input area */}
       <div className="px-4 pb-4">
         <div className="rounded-2xl border border-warm-200/80 bg-white/60 transition-all focus-within:border-warm-300 focus-within:bg-white">
           {/* Top section: @ Add Context + textarea */}
@@ -237,7 +340,6 @@ export function ReportChatPanel({
                       transition={{ duration: 0.15 }}
                       className="absolute bottom-full left-0 z-50 mb-1.5 w-48 rounded-xl border border-warm-200 bg-white p-1 shadow-lg"
                     >
-                      {/* None / default option */}
                       <button
                         onClick={() => {
                           if (activeTool) toggleTool(activeTool);
