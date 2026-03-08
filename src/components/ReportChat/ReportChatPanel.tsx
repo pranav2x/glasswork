@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -14,6 +14,8 @@ import {
   Infinity,
   Plus,
   MessageSquare,
+  User,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -36,6 +38,56 @@ const SUGGESTED_PROMPTS = [
   "Compare top and bottom performers",
 ];
 
+type MentionItem = {
+  id: string;
+  label: string;
+  type: "contributor" | "report";
+  detail?: string;
+};
+
+function buildMentionItems(ctx: ReportContext): MentionItem[] {
+  const items: MentionItem[] = [
+    {
+      id: `report:${ctx.title}`,
+      label: ctx.title,
+      type: "report",
+      detail: `${ctx.contributors.length} contributors · avg ${ctx.teamAvgScore}`,
+    },
+    ...ctx.contributors.map((c) => ({
+      id: `contributor:${c.name}`,
+      label: c.name,
+      type: "contributor" as const,
+      detail: `Score ${c.score} · ${c.tier === "carry" ? "Locked In" : c.tier === "solid" ? "Mid" : "Selling"}`,
+    })),
+  ];
+  return items;
+}
+
+function expandMentions(text: string, ctx: ReportContext): string {
+  let expanded = text;
+
+  // Expand @ReportTitle → inject report summary context
+  if (expanded.includes(`@${ctx.title}`)) {
+    expanded = expanded.replace(
+      `@${ctx.title}`,
+      `[Report: "${ctx.title}" — ${ctx.sourceType === "google_doc" ? "Google Doc" : "GitHub Repo"}, ${ctx.contributors.length} contributors, avg score ${ctx.teamAvgScore}, summary: ${ctx.summary || "N/A"}]`
+    );
+  }
+
+  // Expand @ContributorName → inject their full stats
+  for (const c of ctx.contributors) {
+    if (expanded.includes(`@${c.name}`)) {
+      const tierLabel = c.tier === "carry" ? "LOCKED IN" : c.tier === "solid" ? "MID" : "SELLING";
+      expanded = expanded.replace(
+        `@${c.name}`,
+        `[Contributor: ${c.name}, Score: ${c.score}/100, Tier: ${tierLabel}, Stats: ${JSON.stringify(c.rawStats)}, Strengths: ${c.strengths.join(", ") || "none"}, Improvements: ${c.improvements.join(", ") || "none"}]`
+      );
+    }
+  }
+
+  return expanded;
+}
+
 export function ReportChatPanel({
   reportContext,
 }: {
@@ -57,6 +109,7 @@ export function ReportChatPanel({
   } = useChatMessages(reportContext.title);
 
   const [input, setInput] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);
@@ -67,6 +120,24 @@ export function ReportChatPanel({
   const modelDropdownRef = useRef<HTMLDivElement>(null);
   const convoDropdownRef = useRef<HTMLDivElement>(null);
 
+  // Mention state
+  const [mentionOpen, setMentionOpen] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState("");
+  const [mentionIndex, setMentionIndex] = useState(0);
+  const mentionRef = useRef<HTMLDivElement>(null);
+
+  const allMentionItems = useMemo(() => buildMentionItems(reportContext), [reportContext]);
+
+  const filteredMentions = useMemo(() => {
+    if (!mentionQuery) return allMentionItems;
+    const q = mentionQuery.toLowerCase();
+    return allMentionItems.filter(
+      (item) =>
+        item.label.toLowerCase().includes(q) ||
+        (item.detail && item.detail.toLowerCase().includes(q))
+    );
+  }, [allMentionItems, mentionQuery]);
+
   useEffect(() => {
     if (!userScrolled) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -76,28 +147,27 @@ export function ReportChatPanel({
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        agentDropdownRef.current &&
-        !agentDropdownRef.current.contains(e.target as Node)
-      ) {
+      if (agentDropdownRef.current && !agentDropdownRef.current.contains(e.target as Node)) {
         setAgentDropdownOpen(false);
       }
-      if (
-        modelDropdownRef.current &&
-        !modelDropdownRef.current.contains(e.target as Node)
-      ) {
+      if (modelDropdownRef.current && !modelDropdownRef.current.contains(e.target as Node)) {
         setModelDropdownOpen(false);
       }
-      if (
-        convoDropdownRef.current &&
-        !convoDropdownRef.current.contains(e.target as Node)
-      ) {
+      if (convoDropdownRef.current && !convoDropdownRef.current.contains(e.target as Node)) {
         setConvoDropdownOpen(false);
+      }
+      if (mentionRef.current && !mentionRef.current.contains(e.target as Node)) {
+        setMentionOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Reset mention index when filtered list changes
+  useEffect(() => {
+    setMentionIndex(0);
+  }, [filteredMentions.length]);
 
   const handleScroll = () => {
     const el = scrollAreaRef.current;
@@ -109,12 +179,110 @@ export function ReportChatPanel({
   const handleSend = () => {
     const trimmed = input.trim();
     if (!trimmed || isStreaming) return;
+    // Expand @mentions into full context before sending
+    const expanded = expandMentions(trimmed, reportContext);
     setInput("");
     setUserScrolled(false);
-    sendMessage(trimmed, reportContext);
+    setMentionOpen(false);
+    sendMessage(expanded, reportContext);
+  };
+
+  const insertMention = (item: MentionItem) => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+
+    const cursor = ta.selectionStart;
+    const text = input;
+
+    // Find the @ that triggered this mention
+    let atPos = cursor - 1;
+    while (atPos >= 0 && text[atPos] !== "@") {
+      atPos--;
+    }
+    if (atPos < 0) atPos = cursor;
+
+    const before = text.slice(0, atPos);
+    const after = text.slice(cursor);
+    const mention = `@${item.label} `;
+    const newText = before + mention + after;
+
+    setInput(newText);
+    setMentionOpen(false);
+    setMentionQuery("");
+
+    // Restore cursor position after the mention
+    requestAnimationFrame(() => {
+      const newPos = before.length + mention.length;
+      ta.setSelectionRange(newPos, newPos);
+      ta.focus();
+    });
+  };
+
+  const openMentionFromButton = () => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+
+    // Insert @ at cursor position and open mention popup
+    const cursor = ta.selectionStart;
+    const before = input.slice(0, cursor);
+    const after = input.slice(cursor);
+    setInput(before + "@" + after);
+    setMentionOpen(true);
+    setMentionQuery("");
+
+    requestAnimationFrame(() => {
+      ta.setSelectionRange(cursor + 1, cursor + 1);
+      ta.focus();
+    });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newVal = e.target.value;
+    setInput(newVal);
+
+    const cursor = e.target.selectionStart;
+    // Check if we're in an @mention context
+    const textBeforeCursor = newVal.slice(0, cursor);
+    const lastAtIndex = textBeforeCursor.lastIndexOf("@");
+
+    if (lastAtIndex !== -1) {
+      const textAfterAt = textBeforeCursor.slice(lastAtIndex + 1);
+      // Only show mention popup if there's no space break (simple heuristic)
+      // Allow spaces in names like "Pranav Rapelli"
+      const hasNewline = textAfterAt.includes("\n");
+      if (!hasNewline && textAfterAt.length <= 30) {
+        setMentionOpen(true);
+        setMentionQuery(textAfterAt);
+        return;
+      }
+    }
+    setMentionOpen(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (mentionOpen && filteredMentions.length > 0) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setMentionIndex((i) => (i + 1) % filteredMentions.length);
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setMentionIndex((i) => (i - 1 + filteredMentions.length) % filteredMentions.length);
+        return;
+      }
+      if (e.key === "Enter" || e.key === "Tab") {
+        e.preventDefault();
+        insertMention(filteredMentions[mentionIndex]);
+        return;
+      }
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setMentionOpen(false);
+        return;
+      }
+    }
+
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -154,7 +322,6 @@ export function ReportChatPanel({
                 transition={{ duration: 0.15 }}
                 className="absolute left-0 top-full z-50 mt-1 w-64 rounded-xl border border-warm-200 bg-white p-1.5 shadow-lg"
               >
-                {/* New chat button */}
                 <button
                   onClick={() => {
                     newChat();
@@ -170,7 +337,6 @@ export function ReportChatPanel({
                   <div className="my-1 h-px bg-warm-100" />
                 )}
 
-                {/* Past conversations */}
                 <div className="max-h-48 overflow-y-auto">
                   {conversations.map((convo) => (
                     <div
@@ -283,18 +449,74 @@ export function ReportChatPanel({
 
       {/* Input area */}
       <div className="px-4 pb-4">
-        <div className="rounded-2xl border border-warm-200/80 bg-white/60 transition-all focus-within:border-warm-300 focus-within:bg-white">
+        <div className="relative rounded-2xl border border-warm-200/80 bg-white/60 transition-all focus-within:border-warm-300 focus-within:bg-white">
+          {/* Mention autocomplete popup */}
+          <AnimatePresence>
+            {mentionOpen && filteredMentions.length > 0 && (
+              <motion.div
+                ref={mentionRef}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 4 }}
+                transition={{ duration: 0.12 }}
+                className="absolute bottom-full left-3 z-50 mb-2 w-[calc(100%-24px)] rounded-xl border border-warm-200 bg-white p-1 shadow-lg"
+              >
+                <div className="max-h-48 overflow-y-auto">
+                  {filteredMentions.map((item, i) => (
+                    <button
+                      key={item.id}
+                      onMouseDown={(e) => {
+                        e.preventDefault(); // prevent textarea blur
+                        insertMention(item);
+                      }}
+                      onMouseEnter={() => setMentionIndex(i)}
+                      className={cn(
+                        "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left transition-colors",
+                        i === mentionIndex
+                          ? "bg-warm-100 text-warm-800"
+                          : "text-warm-600 hover:bg-warm-50"
+                      )}
+                    >
+                      {item.type === "contributor" ? (
+                        <User className="h-3.5 w-3.5 shrink-0 text-warm-400" />
+                      ) : (
+                        <FileText className="h-3.5 w-3.5 shrink-0 text-warm-400" />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-[12px] font-semibold">
+                          {item.label}
+                        </div>
+                        {item.detail && (
+                          <div className="truncate text-[10px] text-warm-400">
+                            {item.detail}
+                          </div>
+                        )}
+                      </div>
+                      <span className="shrink-0 rounded bg-warm-100 px-1.5 py-0.5 text-[9px] font-medium text-warm-400">
+                        {item.type === "contributor" ? "person" : "report"}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Top section: @ Add Context + textarea */}
           <div className="px-4 pt-3">
-            <button className="mb-2 flex items-center gap-1.5 rounded-lg border border-warm-200/80 bg-white px-2.5 py-1 text-[12px] font-medium text-warm-500 transition-colors hover:border-warm-300 hover:text-warm-700">
+            <button
+              onClick={openMentionFromButton}
+              className="mb-2 flex items-center gap-1.5 rounded-lg border border-warm-200/80 bg-white px-2.5 py-1 text-[12px] font-medium text-warm-500 transition-colors hover:border-warm-300 hover:text-warm-700"
+            >
               <AtSign className="h-3 w-3" />
               Add Context
             </button>
             <textarea
+              ref={textareaRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder="Imagine, plan, write anything..."
+              placeholder="Imagine, plan, write anything... Type @ to mention"
               disabled={isStreaming}
               rows={1}
               className="w-full resize-none bg-transparent text-[13px] text-warm-900 placeholder:text-warm-400 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
