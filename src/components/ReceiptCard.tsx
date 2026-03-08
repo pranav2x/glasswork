@@ -20,16 +20,10 @@ const tierLabel: Record<string, string> = {
   ghost: "SELLING",
 };
 
-const tierColor: Record<string, string> = {
-  carry: "#15803d",
-  solid: "#b45309",
-  ghost: "#dc2626",
-};
-
-const tierBg: Record<string, string> = {
-  carry: "#dcfce7",
-  solid: "#fef3c7",
-  ghost: "#fee2e2",
+const tierStyle: Record<string, { color: string; bg: string; border: string }> = {
+  carry: { color: "#15803d", bg: "#f0fdf4", border: "#bbf7d0" },
+  solid: { color: "#92400e", bg: "#fef9ee", border: "#fde68a" },
+  ghost: { color: "#991b1b", bg: "#fef2f2", border: "#fecaca" },
 };
 
 export function ReceiptCard({ title, contributors, onClose }: ReceiptCardProps) {
@@ -73,138 +67,139 @@ export function ReceiptCard({ title, contributors, onClose }: ReceiptCardProps) 
         exit={{ opacity: 0 }}
       >
         <div
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          className="absolute inset-0 bg-warm-900/50 backdrop-blur-sm"
           onClick={onClose}
         />
 
         <motion.div
-          className="relative z-10 flex flex-col items-center gap-4"
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          className="relative z-10 flex flex-col items-center gap-5"
+          initial={{ scale: 0.92, opacity: 0, y: 24 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          exit={{ scale: 0.92, opacity: 0, y: 24 }}
+          transition={{ type: "spring", stiffness: 260, damping: 24 }}
         >
-          {/* The receipt itself */}
+          {/* The receipt */}
           <div
             ref={receiptRef}
-            className="w-[420px] overflow-hidden rounded-2xl"
-            style={{ background: "linear-gradient(145deg, #fafaf9 0%, #f5f5f4 100%)" }}
+            className="w-[400px] overflow-hidden rounded-3xl shadow-2xl"
+            style={{ background: "linear-gradient(160deg, #FFFBF7 0%, #FFF8F0 50%, #FBF7F4 100%)" }}
           >
             <div className="px-8 pb-8 pt-10">
               {/* Header */}
-              <div className="mb-1 text-center">
-                <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[0.3em] text-stone-400">
+              <div className="text-center">
+                <div className="text-[10px] font-bold uppercase tracking-[0.35em] text-warm-400">
                   Glasswork
                 </div>
-                <div className="font-display text-[22px] font-semibold tracking-tight text-stone-900">
+                <div className="mt-2 text-[20px] font-bold tracking-tight text-warm-900">
                   Contribution Receipt
                 </div>
               </div>
 
-              <div className="my-5 border-t border-dashed border-stone-300" />
+              <div className="my-6 border-t border-dashed border-warm-300/60" />
 
               {/* Project title */}
-              <div className="mb-5 text-center">
-                <div className="text-[11px] font-medium uppercase tracking-wider text-stone-400">
+              <div className="text-center">
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-warm-400">
                   Project
                 </div>
-                <div className="mt-1 text-[15px] font-semibold text-stone-800">
+                <div className="mt-1.5 text-[15px] font-semibold text-warm-800">
                   {title}
                 </div>
               </div>
 
-              <div className="my-5 border-t border-dashed border-stone-300" />
+              <div className="my-6 border-t border-dashed border-warm-300/60" />
 
               {/* Column header */}
-              <div className="mb-3 flex items-center justify-between px-1 text-[10px] font-bold uppercase tracking-wider text-stone-400">
+              <div className="mb-3 flex items-center justify-between px-1 text-[9px] font-bold uppercase tracking-widest text-warm-400">
                 <span>Contributor</span>
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-5">
                   <span>Score</span>
-                  <span className="w-[72px] text-right">Status</span>
+                  <span className="w-[68px] text-right">Status</span>
                 </div>
               </div>
 
               {/* Contributors */}
-              <div className="space-y-2.5">
-                {sorted.map((c) => (
-                  <div
-                    key={c.id}
-                    className="flex items-center justify-between rounded-xl px-3 py-2.5"
-                    style={{ backgroundColor: c.tier === "carry" ? "#f0fdf4" : "transparent" }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full text-[12px] font-bold"
-                        style={{
-                          backgroundColor: tierBg[c.tier],
-                          color: tierColor[c.tier],
-                        }}
-                      >
-                        {c.avatarUrl ? (
-                          <Image
-                            src={c.avatarUrl}
-                            alt={c.name}
-                            fill
-                            className="object-cover"
-                            referrerPolicy="no-referrer"
-                          />
-                        ) : (
-                          getInitials(c.name)
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-[14px] font-semibold text-stone-900">
-                          {c.name}
+              <div className="space-y-1.5">
+                {sorted.map((c, i) => {
+                  const style = tierStyle[c.tier] || tierStyle.solid;
+                  return (
+                    <div
+                      key={c.id}
+                      className="flex items-center justify-between rounded-xl px-3 py-2.5 transition-colors"
+                      style={{
+                        backgroundColor: i === 0 ? "rgba(255,255,255,0.7)" : "transparent",
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm-100 text-[11px] font-bold text-warm-600">
+                          {c.avatarUrl ? (
+                            <Image
+                              src={c.avatarUrl}
+                              alt={c.name}
+                              fill
+                              className="object-cover"
+                              referrerPolicy="no-referrer"
+                            />
+                          ) : (
+                            getInitials(c.name)
+                          )}
                         </div>
-                        <div className="text-[11px] text-stone-400">
-                          {c.email || c.handle || ""}
+                        <div className="min-w-0">
+                          <div className="truncate text-[13px] font-semibold text-warm-900">
+                            {c.name}
+                          </div>
+                          {(c.email || c.handle) && (
+                            <div className="truncate text-[10px] text-warm-400">
+                              {c.email || c.handle}
+                            </div>
+                          )}
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center gap-4">
-                      <span
-                        className="font-display text-[22px] font-semibold tabular-nums"
-                        style={{ color: tierColor[c.tier] }}
-                      >
-                        {c.fairShareScore}
-                      </span>
-                      <span
-                        className="inline-flex w-[72px] items-center justify-center rounded-full px-2 py-1 text-[9px] font-bold uppercase tracking-wider"
-                        style={{
-                          backgroundColor: tierBg[c.tier],
-                          color: tierColor[c.tier],
-                          border: c.tier === "carry" ? "1px solid #16a34a" : c.tier === "ghost" ? "1px solid #dc2626" : "1px solid #b45309",
-                        }}
-                      >
-                        {tierLabel[c.tier]}
-                      </span>
+                      <div className="flex items-center gap-4">
+                        <span
+                          className="text-[20px] font-bold tabular-nums"
+                          style={{ color: style.color }}
+                        >
+                          {c.fairShareScore}
+                        </span>
+                        <span
+                          className="inline-flex w-[68px] items-center justify-center rounded-full px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider"
+                          style={{
+                            backgroundColor: style.bg,
+                            color: style.color,
+                            border: `1px solid ${style.border}`,
+                          }}
+                        >
+                          {tierLabel[c.tier]}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
-              <div className="my-5 border-t border-dashed border-stone-300" />
+              <div className="my-6 border-t border-dashed border-warm-300/60" />
 
               {/* Footer */}
               <div className="text-center">
-                <div className="text-[11px] text-stone-400">
+                <div className="text-[11px] text-warm-500">
                   Analyzed by{" "}
-                  <span className="font-semibold text-stone-600">glasswork.app</span>
+                  <span className="font-semibold text-warm-700">glasswork.app</span>
                 </div>
-                <div className="mt-1 text-[10px] text-stone-300">
+                <div className="mt-1 text-[9px] italic text-warm-300">
                   who actually did the work?
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Action buttons (outside the receipt so they don't appear in the screenshot) */}
+          {/* Action buttons */}
           <div className="flex items-center gap-3">
             <button
               onClick={handleExport}
               disabled={saving}
-              className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-[13px] font-semibold text-stone-900 shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-[13px] font-semibold text-warm-900 shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
             >
               {saved ? (
                 <Check className="h-4 w-4 text-emerald-500" />
@@ -215,7 +210,7 @@ export function ReceiptCard({ title, contributors, onClose }: ReceiptCardProps) 
             </button>
             <button
               onClick={onClose}
-              className="inline-flex items-center gap-2 rounded-xl bg-white/20 px-5 py-2.5 text-[13px] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/30 active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-xl bg-white/15 px-5 py-2.5 text-[13px] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/25 active:scale-[0.98]"
             >
               <X className="h-4 w-4" />
               Close
