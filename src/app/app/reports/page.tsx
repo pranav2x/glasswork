@@ -526,7 +526,7 @@ function ReportsPage() {
   const [reportContext, setReportContext] = useState<ReportContext | null>(null);
 
   return (
-    <div className="p-6">
+    <div>
       {!analysisId && (
         <div className="hero-fade-in mb-6">
           <p className="text-[13px] font-medium text-warm-400">
