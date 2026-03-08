@@ -550,10 +550,10 @@ function ReportsPage() {
             />
           </div>
 
-          {/* Chat panel — 30%, height matches left content */}
+          {/* Chat panel — 30%, sticky with proper height */}
           {reportContext && (
-            <div className="hidden flex-[30] self-stretch lg:block" style={{ minWidth: 320, maxWidth: 440 }}>
-              <div className="sticky top-6 h-[calc(100vh-48px)]">
+            <div className="hidden flex-[30] lg:block" style={{ minWidth: 320, maxWidth: 440 }}>
+              <div className="sticky top-[80px] h-[calc(100vh-104px)]">
                 <ReportChatPanel reportContext={reportContext} />
               </div>
             </div>
