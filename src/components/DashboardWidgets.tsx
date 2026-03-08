@@ -103,11 +103,11 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
   }
 
   const width = 320;
-  const height = 140;
+  const height = 160;
   const padL = 8;
   const padR = 8;
   const padT = 20;
-  const padB = 24;
+  const padB = 32;
 
   const chartW = width - padL - padR;
   const chartH = height - padT - padB;
@@ -218,7 +218,7 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
           <text
             key={i}
             x={getX(i)}
-            y={height - 4}
+            y={height - 8}
             textAnchor="middle"
             fontSize="9"
             fill="#A3A3A3"
