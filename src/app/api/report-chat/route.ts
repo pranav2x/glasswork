@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   try {
     const { messages, reportContext, tool, model } = await req.json();
 
-    const geminiModel = model || "gemini-2.0-flash";
+    const geminiModel = model || "gemini-3-flash-preview";
 
     const systemInstruction = buildSystemPrompt(reportContext, tool);
 

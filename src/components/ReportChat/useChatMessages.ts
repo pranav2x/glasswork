@@ -4,12 +4,12 @@ import { useState, useCallback, useRef, useEffect } from "react";
 
 export type ToolType = "deep_research" | "canvas" | "guided_learning";
 
-export type GeminiModel = "gemini-2.0-flash" | "gemini-2.5-flash" | "gemini-2.5-pro";
+export type GeminiModel = "gemini-3-flash-preview" | "gemini-3-pro-preview" | "gemini-3.1-pro-preview";
 
 export const GEMINI_MODELS: { id: GeminiModel; label: string }[] = [
-  { id: "gemini-2.0-flash", label: "Gemini 2.0 Flash" },
-  { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
-  { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
+  { id: "gemini-3-flash-preview", label: "Gemini 3 Flash" },
+  { id: "gemini-3-pro-preview", label: "Gemini 3 Pro" },
+  { id: "gemini-3.1-pro-preview", label: "Gemini 3.1 Pro" },
 ];
 
 export type ChatMessage = {
@@ -69,7 +69,7 @@ export function useChatMessages(reportTitle: string) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [activeTool, setActiveTool] = useState<ToolType | null>(null);
-  const [activeModel, setActiveModel] = useState<GeminiModel>("gemini-2.5-flash");
+  const [activeModel, setActiveModel] = useState<GeminiModel>("gemini-3-flash-preview");
   const abortRef = useRef<AbortController | null>(null);
 
   // Load conversations from localStorage on mount / title change
