@@ -148,7 +148,7 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
               cy="40"
               r="36"
               fill="none"
-              stroke="#E8E4DD"
+              stroke="#E5E5E5"
               strokeWidth="2.5"
             />
             <motion.circle

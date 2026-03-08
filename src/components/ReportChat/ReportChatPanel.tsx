@@ -294,7 +294,7 @@ export function ReportChatPanel({
     : "Agent";
 
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-warm-200/60 bg-[#F9F3F1] shadow-card">
+    <div className="flex h-full flex-col rounded-2xl border border-warm-200/60 bg-neutral-50 shadow-card">
       {/* Header with conversation switcher */}
       <div className="flex items-center justify-between px-5 py-3.5">
         <div ref={convoDropdownRef} className="relative min-w-0 flex-1">

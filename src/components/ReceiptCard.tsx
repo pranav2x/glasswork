@@ -22,7 +22,7 @@ const tierLabel: Record<string, string> = {
 
 const tierStyle: Record<string, { color: string; bg: string; border: string }> = {
   carry: { color: "#15803d", bg: "#f0fdf4", border: "#bbf7d0" },
-  solid: { color: "#92400e", bg: "#fef9ee", border: "#fde68a" },
+  solid: { color: "#525252", bg: "#F5F5F5", border: "#D4D4D4" },
   ghost: { color: "#991b1b", bg: "#fef2f2", border: "#fecaca" },
 };
 
@@ -82,7 +82,7 @@ export function ReceiptCard({ title, contributors, onClose }: ReceiptCardProps) 
           <div
             ref={receiptRef}
             className="w-[400px] overflow-hidden rounded-3xl shadow-2xl"
-            style={{ background: "linear-gradient(160deg, #FFFBF7 0%, #FFF8F0 50%, #FBF7F4 100%)" }}
+            style={{ background: "linear-gradient(160deg, #FFFFFF 0%, #FAFAFA 50%, #F5F5F5 100%)" }}
           >
             <div className="px-8 pb-8 pt-10">
               {/* Header */}

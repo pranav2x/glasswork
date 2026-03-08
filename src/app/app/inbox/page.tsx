@@ -28,9 +28,9 @@ const NOTIFICATION_ICONS = {
 
 const NOTIFICATION_COLORS = {
   analysis_complete: "text-[#5BA8C8] bg-[#5BA8C8]/10",
-  mvp_status: "text-[#D4A017] bg-[#D4A017]/10",
+  mvp_status: "text-[#404040] bg-[#404040]/10",
   tier_change: "text-warm-600 bg-warm-100",
-  streak_milestone: "text-[#D4A017] bg-[#D4A017]/10",
+  streak_milestone: "text-[#404040] bg-[#404040]/10",
 } as const;
 
 export default function InboxPageWrapper() {
@@ -130,11 +130,11 @@ function InboxPage() {
                 >
                   <GlassPanel className={cn(
                     "flex items-start gap-4 p-4 pr-12",
-                    !n.read && "border-[#D4A017]/20"
+                    !n.read && "border-[#404040]/20"
                   )}>
                     {/* Unread dot */}
                     {!n.read && (
-                      <div className="absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-[#D4A017]" />
+                      <div className="absolute left-2 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-[#404040]" />
                     )}
 
                     {/* Icon */}

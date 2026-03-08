@@ -19,9 +19,9 @@ interface ContributorCardProps {
 const tierConfig = {
   carry: {
     label: "LOCKED IN",
-    color: "text-[#D4A017]",
-    bg: "bg-[#D4A017] border-[#D4A017] text-white",
-    accent: "bg-[#D4A017]/5",
+    color: "text-[#404040]",
+    bg: "bg-[#404040] border-[#404040] text-white",
+    accent: "bg-[#404040]/5",
   },
   solid: {
     label: "MID",
@@ -205,7 +205,7 @@ export function ContributorCard({ contributor, index, maxScore, revealDelay }: C
         {/* Score Progress Bar */}
         <div className="h-1.5 overflow-hidden rounded-full bg-white/40">
           <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-[#3B7A9E] to-[#D4A017]"
+            className="h-full rounded-full bg-gradient-to-r from-[#3B7A9E] to-[#404040]"
             initial={{ width: 0 }}
             animate={{ width: `${Math.min(100, (fairShareScore / (maxScore ?? Math.max(fairShareScore, 100))) * 100)}%` }}
             transition={{ delay: baseDelay + 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}

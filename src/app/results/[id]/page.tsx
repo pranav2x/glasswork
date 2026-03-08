@@ -16,7 +16,6 @@ import { PageTransition } from "@/components/PageTransition";
 import { ReceiptCard } from "@/components/ReceiptCard";
 import { Badge } from "@/components/ui/badge";
 import { mapConvexAnalysis } from "@/lib/mappers";
-import { cn } from "@/lib/utils";
 import { Users, BarChart3, Sparkles, Share2, Download } from "lucide-react";
 
 function TypewriterText({ text }: { text: string }) {
@@ -65,7 +64,7 @@ export default function ResultsPage() {
       if (prevStatusRef.current === "pending" && data.status === "ready") {
         confettiFiredRef.current = true;
         confetti({
-          colors: ["#6C63FF", "#D4A017", "#2DA44E"],
+          colors: ["#6C63FF", "#404040", "#2DA44E"],
           particleCount: 100,
           spread: 80,
           origin: { y: 0.5 },

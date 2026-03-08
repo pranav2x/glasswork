@@ -139,7 +139,7 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#F5A623]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-[#737373]" />
           <span className="text-[10px] font-medium text-warm-500">
             Repos: {reposTotal.toLocaleString()}
           </span>
@@ -194,7 +194,7 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
         <polyline
           points={reposPoints}
           fill="none"
-          stroke="#F5A623"
+          stroke="#737373"
           strokeWidth="2"
           strokeDasharray="4 3"
           strokeLinecap="round"
@@ -210,7 +210,7 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
             cx={getX(i)}
             cy={getY(v)}
             r="2"
-            fill="#F5A623"
+            fill="#737373"
           />
         ))}
 

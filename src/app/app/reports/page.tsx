@@ -103,7 +103,7 @@ function computeTeamAvg(
 // ─── Tier config ───────────────────────────────────────────────────────────
 
 const tierConfig = {
-  carry: { label: "LOCKED IN", bg: "bg-[#D4A017] text-white border-[#D4A017]" },
+  carry: { label: "LOCKED IN", bg: "bg-[#404040] text-white border-[#404040]" },
   solid: { bg: "bg-[#5BA8C8]/20 text-[#5BA8C8] border-[#5BA8C8]/30", label: "MID" },
   ghost: { bg: "bg-warm-100 text-warm-400 border-warm-200", label: "SELLING" },
 };
@@ -415,7 +415,7 @@ function ReportView({
             <div className="w-px bg-warm-100" />
             <div className="flex flex-col">
               <span className="text-[11px] font-medium text-warm-400">Carrying</span>
-              <span className="text-[20px] font-bold text-[#D4A017]">{carryCount}</span>
+              <span className="text-[20px] font-bold text-[#404040]">{carryCount}</span>
             </div>
             <div className="w-px bg-warm-100" />
             <div className="flex flex-col">
@@ -509,6 +509,7 @@ function ProjectPicker() {
               </div>
             </button>
             <button
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               onClick={() => deleteAnalysis({ analysisId: analysis._id as any })}
               className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-lg text-warm-300 opacity-0 transition-all duration-150 group-hover:opacity-100 hover:bg-red-50 hover:text-red-500"
               title="Delete report"
@@ -552,8 +553,8 @@ function ReportsPage() {
 
           {/* Chat panel — 30%, sticky with proper height */}
           {reportContext && (
-            <div className="hidden flex-[30] lg:block" style={{ minWidth: 320, maxWidth: 440 }}>
-              <div className="sticky top-[80px] h-[calc(100vh-104px)]">
+            <div className="hidden flex-[30] pt-[74px] lg:block" style={{ minWidth: 320, maxWidth: 440 }}>
+              <div className="sticky top-[80px] h-[calc(100vh-174px)]">
                 <ReportChatPanel reportContext={reportContext} />
               </div>
             </div>

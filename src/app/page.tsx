@@ -55,7 +55,7 @@ export default function WaitlistPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F4F1ED] px-6">
+    <div className="flex min-h-screen items-center justify-center bg-white px-6">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -136,8 +136,8 @@ export default function WaitlistPage() {
               animate={{ opacity: 1, y: 0 }}
               className="flex flex-col items-center gap-3 text-center"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#D4A017]/10">
-                <CheckCircle2 className="h-6 w-6 text-[#D4A017]" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#404040]/10">
+                <CheckCircle2 className="h-6 w-6 text-[#404040]" />
               </div>
               <h2 className="font-myflora text-[1.5rem] text-warm-900">
                 {joined.alreadyJoined ? "Already in!" : "You're in."}

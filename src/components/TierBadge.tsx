@@ -10,9 +10,9 @@ interface TierBadgeProps {
 const TIER_CONFIG = {
   carry: {
     label: "LOCKED IN",
-    bg: "bg-[#D4A017]/10",
-    border: "border-[#D4A017]/30",
-    text: "text-[#D4A017]",
+    bg: "bg-[#404040]/10",
+    border: "border-[#404040]/30",
+    text: "text-[#404040]",
     glow: "animate-pulse-glow",
   },
   solid: {

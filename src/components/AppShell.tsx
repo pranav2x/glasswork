@@ -175,7 +175,7 @@ function Sidebar() {
   const isReportsActive = pathname.startsWith("/app/reports");
 
   return (
-    <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col border-r border-white/[0.25] bg-[#FFF5EB]/[0.12] backdrop-blur-[20px] lg:w-[200px]">
+    <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col border-r border-white/[0.25] bg-white/[0.12] backdrop-blur-[20px] lg:w-[200px]">
       {/* Logo + Brand */}
       <div className="flex h-14 items-center gap-2 px-3 lg:px-4">
         <Link href="/" title="Back to home" className="flex items-center gap-2">
@@ -327,7 +327,7 @@ function UserAvatar() {
 
 function DashboardTopBar() {
   return (
-    <header className="sticky top-0 z-20 bg-[#FDF3E8]/80 backdrop-blur-xl border-b border-warm-200/30">
+    <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-warm-200/30">
       <div className="flex h-14 items-center justify-between px-6">
         {/* Left: Brand (hidden on lg where sidebar shows it) */}
         <Link
@@ -361,10 +361,8 @@ export function AppShell({ children }: AppShellProps) {
   if (isWorkspace && isAuthenticated) {
     return (
       <div className="relative min-h-screen grain-overlay">
-        {/* Warm cream gradient background */}
-        <div className="fixed inset-0 -z-10" style={{ background: "linear-gradient(135deg, #FFF8F0 0%, #FBF7F4 40%, #F5F0EB 100%)" }} />
-        <div className="fixed -left-[200px] -top-[200px] -z-10 h-[600px] w-[600px] rounded-full bg-[#FFE8D4] opacity-30 blur-[120px]" />
-        <div className="fixed -bottom-[100px] -right-[100px] -z-10 h-[500px] w-[500px] rounded-full bg-[#FFF0D4] opacity-25 blur-[120px]" />
+        {/* Clean white background */}
+        <div className="fixed inset-0 -z-10 bg-white" />
         <Sidebar />
         <div className="relative z-10 pl-[56px] lg:pl-[200px]">
           <DashboardTopBar />
