@@ -141,126 +141,121 @@ function ContributorReportRow({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: rank * 0.08, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="rounded-2xl border border-white/50 bg-white/55 p-5 shadow-card backdrop-blur-xl"
+      className="flex flex-col rounded-2xl border border-white/50 bg-white/55 p-4 shadow-card backdrop-blur-xl"
     >
-      <div className="flex flex-col gap-5 sm:flex-row sm:gap-6">
-        {/* Left: Identity + Score */}
-        <div className="flex min-w-0 flex-col gap-3 sm:w-[200px] sm:shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              {contributor.avatarUrl ? (
-                <Image
-                  src={contributor.avatarUrl}
-                  alt={contributor.name}
-                  width={44}
-                  height={44}
-                  className="h-11 w-11 shrink-0 rounded-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-warm-100 text-[13px] font-bold text-warm-700">
-                  {getInitials(contributor.name)}
-                </div>
-              )}
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-warm-200 text-[10px] font-bold text-warm-700">
-                {rank + 1}
-              </span>
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-[14px] font-semibold text-warm-900">{contributor.name}</p>
-              {contributor.emailOrHandle && (
-                <p className="truncate text-[11px] text-warm-400">{contributor.emailOrHandle}</p>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="font-display text-3xl font-normal text-warm-900">{contributor.score}</span>
-            <div className="flex flex-col">
-              <span
-                className={cn(
-                  "inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider",
-                  tc.bg
-                )}
-              >
-                {tc.label}
-              </span>
-              <span
-                className={cn(
-                  "mt-1 text-[11px] font-medium",
-                  scoreDelta >= 0 ? "text-emerald-600" : "text-red-400"
-                )}
-              >
-                {scoreDelta >= 0 ? "+" : ""}
-                {scoreDelta} vs avg
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="hidden w-px bg-warm-100 sm:block" />
-
-        {/* Middle: Strengths + Improvements */}
-        <div className="flex min-w-0 flex-1 flex-col gap-3">
-          {strengths.length > 0 && (
-            <div>
-              <div className="mb-1.5 flex items-center gap-1.5">
-                <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600">
-                  Strengths
-                </span>
-              </div>
-              <ul className="space-y-1">
-                {strengths.map((s) => (
-                  <li key={s} className="flex items-center gap-2 text-[13px] text-warm-700">
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" />
-                    {s}
-                  </li>
-                ))}
-              </ul>
+      {/* Identity + Score */}
+      <div className="flex items-center gap-3">
+        <div className="relative">
+          {contributor.avatarUrl ? (
+            <Image
+              src={contributor.avatarUrl}
+              alt={contributor.name}
+              width={40}
+              height={40}
+              className="h-10 w-10 shrink-0 rounded-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-warm-100 text-[12px] font-bold text-warm-700">
+              {getInitials(contributor.name)}
             </div>
           )}
-
-          {improvements.length > 0 && (
-            <div>
-              <div className="mb-1.5 flex items-center gap-1.5">
-                <ArrowUpRight className="h-3.5 w-3.5 text-amber-500" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600">
-                  Can improve
-                </span>
-              </div>
-              <ul className="space-y-1">
-                {improvements.map((s) => (
-                  <li key={s} className="flex items-center gap-2 text-[13px] text-warm-500">
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" />
-                    {s}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {strengths.length === 0 && improvements.length === 0 && (
-            <p className="text-[13px] italic text-warm-400">
-              Performance is close to the team average across all metrics.
-            </p>
-          )}
-        </div>
-
-        {/* Divider */}
-        <div className="hidden w-px bg-warm-100 sm:block" />
-
-        {/* Right: Activity */}
-        <div className="flex shrink-0 flex-col items-end gap-3 sm:w-[120px]">
-          <LiquidHeatmap
-            mode={isDoc ? "doc" : "repo"}
-            data={contributor.heatmapData}
-          />
-          <span className="rounded-full bg-warm-100 px-2.5 py-1 text-[11px] font-medium text-warm-600">
-            {pattern}
+          <span className="absolute -right-1 -top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-warm-200 text-[9px] font-bold text-warm-700">
+            {rank + 1}
           </span>
         </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[13px] font-semibold text-warm-900">{contributor.name}</p>
+          {contributor.emailOrHandle && (
+            <p className="truncate text-[10px] text-warm-400">{contributor.emailOrHandle}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Score + Tier */}
+      <div className="mt-3 flex items-center gap-2">
+        <span className="font-display text-2xl font-normal text-warm-900">{contributor.score}</span>
+        <div className="flex flex-col">
+          <span
+            className={cn(
+              "inline-flex items-center rounded-full border px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider",
+              tc.bg
+            )}
+          >
+            {tc.label}
+          </span>
+          <span
+            className={cn(
+              "mt-0.5 text-[10px] font-medium",
+              scoreDelta >= 0 ? "text-emerald-600" : "text-red-400"
+            )}
+          >
+            {scoreDelta >= 0 ? "+" : ""}
+            {scoreDelta} vs avg
+          </span>
+        </div>
+      </div>
+
+      {/* Activity Heatmap */}
+      <div className="mt-3">
+        <LiquidHeatmap
+          mode={isDoc ? "doc" : "repo"}
+          data={contributor.heatmapData}
+        />
+      </div>
+
+      {/* Strengths / Improvements */}
+      <div className="mt-3 flex-1 space-y-2">
+        {strengths.length > 0 && (
+          <div>
+            <div className="mb-1 flex items-center gap-1">
+              <TrendingUp className="h-3 w-3 text-emerald-500" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+                Strengths
+              </span>
+            </div>
+            <ul className="space-y-0.5">
+              {strengths.map((s) => (
+                <li key={s} className="flex items-center gap-1.5 text-[11px] text-warm-700">
+                  <span className="h-1 w-1 shrink-0 rounded-full bg-emerald-400" />
+                  {s}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {improvements.length > 0 && (
+          <div>
+            <div className="mb-1 flex items-center gap-1">
+              <ArrowUpRight className="h-3 w-3 text-amber-500" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600">
+                Can improve
+              </span>
+            </div>
+            <ul className="space-y-0.5">
+              {improvements.map((s) => (
+                <li key={s} className="flex items-center gap-1.5 text-[11px] text-warm-500">
+                  <span className="h-1 w-1 shrink-0 rounded-full bg-amber-400" />
+                  {s}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {strengths.length === 0 && improvements.length === 0 && (
+          <p className="text-[11px] italic text-warm-400">
+            Close to team average.
+          </p>
+        )}
+      </div>
+
+      {/* Pattern badge */}
+      <div className="mt-2">
+        <span className="rounded-full bg-warm-100 px-2 py-0.5 text-[10px] font-medium text-warm-600">
+          {pattern}
+        </span>
       </div>
     </motion.div>
   );
@@ -352,7 +347,7 @@ function ReportView({
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* Header */}
       <div className="hero-fade-in flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
@@ -424,8 +419,8 @@ function ReportView({
             </div>
           </motion.div>
 
-          {/* Per-Contributor Rows */}
-          <div className="space-y-3">
+          {/* Per-Contributor Cards Grid */}
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             {contributors.map((c, i) => (
               <ContributorReportRow
                 key={c._id}
@@ -542,19 +537,19 @@ function ReportsPage() {
       )}
 
       {analysisId ? (
-        <div className="flex items-start gap-6">
-          {/* Report content — 70% */}
-          <div className="min-w-0 flex-[70]">
+        <div className="flex items-start gap-5">
+          {/* Report content — 65% with matching border */}
+          <div className="min-w-0 flex-[65] rounded-2xl border border-warm-200/60 bg-white/40 p-5">
             <ReportView
               analysisId={analysisId}
               onReportContext={setReportContext}
             />
           </div>
 
-          {/* Chat panel — 30%, sticky with proper height */}
+          {/* Chat panel — 35%, sticky, aligned */}
           {reportContext && (
-            <div className="hidden flex-[30] pt-[74px] lg:block" style={{ minWidth: 320, maxWidth: 440 }}>
-              <div className="sticky top-[80px] h-[calc(100vh-174px)]">
+            <div className="hidden flex-[35] lg:block" style={{ minWidth: 320, maxWidth: 440 }}>
+              <div className="sticky top-[80px] h-[calc(100vh-128px)]">
                 <ReportChatPanel reportContext={reportContext} />
               </div>
             </div>

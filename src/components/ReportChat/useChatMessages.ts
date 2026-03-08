@@ -16,6 +16,7 @@ export type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   content: string;
+  displayContent?: string; // original text with @mentions (before expansion)
 };
 
 export type Conversation = {
@@ -95,7 +96,7 @@ export function useChatMessages(reportTitle: string) {
   }, [messages, activeConvoId, isStreaming, reportTitle]);
 
   const sendMessage = useCallback(
-    async (content: string, reportContext: ReportContext) => {
+    async (content: string, reportContext: ReportContext, displayContent?: string) => {
       // Auto-create conversation on first message
       let convoId = activeConvoId;
       if (!convoId) {
@@ -118,6 +119,7 @@ export function useChatMessages(reportTitle: string) {
         id: crypto.randomUUID(),
         role: "user",
         content,
+        displayContent: displayContent || content,
       };
 
       const assistantMsg: ChatMessage = {

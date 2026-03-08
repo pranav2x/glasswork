@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 import {
   Search,
   PenLine,
@@ -86,6 +87,21 @@ function expandMentions(text: string, ctx: ReportContext): string {
   }
 
   return expanded;
+}
+
+function renderWithMentions(text: string): React.ReactNode {
+  // Split text on @mentions and render them as blue spans
+  const parts = text.split(/(@\w[\w\s]*?)(?=\s@|\s*$|[.,!?])/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("@")) {
+      return (
+        <span key={i} className="font-semibold text-blue-600">
+          {part}
+        </span>
+      );
+    }
+    return part;
+  });
 }
 
 export function ReportChatPanel({
@@ -179,12 +195,13 @@ export function ReportChatPanel({
   const handleSend = () => {
     const trimmed = input.trim();
     if (!trimmed || isStreaming) return;
-    // Expand @mentions into full context before sending
+    // Expand @mentions into full context before sending to API
     const expanded = expandMentions(trimmed, reportContext);
     setInput("");
     setUserScrolled(false);
     setMentionOpen(false);
-    sendMessage(expanded, reportContext);
+    // Pass original text as displayContent so user sees clean message
+    sendMessage(expanded, reportContext, trimmed);
   };
 
   const insertMention = (item: MentionItem) => {
@@ -294,7 +311,7 @@ export function ReportChatPanel({
     : "Agent";
 
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-warm-200/60 bg-neutral-50 shadow-card">
+    <div className="flex h-full flex-col rounded-2xl border border-warm-200/60 bg-white shadow-card">
       {/* Header with conversation switcher */}
       <div className="flex items-center justify-between px-5 py-3.5">
         <div ref={convoDropdownRef} className="relative min-w-0 flex-1">
@@ -424,12 +441,16 @@ export function ReportChatPanel({
                 {msg.role === "user" ? (
                   <div className="flex justify-end">
                     <div className="max-w-[85%] rounded-2xl rounded-br-md bg-warm-100 px-3.5 py-2.5 text-[13px] leading-relaxed text-warm-800">
-                      {msg.content}
+                      {renderWithMentions(msg.displayContent || msg.content)}
                     </div>
                   </div>
                 ) : (
                   <div className="text-[13px] leading-relaxed text-warm-700">
-                    {msg.content || (
+                    {msg.content ? (
+                      <div className="prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:text-warm-900 prose-headings:text-sm prose-strong:text-warm-800">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    ) : (
                       isStreaming && (
                         <span className="flex items-center gap-1 py-1">
                           <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-warm-300" />

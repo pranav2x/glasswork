@@ -175,9 +175,12 @@ ${contributorDetails}
 
 GUIDELINES:
 - Reference specific data points and contributor names when answering
-- Be concise but insightful
+- Be concise but insightful — use short paragraphs and bullet points
 - Use the scoring tiers: LOCKED IN (>=70), MID (40-69), SELLING (<40)
-- When comparing contributors, use actual numbers from their stats`;
+- When comparing contributors, use actual numbers from their stats
+- IMPORTANT: When the user asks about a specific person, focus ONLY on that person. Do not bring up other contributors unless directly asked to compare
+- Format your responses with markdown: use **bold** for emphasis, bullet points for lists, and headers for sections
+- Keep responses focused and well-structured`;
 
   if (tool && TOOL_INSTRUCTIONS[tool]) {
     prompt += `\n\n${TOOL_INSTRUCTIONS[tool]}`;
