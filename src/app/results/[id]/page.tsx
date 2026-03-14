@@ -16,7 +16,7 @@ import { PageTransition } from "@/components/PageTransition";
 import { ReceiptCard } from "@/components/ReceiptCard";
 import { Badge } from "@/components/ui/badge";
 import { mapConvexAnalysis } from "@/lib/mappers";
-import { Users, BarChart3, Sparkles, Share2, Download } from "lucide-react";
+import { Users, BarChart3, Sparkles, Share2, Download, Trophy, Ghost } from "lucide-react";
 
 function TypewriterText({ text }: { text: string }) {
   const [displayed, setDisplayed] = useState("");
@@ -58,17 +58,28 @@ export default function ResultsPage() {
     analysisId: analysisId as Id<"analyses">,
   });
 
-  // Fire confetti when transitioning from pending to ready
   useEffect(() => {
     if (data && !confettiFiredRef.current) {
       if (prevStatusRef.current === "pending" && data.status === "ready") {
         confettiFiredRef.current = true;
         confetti({
-          colors: ["#6C63FF", "#404040", "#2DA44E"],
-          particleCount: 100,
-          spread: 80,
-          origin: { y: 0.5 },
+          colors: ["#A78BFA", "#34D399", "#F87171", "#7C6FFF"],
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.4 },
+          gravity: 0.8,
+          scalar: 1.2,
         });
+        setTimeout(() => {
+          confetti({
+            colors: ["#A78BFA", "#34D399", "#F87171", "#7C6FFF"],
+            particleCount: 80,
+            spread: 60,
+            origin: { y: 0.2 },
+            gravity: 1,
+            scalar: 0.9,
+          });
+        }, 300);
       }
       prevStatusRef.current = data.status;
     }
@@ -82,13 +93,15 @@ export default function ResultsPage() {
 
   function handleShareTwitter() {
     if (!mapped) return;
+    const sorted = [...mapped.contributors].sort((a, b) => b.fairShareScore - a.fairShareScore);
+    const tierEmoji = (tier: string) =>
+      tier === "carry" ? "🔒" : tier === "solid" ? "📊" : "💀";
     const tierLabel = (tier: string) =>
       tier === "carry" ? "LOCKED IN" : tier === "solid" ? "MID" : "SELLING";
-    const lines = mapped.contributors
-      .sort((a, b) => b.fairShareScore - a.fairShareScore)
-      .map((c) => `• ${c.name} — ${tierLabel(c.tier)} (${c.fairShareScore})`)
+    const lines = sorted
+      .map((c) => `${tierEmoji(c.tier)} ${c.name} — ${tierLabel(c.tier)} (${c.fairShareScore})`)
       .join("\n");
-    const text = `📊 Glasswork just exposed my group project:\n${lines}\n\nwho actually did the work 😭\n${window.location.href}`;
+    const text = `📊 Glasswork just exposed my group project:\n\n${lines}\n\nfind out who actually did the work 👀\n${window.location.href}`;
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
       "_blank"
@@ -109,7 +122,7 @@ export default function ResultsPage() {
         <div className="mx-auto max-w-6xl py-8">
           <div className="flex justify-center pt-16">
             <GlassPanel className="max-w-md p-10 text-center">
-              <h2 className="font-display text-2xl font-normal tracking-display text-warm-900">
+              <h2 className="font-display text-2xl font-bold tracking-tight text-warm-900">
                 Analysis not found
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-warm-500">
@@ -131,7 +144,6 @@ export default function ResultsPage() {
       ? mapConvexAnalysis(data, data.contributors)
       : null;
 
-  // Calculate summary stats
   const summaryStats = mapped
     ? {
         total: mapped.contributors.length,
@@ -146,51 +158,45 @@ export default function ResultsPage() {
 
   return (
     <PageTransition>
-      <div className="mx-auto max-w-6xl space-y-6 py-8">
+      <div className="mx-auto max-w-6xl space-y-6 py-8 pb-24">
         {/* Top Meta Bar */}
         <div className="hero-fade-in" style={{ animationDelay: "0s" }}>
-          <GlassPanel className="flex flex-col items-start justify-between gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
-            <div className="flex items-center gap-3">
-              <Badge
-                variant="outline"
-                className="text-[11px] font-medium border-warm-200 bg-warm-100/50 text-warm-500"
-              >
-                {isDoc ? "Google Doc" : "GitHub Repo"}
-              </Badge>
-              <span className="text-[15px] font-semibold text-warm-900">
-                {data.title}
-              </span>
-            </div>
+          <GlassPanel className="p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <Badge
+                  variant="outline"
+                  className="text-[10px] font-semibold border-white/[0.10] bg-white/[0.04] text-warm-500 uppercase tracking-[0.1em] mb-2"
+                >
+                  {isDoc ? "Google Doc" : "GitHub Repo"}
+                </Badge>
+                <h1 className="text-[22px] font-bold text-warm-900 tracking-tight">
+                  {data.title}
+                </h1>
+              </div>
 
-            <div className="flex items-center gap-2">
-              <Link href={`/app/reports?id=${analysisId}`}>
-                <GlassButton variant="ghost" size="sm">
-                  Report
-                </GlassButton>
-              </Link>
-              <Link href="/app">
-                <GlassButton variant="ghost" size="sm">
-                  Workspace
-                </GlassButton>
-              </Link>
-              <GlassButton variant="ghost" size="sm" onClick={handleCopyLink}>
-                <Share2 className="h-3.5 w-3.5" />
-                {copied ? "Link copied" : "Copy link"}
-              </GlassButton>
-              {mapped && (
-                <>
-                  <GlassButton variant="ghost" size="sm" onClick={handleShareTwitter}>
-                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                    </svg>
-                    Share on X
+              <div className="flex items-center gap-2 flex-wrap">
+                <Link href={`/app/reports?id=${analysisId}`}>
+                  <GlassButton variant="ghost" size="sm">
+                    Report
                   </GlassButton>
+                </Link>
+                <Link href="/app">
+                  <GlassButton variant="ghost" size="sm">
+                    Workspace
+                  </GlassButton>
+                </Link>
+                <GlassButton variant="ghost" size="sm" onClick={handleCopyLink}>
+                  <Share2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+                  {copied ? "Copied!" : "Copy link"}
+                </GlassButton>
+                {mapped && (
                   <GlassButton variant="primary" size="sm" onClick={() => setShowReceipt(true)}>
                     <Download className="h-3.5 w-3.5" />
                     Receipt
                   </GlassButton>
-                </>
-              )}
+                )}
+              </div>
             </div>
           </GlassPanel>
         </div>
@@ -213,7 +219,7 @@ export default function ResultsPage() {
                   />
                 </svg>
               </div>
-              <h2 className="font-display text-xl font-normal tracking-display text-warm-900">
+              <h2 className="font-display text-xl font-bold tracking-tight text-warm-900">
                 Analysis failed
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-danger/70">
@@ -229,12 +235,12 @@ export default function ResultsPage() {
         {data.status === "ready" && data.contributors.length === 0 && (
           <div className="flex justify-center pt-8">
             <GlassPanel className="max-w-md p-10 text-center">
-              <h2 className="font-display text-2xl font-normal tracking-display text-warm-900">
+              <h2 className="font-display text-2xl font-bold tracking-tight text-warm-900">
                 No contributors found
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-warm-500">
                 {isDoc
-                  ? "This document doesn't have accessible revision history, or all revisions are by the same anonymous user."
+                  ? "This document doesn't have accessible revision history."
                   : "This repository has no commits or the API couldn't retrieve contributor data."}
               </p>
               <Link href="/app" className="mt-6 inline-block">
@@ -251,10 +257,10 @@ export default function ResultsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           >
-            <GlassPanel className="border-l-2 border-l-brand/30 p-5">
+            <GlassPanel className="border-l-2 border-l-brand/40 animate-border-glow p-5">
               <div className="mb-2 flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-brand" />
-                <span className="text-[11px] font-bold uppercase tracking-micro text-brand">
+                <Sparkles className="h-4 w-4 text-brand" strokeWidth={1.5} />
+                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-brand">
                   AI Insight
                 </span>
               </div>
@@ -265,72 +271,38 @@ export default function ResultsPage() {
           </motion.div>
         )}
 
-        {/* Summary Strip */}
+        {/* Summary Stats */}
         {summaryStats && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="grid grid-cols-2 gap-3 sm:grid-cols-4"
           >
-            <GlassPanel className="p-4">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <motion.div
-                  className="flex items-center gap-2"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <Users className="h-4 w-4 text-warm-500" />
-                  <span className="text-[13px] font-semibold text-warm-800">
-                    {summaryStats.total} contributors
-                  </span>
-                </motion.div>
-
-                <motion.div
-                  className="flex items-center gap-2"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.25 }}
-                >
-                  <BarChart3 className="h-4 w-4 text-warm-500" />
-                  <span className="text-[13px] font-semibold text-warm-800">
-                    Avg score: {summaryStats.avgScore}
-                  </span>
-                </motion.div>
-
-                <motion.div
-                  className="flex items-center gap-3"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  {summaryStats.lockedIn > 0 && (
-                    <span className="flex items-center gap-1.5 text-[12px] font-semibold">
-                      <span className="h-2 w-2 rounded-full bg-warm-900" />
-                      <span className="text-warm-900">{summaryStats.lockedIn} carry</span>
-                    </span>
-                  )}
-                  {summaryStats.notLockedIn > 0 && (
-                    <span className="flex items-center gap-1.5 text-[12px] font-semibold">
-                      <span className="h-2 w-2 rounded-full bg-warm-400" />
-                      <span className="text-warm-500">{summaryStats.notLockedIn} selling</span>
-                    </span>
-                  )}
-                </motion.div>
-
-                <motion.span
-                  className="text-[11px] text-warm-400"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  Analyzed just now
-                </motion.span>
-              </div>
+            <GlassPanel className="p-4 text-center">
+              <Users className="h-5 w-5 text-warm-500 mx-auto mb-2" strokeWidth={1.5} />
+              <p className="text-[28px] font-black text-warm-900 tabular-nums">{summaryStats.total}</p>
+              <p className="text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em]">Contributors</p>
+            </GlassPanel>
+            <GlassPanel className="p-4 text-center">
+              <BarChart3 className="h-5 w-5 text-warm-500 mx-auto mb-2" strokeWidth={1.5} />
+              <p className="text-[28px] font-black text-warm-900 tabular-nums">{summaryStats.avgScore}</p>
+              <p className="text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em]">Avg Score</p>
+            </GlassPanel>
+            <GlassPanel className="p-4 text-center">
+              <Trophy className="h-5 w-5 text-carry mx-auto mb-2" strokeWidth={1.5} />
+              <p className="text-[28px] font-black text-carry tabular-nums">{summaryStats.lockedIn}</p>
+              <p className="text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em]">Locked In</p>
+            </GlassPanel>
+            <GlassPanel className="p-4 text-center">
+              <Ghost className="h-5 w-5 text-ghost mx-auto mb-2" strokeWidth={1.5} />
+              <p className="text-[28px] font-black text-ghost tabular-nums">{summaryStats.notLockedIn}</p>
+              <p className="text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em]">Selling</p>
             </GlassPanel>
           </motion.div>
         )}
 
+        {/* Contributor Cards Grid */}
         {mapped && (
           <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3">
             {(() => {
@@ -350,6 +322,7 @@ export default function ResultsPage() {
             })()}
           </div>
         )}
+
         {mapped && showReceipt && (
           <ReceiptCard
             title={data.title}
@@ -358,6 +331,29 @@ export default function ResultsPage() {
           />
         )}
       </div>
+
+      {/* Sticky Share Bar (mobile) */}
+      {mapped && data.status === "ready" && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 glass-strong z-50 sm:hidden">
+          <div className="flex gap-2">
+            <button
+              onClick={handleShareTwitter}
+              className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-brand py-3 text-[13px] font-semibold text-white shadow-glow-brand transition-all active:scale-[0.97]"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+              Share results
+            </button>
+            <button
+              onClick={() => setShowReceipt(true)}
+              className="flex items-center justify-center gap-2 rounded-xl bg-white/[0.08] border border-white/[0.10] px-4 py-3 text-[13px] font-semibold text-warm-800 transition-all active:scale-[0.97]"
+            >
+              <Download className="h-4 w-4" strokeWidth={1.5} />
+            </button>
+          </div>
+        </div>
+      )}
     </PageTransition>
   );
 }
