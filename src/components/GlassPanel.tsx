@@ -3,23 +3,22 @@ import { forwardRef } from "react";
 
 interface GlassPanelProps extends React.HTMLAttributes<HTMLDivElement> {
   hoverable?: boolean;
-  intensity?: "default" | "strong";
 }
 
 const GlassPanel = forwardRef<HTMLDivElement, GlassPanelProps>(
-  ({ className, hoverable = false, intensity = "default", children, ...props }, ref) => {
-    const base =
-      intensity === "strong"
-        ? "bg-white/[0.07] border-white/[0.12] backdrop-blur-[40px]"
-        : "bg-white/[0.04] border-white/[0.08] backdrop-blur-[20px]";
+  ({ className, hoverable = false, children, ...props }, ref) => {
     return (
       <div
         ref={ref}
         className={cn(
-          "rounded-2xl border shadow-glass",
-          base,
-          hoverable &&
-            "transition-all duration-300 hover:-translate-y-1 hover:shadow-glass-hover hover:border-white/[0.14] cursor-pointer",
+          "rounded-[14px] border",
+          "bg-white/[0.03] border-white/[0.07]",
+          hoverable && [
+            "transition-all duration-200 cursor-pointer",
+            "hover:-translate-y-[2px]",
+            "hover:border-white/[0.12]",
+            "hover:bg-white/[0.05]",
+          ],
           className
         )}
         {...props}
