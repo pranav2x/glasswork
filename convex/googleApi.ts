@@ -3,8 +3,9 @@
 import { GenericActionCtx } from "convex/server";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
+import type { DataModel } from "./_generated/dataModel";
 
-interface GoogleUser {
+export interface GoogleUser {
   googleAccessToken?: string;
   googleRefreshToken?: string;
 }
@@ -44,7 +45,7 @@ async function refreshAccessToken(refreshToken: string): Promise<string> {
  * Returns the Response object for the caller to parse.
  */
 export async function googleFetch(
-  ctx: GenericActionCtx<any>,
+  ctx: GenericActionCtx<DataModel>,
   userId: Id<"users">,
   user: GoogleUser,
   url: string,

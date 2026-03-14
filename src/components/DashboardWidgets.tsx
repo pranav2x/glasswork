@@ -376,7 +376,7 @@ export function ReportItem({ label, title, time, icon, iconBg }: ReportItemProps
           </div>
         </div>
       </div>
-      <button className="flex h-7 w-7 items-center justify-center rounded-lg text-warm-400 transition-colors hover:bg-warm-100 hover:text-warm-600">
+      <button aria-label="View notification details" className="flex h-7 w-7 items-center justify-center rounded-lg text-warm-400 transition-colors hover:bg-warm-100 hover:text-warm-600">
         <svg
           width="14"
           height="14"

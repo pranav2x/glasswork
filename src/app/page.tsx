@@ -5,6 +5,7 @@ import { useMutation, useQuery } from "convex/react";
 import { useConvexAuth } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { api } from "../../convex/_generated/api";
 import { CheckCircle2 } from "lucide-react";
@@ -64,7 +65,7 @@ export default function WaitlistPage() {
       >
         {/* Logo + Brand */}
         <div className="mb-8 flex flex-col items-center gap-3">
-          <img src="/logo.png" alt="Glasswork" className="h-10 w-10 rounded-xl object-contain" />
+          <Image src="/logo.png" alt="Glasswork" width={40} height={40} className="rounded-xl object-contain" />
           <h1 className="font-myflora text-[2rem] font-semibold text-warm-900">Glasswork</h1>
           <p className="text-center font-body text-[14px] text-warm-500">
             See through the work. Coming soon.
@@ -87,8 +88,9 @@ export default function WaitlistPage() {
               className="space-y-3"
             >
               <div className="space-y-1">
-                <label className="font-body text-[13px] font-medium text-warm-700">Name</label>
+                <label htmlFor="waitlist-name" className="font-body text-[13px] font-medium text-warm-700">Name</label>
                 <input
+                  id="waitlist-name"
                   type="text"
                   placeholder="Enter your name"
                   value={name}
@@ -99,8 +101,9 @@ export default function WaitlistPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="font-body text-[13px] font-medium text-warm-700">Email</label>
+                <label htmlFor="waitlist-email" className="font-body text-[13px] font-medium text-warm-700">Email</label>
                 <input
+                  id="waitlist-email"
                   type="email"
                   placeholder="Enter your email"
                   value={email}
@@ -156,10 +159,10 @@ export default function WaitlistPage() {
           )}
         </AnimatePresence>
 
-        {/* Owner access — subtle, won't be noticed */}
         <div className="mt-10 flex justify-center">
           <button
             onClick={() => signIn("google", { redirectTo: "/app" })}
+            aria-label="Sign in with Google"
             className="font-body text-[11px] text-warm-200 hover:text-warm-400 transition-colors"
           >
             ·

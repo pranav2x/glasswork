@@ -68,7 +68,11 @@ export function ReceiptCard({ title, contributors, onClose }: ReceiptCardProps) 
       >
         <div
           className="absolute inset-0 bg-warm-900/50 backdrop-blur-sm"
+          role="button"
+          tabIndex={-1}
+          aria-label="Close receipt"
           onClick={onClose}
+          onKeyDown={(e) => e.key === "Escape" && onClose()}
         />
 
         <motion.div
@@ -199,6 +203,7 @@ export function ReceiptCard({ title, contributors, onClose }: ReceiptCardProps) 
             <button
               onClick={handleExport}
               disabled={saving}
+              aria-label="Save receipt as PNG"
               className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-[13px] font-semibold text-warm-900 shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] disabled:opacity-50"
             >
               {saved ? (
@@ -210,6 +215,7 @@ export function ReceiptCard({ title, contributors, onClose }: ReceiptCardProps) 
             </button>
             <button
               onClick={onClose}
+              aria-label="Close receipt"
               className="inline-flex items-center gap-2 rounded-xl bg-white/15 px-5 py-2.5 text-[13px] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/25 active:scale-[0.98]"
             >
               <X className="h-4 w-4" />

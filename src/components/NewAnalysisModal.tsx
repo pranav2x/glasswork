@@ -6,33 +6,11 @@ import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { GlassInput } from "@/components/GlassInput";
 import { GlassButton } from "@/components/GlassButton";
+import { detectSourceType } from "@/lib/detect-source";
 
 interface NewAnalysisModalProps {
   isOpen: boolean;
   onClose: () => void;
-}
-
-function detectSourceType(input: string): { type: "google_doc" | "github_repo"; id: string } | null {
-  const trimmed = input.trim();
-
-  // Google Doc URL
-  const gdocMatch = trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (gdocMatch) {
-    return { type: "google_doc", id: gdocMatch[1] };
-  }
-
-  // GitHub repo URL like https://github.com/owner/repo
-  const ghUrlMatch = trimmed.match(/github\.com\/([a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+)/);
-  if (ghUrlMatch) {
-    return { type: "github_repo", id: ghUrlMatch[1].replace(/\.git$/, "") };
-  }
-
-  // GitHub repo shorthand like owner/repo
-  if (/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(trimmed)) {
-    return { type: "github_repo", id: trimmed };
-  }
-
-  return null;
 }
 
 export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
@@ -75,12 +53,17 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         className="animate-modal-overlay absolute inset-0 bg-warm-900/10 backdrop-blur-[3px]"
+        role="button"
+        tabIndex={-1}
+        aria-label="Close modal"
         onClick={onClose}
+        onKeyDown={(e) => e.key === "Escape" && onClose()}
       />
 
       <div className="animate-modal-enter relative w-full max-w-md rounded-2xl border border-white/40 bg-white/80 backdrop-blur-2xl p-8 shadow-layered-lg">
         <button
           onClick={onClose}
+          aria-label="Close modal"
           className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-all duration-200 hover:bg-warm-100 hover:text-warm-600"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -109,6 +92,7 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
               setError(null);
             }}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
           />
 

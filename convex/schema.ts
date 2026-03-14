@@ -44,6 +44,8 @@ export default defineSchema({
     avatarUrl: v.optional(v.string()),
     score: v.number(),
     tier: v.union(v.literal("carry"), v.literal("solid"), v.literal("ghost")),
+    // Shape varies by sourceType: { revisions, charsAdded?, wordsAdded? } for docs,
+    // { commits, additions?, deletions? } for repos
     rawStats: v.any(),
     heatmapData: v.array(v.number()),
     heatmapBySource: v.optional(

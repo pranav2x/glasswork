@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { GitBranch, FileText, ArrowUpRight, Trash2 } from "lucide-react";
 import { useMutation } from "convex/react";
+import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { GlassPanel } from "@/components/GlassPanel";
@@ -106,13 +107,19 @@ export function ProjectCard({ analysis }: ProjectCardProps) {
       </GlassPanel>
     </Link>
     <button
-      onClick={(e) => {
+      onClick={async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        deleteAnalysis({ analysisId: _id as Id<"analyses"> });
+        try {
+          await deleteAnalysis({ analysisId: _id as Id<"analyses"> });
+        } catch (error) {
+          toast.error(
+            error instanceof Error ? error.message : "Failed to delete project"
+          );
+        }
       }}
       className="absolute right-2 bottom-2 z-10 flex h-7 w-7 items-center justify-center rounded-lg text-warm-300 opacity-0 transition-all duration-150 group-hover:opacity-100 hover:bg-red-50 hover:text-red-500"
-      title="Delete project"
+      aria-label="Delete project"
     >
       <Trash2 className="h-3.5 w-3.5" />
     </button>

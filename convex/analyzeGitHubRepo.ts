@@ -87,8 +87,8 @@ async function fetchRepoName(ownerRepo: string): Promise<string> {
       const data: GitHubRepo = await res.json();
       return data.name;
     }
-  } catch {
-    // fall through
+  } catch (error) {
+    console.warn("Failed to fetch repo name, falling back to ownerRepo:", error);
   }
   return ownerRepo;
 }
@@ -132,8 +132,8 @@ export const analyzeGitHubRepo = internalAction({
               }
             }
           }
-        } catch {
-          // co-author parsing is best-effort
+        } catch (error) {
+          console.warn("Co-author parsing failed (best-effort):", error);
         }
 
         contributions = statsData.map((contributor) => {

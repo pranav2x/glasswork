@@ -596,7 +596,7 @@ export function ReportChatPanel({
                 <button
                   onClick={() => { setRubricText(null); setRubricBase64(null); setRubricMimeType(null); setRubricName(null); }}
                   className="flex h-5 w-5 items-center justify-center rounded text-warm-400 hover:text-red-400"
-                  title="Remove rubric"
+                  aria-label="Remove rubric"
                 >
                   <span className="text-[14px] leading-none">&times;</span>
                 </button>
@@ -749,10 +749,10 @@ export function ReportChatPanel({
               </div>
             </div>
 
-            {/* Send button */}
             <button
               onClick={handleSend}
               disabled={!input.trim() || isStreaming}
+              aria-label="Send message"
               className={cn(
                 "flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all",
                 input.trim() && !isStreaming
