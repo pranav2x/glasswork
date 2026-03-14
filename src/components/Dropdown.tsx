@@ -23,7 +23,7 @@ export function Dropdown({ trigger, children, align = "left" }: DropdownProps) {
       {trigger({ isOpen, toggle })}
       {isOpen && (
         <div
-          className={`absolute top-10 z-40 min-w-[150px] overflow-hidden rounded-xl border border-warm-200 bg-white py-1 shadow-layered-lg ${
+          className={`absolute top-10 z-40 min-w-[150px] overflow-hidden rounded-xl border border-white/[0.10] bg-surface-2 py-1 shadow-layered-lg ${
             align === "right" ? "right-0" : "left-0"
           }`}
         >
