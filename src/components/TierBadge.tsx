@@ -1,57 +1,63 @@
 import { cn } from "@/lib/utils";
+import type { ContributorTier } from "@/lib/types";
 
 interface TierBadgeProps {
-  tier: "carry" | "solid" | "ghost";
+  tier: ContributorTier;
   size?: "sm" | "md" | "lg";
-  animated?: boolean;
   className?: string;
 }
 
 const TIER_CONFIG = {
   carry: {
     label: "LOCKED IN",
-    bg: "bg-[#404040]/10",
-    border: "border-[#404040]/30",
-    text: "text-[#404040]",
-    glow: "animate-pulse-glow",
+    emoji: "🔒",
+    bg: "rgba(167,139,250,0.15)",
+    border: "rgba(167,139,250,0.35)",
+    text: "#A78BFA",
+    glow: "0 0 16px rgba(167,139,250,0.3)",
   },
   solid: {
     label: "MID",
-    bg: "bg-[#5BA8C8]/10",
-    border: "border-[#5BA8C8]/30",
-    text: "text-[#5BA8C8]",
-    glow: "",
+    emoji: "📊",
+    bg: "rgba(52,211,153,0.12)",
+    border: "rgba(52,211,153,0.30)",
+    text: "#34D399",
+    glow: "0 0 12px rgba(52,211,153,0.2)",
   },
   ghost: {
     label: "SELLING",
-    bg: "bg-warm-100",
-    border: "border-warm-200",
-    text: "text-warm-400",
-    glow: "",
+    emoji: "💀",
+    bg: "rgba(248,113,113,0.12)",
+    border: "rgba(248,113,113,0.30)",
+    text: "#F87171",
+    glow: "0 0 12px rgba(248,113,113,0.2)",
   },
 } as const;
 
 const SIZE_CLASSES = {
-  sm: "px-2 py-0.5 text-[9px]",
-  md: "px-2.5 py-0.5 text-[10px]",
-  lg: "px-3 py-1 text-[11px]",
+  sm: "text-[10px] px-2 py-0.5 gap-1",
+  md: "text-[11px] px-2.5 py-1 gap-1.5",
+  lg: "text-[13px] px-3.5 py-1.5 gap-2 font-bold",
 } as const;
 
-export function TierBadge({ tier, size = "md", animated = true, className }: TierBadgeProps) {
+export function TierBadge({ tier, size = "md", className }: TierBadgeProps) {
   const config = TIER_CONFIG[tier];
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border font-bold uppercase tracking-[0.12em]",
-        config.bg,
-        config.border,
-        config.text,
-        animated && config.glow,
+        "inline-flex items-center rounded-full font-semibold tracking-wide",
         SIZE_CLASSES[size],
         className
       )}
+      style={{
+        backgroundColor: config.bg,
+        border: `1px solid ${config.border}`,
+        color: config.text,
+        boxShadow: config.glow,
+      }}
     >
-      {config.label}
+      <span>{config.emoji}</span>
+      <span>{config.label}</span>
     </span>
   );
 }
