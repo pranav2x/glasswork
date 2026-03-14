@@ -1,37 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Glasswork
+
+**See through the work.** Glasswork analyzes Google Docs and GitHub repositories to reveal who actually contributed, using a fair-share scoring model.
+
+## Features
+
+- **Google Docs Analysis** -- parses revision history to measure per-contributor effort
+- **GitHub Repo Analysis** -- examines commit stats, additions/deletions, and co-author tags
+- **Fair Share Scoring** -- 100 = fair share, >100 = overcontributor, <100 = undercontributor (capped at 200)
+- **Contributor Tiers** -- carry (top 25%), solid (middle 50%), ghost (bottom 25%)
+- **AI Summaries** -- Claude-powered analysis summaries and rubric-based feedback
+- **Report Chat** -- conversational AI assistant for deeper analysis insights
+- **Contribution Receipts** -- exportable PNG receipts showing team contributions
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Framework | Next.js 14 (App Router) |
+| Backend | Convex (serverless DB + functions) |
+| Auth | @convex-dev/auth (Google OAuth) |
+| Styling | Tailwind CSS, shadcn/ui |
+| Animation | Framer Motion |
+| AI | Anthropic Claude |
+| Testing | Vitest, React Testing Library |
+| CI | GitHub Actions |
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20+
+- npm
+- A [Convex](https://convex.dev) account
+- Google OAuth credentials (for Docs analysis)
+- Anthropic API key (for AI features)
+
+### Setup
+
+1. Clone the repository and install dependencies:
+
+```bash
+npm install
+```
+
+2. Copy the environment template and fill in your values:
+
+```bash
+cp .env.example .env.local
+```
+
+3. Start the Convex dev server:
+
+```bash
+npx convex dev
+```
+
+4. In a separate terminal, start the Next.js dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Next.js dev server |
+| `npm run build` | Production build |
+| `npm run lint` | Run ESLint |
+| `npm run format` | Format code with Prettier |
+| `npm run format:check` | Check formatting without writing |
+| `npm run typecheck` | Run TypeScript type checking |
+| `npm test` | Run unit tests |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:coverage` | Run tests with coverage report |
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/              Next.js App Router pages
+    api/            API routes (report-chat, rubric-feedback)
+    app/            Authenticated app shell and dashboard
+    results/[id]/   Analysis results page
+  components/       React components
+    ui/             shadcn/ui primitives
+    ReportChat/     AI chat panel
+  hooks/            Custom React hooks
+  lib/              Utilities, types, formatters
+convex/             Convex backend
+  schema.ts         Database schema
+  analyses.ts       Analysis queries and mutations
+  scoring.ts        Fair share scoring algorithm
+  analyzeGoogleDoc.ts   Google Docs analysis pipeline
+  analyzeGitHubRepo.ts  GitHub repo analysis pipeline
+  generateSummary.ts    AI summary generation
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# glasswork
+Private -- all rights reserved.
