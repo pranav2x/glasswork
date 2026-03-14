@@ -304,12 +304,12 @@ export default function LandingPage() {
           </span>
         </a>
 
-        <a
-          href="/app"
+        <button
+          onClick={() => signIn("google", { redirectTo: "/app" })}
           className="flex items-center gap-1.5 rounded-lg border border-white/[0.10] bg-white/[0.04] px-4 py-2 text-[13px] font-medium text-white/70 transition-all duration-150 hover:border-white/[0.18] hover:bg-white/[0.07] hover:text-white/90 active:scale-[0.97]"
         >
           Sign in
-        </a>
+        </button>
       </nav>
 
       {/* ── Hero ── */}
@@ -706,8 +706,8 @@ export default function LandingPage() {
         >
           Paste any link. Find out in 30 seconds.
         </p>
-        <a
-          href="/app"
+        <button
+          onClick={() => signIn("google", { redirectTo: "/app" })}
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -721,13 +721,15 @@ export default function LandingPage() {
             fontWeight: 600,
             letterSpacing: "-0.01em",
             textDecoration: "none",
+            border: "none",
+            cursor: "pointer",
             transition: "background 0.15s",
           }}
           onMouseEnter={(e) => (e.currentTarget.style.background = "#7B72E0")}
           onMouseLeave={(e) => (e.currentTarget.style.background = "#6D63D4")}
         >
           Start for free →
-        </a>
+        </button>
       </section>
 
       {/* ── Footer ── */}
