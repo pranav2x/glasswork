@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -10,6 +10,7 @@ import { api } from "../../convex/_generated/api";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { getInitials } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
+import { NewAnalysisModal } from "@/components/NewAnalysisModal";
 import {
   Home,
   Inbox,
@@ -22,8 +23,6 @@ import {
 interface AppShellProps {
   children: React.ReactNode;
 }
-
-/* ─── Settings Popover (for collapsed sidebar on mobile) ─── */
 
 function SettingsPopover() {
   const { signOut } = useAuthActions();
@@ -41,8 +40,8 @@ function SettingsPopover() {
         className={cn(
           "group/settings relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200",
           open
-            ? "bg-warm-100 text-warm-700"
-            : "text-warm-400 hover:bg-warm-100 hover:text-warm-600"
+            ? "bg-white/[0.08] text-warm-800"
+            : "text-warm-500 hover:bg-white/[0.06] hover:text-warm-700"
         )}
         title="Settings & Account"
       >
@@ -50,10 +49,10 @@ function SettingsPopover() {
       </button>
 
       {open && (
-        <div className="absolute bottom-0 left-[56px] z-50 min-w-[220px] overflow-hidden rounded-2xl border border-white/[0.25] bg-white/80 backdrop-blur-xl shadow-layered-lg lg:bottom-auto lg:left-auto lg:right-0 lg:top-full lg:mt-2">
+        <div className="absolute bottom-0 left-[56px] z-50 min-w-[220px] overflow-hidden rounded-2xl border border-white/[0.10] bg-surface-2 shadow-layered-lg lg:bottom-auto lg:left-auto lg:right-0 lg:top-full lg:mt-2">
           {user && (
-            <div className="flex items-center gap-3 border-b border-warm-100 px-4 py-3.5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm-100">
+            <div className="flex items-center gap-3 border-b border-white/[0.06] px-4 py-3.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/[0.06]">
                 {user.image ? (
                   <Image
                     src={user.image}
@@ -85,9 +84,9 @@ function SettingsPopover() {
             <Link
               href="/app/settings"
               onClick={() => setOpen(false)}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] font-medium text-warm-500 transition-colors hover:bg-warm-50 hover:text-warm-700"
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] font-medium text-warm-600 transition-colors hover:bg-white/[0.06] hover:text-warm-800"
             >
-              <Settings className="h-3.5 w-3.5" />
+              <Settings className="h-3.5 w-3.5" strokeWidth={1.5} />
               Settings
             </Link>
             <button
@@ -95,9 +94,9 @@ function SettingsPopover() {
                 setOpen(false);
                 void signOut();
               }}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] font-medium text-warm-500 transition-colors hover:bg-warm-50 hover:text-danger"
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] font-medium text-warm-600 transition-colors hover:bg-danger/10 hover:text-danger"
             >
-              <LogOut className="h-3.5 w-3.5" />
+              <LogOut className="h-3.5 w-3.5" strokeWidth={1.5} />
               Sign out
             </button>
           </div>
@@ -107,8 +106,6 @@ function SettingsPopover() {
   );
 }
 
-/* ─── Sidebar Nav Item ─── */
-
 function SidebarNavItem({
   icon: Icon,
   label,
@@ -116,6 +113,7 @@ function SidebarNavItem({
   href,
   onClick,
   badge,
+  shortcut,
 }: {
   icon: typeof Home;
   label: string;
@@ -123,6 +121,7 @@ function SidebarNavItem({
   href?: string;
   onClick?: () => void;
   badge?: number;
+  shortcut?: string;
 }) {
   const inner = (
     <button
@@ -130,27 +129,30 @@ function SidebarNavItem({
       className={cn(
         "group/icon relative flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 transition-all duration-200",
         isActive
-          ? "bg-white/50 text-warm-900 shadow-sm"
-          : "text-warm-500 hover:bg-white/30 hover:text-warm-700"
+          ? "bg-brand/15 text-brand font-semibold border border-brand/20 shadow-[0_0_12px_rgba(124,111,255,0.15)]"
+          : "text-warm-500 hover:text-warm-800 hover:bg-white/[0.04]"
       )}
     >
-      <Icon className="h-[16px] w-[16px] shrink-0" strokeWidth={1.5} />
+      <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.5} />
       <span
         className={cn(
           "hidden text-[11px] font-medium lg:block",
-          isActive ? "text-warm-900" : "text-warm-500"
+          isActive ? "text-brand" : "text-warm-500"
         )}
       >
         {label}
       </span>
-      {/* Unread badge */}
+      {shortcut && (
+        <span className="ml-auto hidden text-[9px] font-mono text-warm-400 lg:block">
+          {shortcut}
+        </span>
+      )}
       {badge !== undefined && badge > 0 && (
-        <span className="absolute right-1.5 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-carry px-1 text-[9px] font-bold text-white lg:relative lg:right-auto lg:top-auto lg:ml-auto">
+        <span className="absolute right-1.5 top-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-brand px-1 text-[9px] font-bold text-white lg:relative lg:right-auto lg:top-auto lg:ml-auto">
           {badge > 99 ? "99+" : badge}
         </span>
       )}
-      {/* Tooltip for collapsed sidebar */}
-      <span className="pointer-events-none absolute left-[44px] whitespace-nowrap rounded-lg bg-warm-900 px-2.5 py-1 text-[11px] font-medium text-white opacity-0 shadow-md transition-opacity group-hover/icon:opacity-100 lg:hidden">
+      <span className="pointer-events-none absolute left-[44px] whitespace-nowrap rounded-lg bg-surface-3 px-2.5 py-1 text-[11px] font-medium text-warm-800 opacity-0 shadow-md transition-opacity group-hover/icon:opacity-100 lg:hidden">
         {label}
       </span>
     </button>
@@ -162,11 +164,10 @@ function SidebarNavItem({
   return inner;
 }
 
-/* ─── Sidebar ─── */
-
 function Sidebar() {
   const pathname = usePathname();
   const unreadCount = useQuery(api.notifications.getUnreadCount);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const isHomeActive =
     pathname === "/app" || pathname.startsWith("/results");
@@ -174,58 +175,85 @@ function Sidebar() {
   const isProjectsActive = pathname === "/app/projects";
   const isReportsActive = pathname.startsWith("/app/reports");
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setIsModalOpen(true);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
-    <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col border-r border-white/[0.25] bg-white/[0.12] backdrop-blur-[20px] lg:w-[200px]">
-      {/* Logo + Brand */}
-      <div className="flex h-14 items-center gap-2 px-3 lg:px-4">
-        <Link href="/" title="Back to home" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl shadow-sm transition-transform duration-200 hover:scale-105">
-            <img src="/logo.png" alt="Glasswork" className="h-8 w-8 rounded-xl object-contain" />
-          </div>
-          <span className="hidden text-[13px] font-bold text-warm-800 lg:block">
-            Glasswork
-          </span>
-        </Link>
-      </div>
+    <>
+      <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col border-r border-white/[0.06] bg-surface-1 lg:w-[200px]">
+        {/* Logo */}
+        <div className="flex h-14 items-center gap-2.5 px-3 lg:px-4">
+          <Link href="/" title="Back to home" className="flex items-center gap-2.5">
+            <span className="animate-online-pulse inline-block h-2 w-2 rounded-full bg-emerald-400 shrink-0" />
+            <span className="hidden font-black text-[20px] tracking-tight text-warm-900 lg:block">
+              glass<span className="text-brand">work</span>
+            </span>
+            <img src="/logo.png" alt="Glasswork" className="h-7 w-7 rounded-lg object-contain lg:hidden" />
+          </Link>
+        </div>
 
-      {/* Navigation — 3 primary destinations */}
-      <nav className="mt-2 flex flex-col gap-1 px-2 lg:px-3">
-        <SidebarNavItem
-          icon={Home}
-          label="Home"
-          href="/app"
-          isActive={isHomeActive}
-        />
-        <SidebarNavItem
-          icon={Inbox}
-          label="Inbox"
-          href="/app/inbox"
-          isActive={isInboxActive}
-          badge={unreadCount ?? undefined}
-        />
-        <SidebarNavItem
-          icon={FolderKanban}
-          label="Projects"
-          href="/app/projects"
-          isActive={isProjectsActive}
-        />
-        <SidebarNavItem
-          icon={ClipboardList}
-          label="Report"
-          href="/app/reports"
-          isActive={isReportsActive}
-        />
-      </nav>
+        {/* New Analysis button */}
+        <div className="px-2 lg:px-3 mb-2">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand/15 px-2.5 py-2 text-[11px] font-semibold text-brand border border-brand/20 transition-all duration-200 hover:bg-brand/25 hover:shadow-[0_0_16px_rgba(124,111,255,0.2)] active:scale-[0.97]"
+          >
+            <span className="text-[14px] leading-none">+</span>
+            <span className="hidden lg:block">New Analysis</span>
+            <span className="ml-auto hidden text-[9px] font-mono text-brand/60 lg:block">⌘K</span>
+          </button>
+        </div>
 
-      {/* Bottom: Settings */}
-      <div className="mt-auto mb-4 px-2 lg:px-3">
-        <SettingsPopover />
-      </div>
-    </aside>
+        {/* Navigation */}
+        <nav className="flex flex-col gap-1 px-2 lg:px-3">
+          <SidebarNavItem
+            icon={Home}
+            label="Home"
+            href="/app"
+            isActive={isHomeActive}
+          />
+          <SidebarNavItem
+            icon={Inbox}
+            label="Inbox"
+            href="/app/inbox"
+            isActive={isInboxActive}
+            badge={unreadCount ?? undefined}
+          />
+          <SidebarNavItem
+            icon={FolderKanban}
+            label="Projects"
+            href="/app/projects"
+            isActive={isProjectsActive}
+          />
+          <SidebarNavItem
+            icon={ClipboardList}
+            label="Reports"
+            href="/app/reports"
+            isActive={isReportsActive}
+          />
+        </nav>
+
+        {/* Bottom: Settings */}
+        <div className="mt-auto mb-4 px-2 lg:px-3">
+          <SettingsPopover />
+        </div>
+      </aside>
+
+      <NewAnalysisModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </>
   );
 }
-
-/* ─── User Avatar with Settings Dropdown ─── */
 
 function UserAvatar() {
   const { signOut } = useAuthActions();
@@ -240,9 +268,9 @@ function UserAvatar() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 transition-colors hover:bg-warm-100/60"
+        className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 transition-colors hover:bg-white/[0.06]"
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm-200 ring-2 ring-white">
+        <div className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/[0.08] ring-2 ring-emerald-400/40">
           {user?.image ? (
             <Image
               src={user.image}
@@ -257,6 +285,7 @@ function UserAvatar() {
               {getInitials(user?.name)}
             </span>
           )}
+          <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-surface" />
         </div>
         <div className="hidden min-w-0 lg:block">
           <p className="truncate text-[13px] font-semibold text-warm-800">
@@ -266,10 +295,10 @@ function UserAvatar() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 min-w-[220px] overflow-hidden rounded-2xl border border-warm-200/50 bg-white/90 backdrop-blur-xl shadow-lg">
+        <div className="absolute right-0 top-full z-50 mt-2 min-w-[220px] overflow-hidden rounded-2xl border border-white/[0.10] bg-surface-2 shadow-layered-lg">
           {user && (
-            <div className="flex items-center gap-3 border-b border-warm-100 px-4 py-3.5">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm-100">
+            <div className="flex items-center gap-3 border-b border-white/[0.06] px-4 py-3.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/[0.06]">
                 {user.image ? (
                   <Image
                     src={user.image}
@@ -301,9 +330,9 @@ function UserAvatar() {
             <Link
               href="/app/settings"
               onClick={() => setOpen(false)}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] font-medium text-warm-500 transition-colors hover:bg-warm-50 hover:text-warm-700"
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] font-medium text-warm-600 transition-colors hover:bg-white/[0.06] hover:text-warm-800"
             >
-              <Settings className="h-3.5 w-3.5" />
+              <Settings className="h-3.5 w-3.5" strokeWidth={1.5} />
               Settings
             </Link>
             <button
@@ -311,9 +340,9 @@ function UserAvatar() {
                 setOpen(false);
                 void signOut();
               }}
-              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] font-medium text-warm-500 transition-colors hover:bg-warm-50 hover:text-danger"
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-[13px] font-medium text-warm-600 transition-colors hover:bg-danger/10 hover:text-danger"
             >
-              <LogOut className="h-3.5 w-3.5" />
+              <LogOut className="h-3.5 w-3.5" strokeWidth={1.5} />
               Sign out
             </button>
           </div>
@@ -323,33 +352,23 @@ function UserAvatar() {
   );
 }
 
-/* ─── Top Bar ─── */
-
 function DashboardTopBar() {
   return (
-    <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-20 bg-surface/80 backdrop-blur-xl border-b border-white/[0.04]">
       <div className="flex h-14 items-center justify-between px-6">
-        {/* Left: Brand (hidden on lg where sidebar shows it) */}
         <Link
           href="/app"
           className="flex items-center gap-2 transition-opacity hover:opacity-70 lg:invisible"
         >
-          <span className="font-display text-lg text-warm-800 tracking-tight italic">
-            glasswork
-          </span>
-          <span className="text-[10px] font-medium text-warm-400 -ml-0.5 mt-1">
-            studio
+          <span className="font-black text-lg text-warm-900 tracking-tight">
+            glass<span className="text-brand">work</span>
           </span>
         </Link>
-
-        {/* Right: Avatar */}
         <UserAvatar />
       </div>
     </header>
   );
 }
-
-/* ─── App Shell ─── */
 
 export function AppShell({ children }: AppShellProps) {
   const { isAuthenticated } = useConvexAuth();
@@ -360,9 +379,7 @@ export function AppShell({ children }: AppShellProps) {
 
   if (isWorkspace && isAuthenticated) {
     return (
-      <div className="relative min-h-screen grain-overlay">
-        {/* Clean white background */}
-        <div className="fixed inset-0 -z-10 bg-white" />
+      <div className="relative min-h-screen">
         <Sidebar />
         <div className="relative z-10 pl-[56px] lg:pl-[200px]">
           <DashboardTopBar />
