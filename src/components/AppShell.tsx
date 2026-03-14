@@ -129,15 +129,15 @@ function SidebarNavItem({
       className={cn(
         "group/icon relative flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 transition-all duration-200",
         isActive
-          ? "bg-brand/15 text-brand font-semibold border border-brand/20 shadow-[0_0_12px_rgba(124,111,255,0.15)]"
-          : "text-warm-500 hover:text-warm-800 hover:bg-white/[0.04]"
+          ? "bg-white/[0.06] text-white font-medium rounded-lg"
+          : "text-white/40 hover:text-white/70 hover:bg-white/[0.03] rounded-lg font-normal"
       )}
     >
       <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.5} />
       <span
         className={cn(
           "hidden text-[11px] font-medium lg:block",
-          isActive ? "text-brand" : "text-warm-500"
+          isActive ? "text-white" : "text-white/40"
         )}
       >
         {label}
@@ -188,13 +188,24 @@ function Sidebar() {
 
   return (
     <>
-      <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col border-r border-white/[0.06] bg-surface-1 lg:w-[200px]">
+      <aside className="fixed left-0 top-0 z-30 flex h-screen w-[56px] flex-col border-r border-white/[0.06] bg-[#09090E] lg:w-[200px]">
         {/* Logo */}
         <div className="flex h-14 items-center gap-2.5 px-3 lg:px-4">
-          <Link href="/" title="Back to home" className="flex items-center gap-2.5">
-            <span className="animate-online-pulse inline-block h-2 w-2 rounded-full bg-emerald-400 shrink-0" />
-            <span className="hidden font-black text-[20px] tracking-tight text-warm-900 lg:block">
-              glass<span className="text-brand">work</span>
+          <Link href="/" title="Back to home" className="flex items-center gap-2">
+            <span className="relative flex h-[7px] w-[7px] shrink-0">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+              <span className="relative inline-flex h-[7px] w-[7px] rounded-full bg-emerald-500" />
+            </span>
+            <span
+              className="hidden lg:block"
+              style={{
+                fontSize: "15px",
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+                color: "#F4F4F6",
+              }}
+            >
+              glass<span style={{ color: "#8B7CF6" }}>work</span>
             </span>
             <img src="/logo.png" alt="Glasswork" className="h-7 w-7 rounded-lg object-contain lg:hidden" />
           </Link>
@@ -360,8 +371,8 @@ function DashboardTopBar() {
           href="/app"
           className="flex items-center gap-2 transition-opacity hover:opacity-70 lg:invisible"
         >
-          <span className="font-black text-lg text-warm-900 tracking-tight">
-            glass<span className="text-brand">work</span>
+          <span style={{ fontSize: "15px", fontWeight: 600, letterSpacing: "-0.02em", color: "#F4F4F6" }}>
+            glass<span style={{ color: "#8B7CF6" }}>work</span>
           </span>
         </Link>
         <UserAvatar />
