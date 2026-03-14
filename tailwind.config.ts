@@ -34,14 +34,14 @@ const config: Config = {
         },
 
         brand: {
-          DEFAULT: "#7C6FFF",
-          light: "#A89FFF",
-          dark: "#5A4FDD",
-          muted: "rgba(124, 111, 255, 0.12)",
-          glow: "rgba(124, 111, 255, 0.35)",
+          DEFAULT: "#6D63D4",
+          light: "#9B91EF",
+          dark: "#524ABE",
+          muted: "rgba(109, 99, 212, 0.10)",
+          glow: "rgba(109, 99, 212, 0.30)",
         },
 
-        carry: "#A78BFA",
+        carry: "#8B7CF6",
         solid: "#34D399",
         ghost: "#F87171",
 
@@ -102,6 +102,8 @@ const config: Config = {
           "0 2px 4px rgba(0,0,0,0.3), 0 12px 40px rgba(0,0,0,0.3)",
         card: "0 2px 12px rgba(0,0,0,0.3)",
         "card-hover": "0 8px 30px rgba(0,0,0,0.4)",
+        "hero-card": "0 1px 0 0 rgba(255,255,255,0.08) inset, 0 0 0 1px rgba(255,255,255,0.06), 0 16px 32px rgba(0,0,0,0.35)",
+        "hero-card-top": "0 0 0 1px rgba(255,255,255,0.08), 0 -1px 0 0 rgba(255,255,255,0.12) inset",
       },
       borderRadius: {
         lg: "var(--radius)",
