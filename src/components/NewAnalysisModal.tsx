@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -12,22 +12,51 @@ interface NewAnalysisModalProps {
   onClose: () => void;
 }
 
+const PLACEHOLDERS = [
+  "docs.google.com/document/d/...",
+  "github.com/org/repo",
+  "paste any link...",
+];
+
+function TypewriterPlaceholder() {
+  const [index, setIndex] = useState(0);
+  const [text, setText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const current = PLACEHOLDERS[index];
+    let timeout: ReturnType<typeof setTimeout>;
+
+    if (!isDeleting && text.length < current.length) {
+      timeout = setTimeout(() => setText(current.slice(0, text.length + 1)), 60);
+    } else if (!isDeleting && text.length === current.length) {
+      timeout = setTimeout(() => setIsDeleting(true), 2000);
+    } else if (isDeleting && text.length > 0) {
+      timeout = setTimeout(() => setText(text.slice(0, -1)), 30);
+    } else if (isDeleting && text.length === 0) {
+      setIsDeleting(false);
+      setIndex((i) => (i + 1) % PLACEHOLDERS.length);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [text, isDeleting, index]);
+
+  return text;
+}
+
 function detectSourceType(input: string): { type: "google_doc" | "github_repo"; id: string } | null {
   const trimmed = input.trim();
 
-  // Google Doc URL
   const gdocMatch = trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (gdocMatch) {
     return { type: "google_doc", id: gdocMatch[1] };
   }
 
-  // GitHub repo URL like https://github.com/owner/repo
   const ghUrlMatch = trimmed.match(/github\.com\/([a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+)/);
   if (ghUrlMatch) {
     return { type: "github_repo", id: ghUrlMatch[1].replace(/\.git$/, "") };
   }
 
-  // GitHub repo shorthand like owner/repo
   if (/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(trimmed)) {
     return { type: "github_repo", id: trimmed };
   }
@@ -41,6 +70,14 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
   const [input, setInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const placeholder = TypewriterPlaceholder();
+
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -74,14 +111,14 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="animate-modal-overlay absolute inset-0 bg-warm-900/10 backdrop-blur-[3px]"
+        className="animate-modal-overlay absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      <div className="animate-modal-enter relative w-full max-w-md rounded-2xl border border-white/40 bg-white/80 backdrop-blur-2xl p-8 shadow-layered-lg">
+      <div className="animate-modal-enter relative w-full max-w-md rounded-2xl border border-white/[0.10] bg-surface-2 backdrop-blur-2xl p-8 shadow-layered-lg">
         <button
           onClick={onClose}
-          className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-all duration-200 hover:bg-warm-100 hover:text-warm-600"
+          className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-all duration-200 hover:bg-white/[0.06] hover:text-warm-600"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path
@@ -93,23 +130,23 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
           </svg>
         </button>
 
-        <h2 className="font-display text-2xl font-normal tracking-display text-warm-900">
-          New analysis
+        <h2 className="font-display text-2xl font-bold tracking-tight text-warm-900">
+          Who actually did the work?
         </h2>
         <p className="mt-1.5 text-[13px] text-warm-500">
-          Paste a Google Doc link or GitHub repo.
+          Paste a Google Doc or GitHub repo — we&apos;ll settle the score.
         </p>
 
         <div className="mt-6 space-y-3">
           <GlassInput
-            placeholder="docs.google.com/… or owner/repo"
+            ref={inputRef}
+            placeholder={placeholder}
             value={input}
             onChange={(e) => {
               setInput(e.target.value);
               setError(null);
             }}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-            autoFocus
           />
 
           {detected && (
@@ -128,8 +165,12 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
           onClick={handleSubmit}
           disabled={isSubmitting || !input.trim()}
         >
-          {isSubmitting ? "Creating..." : "Analyze"}
+          {isSubmitting ? "Creating..." : "Run Analysis →"}
         </GlassButton>
+
+        <p className="mt-3 text-center text-[11px] text-warm-400">
+          Results in ~30 seconds
+        </p>
 
         {error && (
           <p className="mt-3 text-[12px] font-medium text-danger">{error}</p>
