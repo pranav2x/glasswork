@@ -10,7 +10,6 @@ import Link from "next/link";
 import { formatTimeAgo } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 
-/* ─── Animated Number ─── */
 function AnimatedNumber({ value }: { value: number }) {
   const motionValue = useMotionValue(0);
   const spring = useSpring(motionValue, { stiffness: 40, damping: 15 });
@@ -23,7 +22,6 @@ function AnimatedNumber({ value }: { value: number }) {
   return <motion.span>{display}</motion.span>;
 }
 
-/* ─── 1. Global Score Widget ─── */
 export function BentoGlobalScore({
   avgScore,
   avgTier,
@@ -35,8 +33,8 @@ export function BentoGlobalScore({
 }) {
   return (
     <GlassPanel hoverable className={cn("flex flex-col justify-center p-6", className)}>
-      <p className="text-[12px] font-medium text-warm-400">Global Score</p>
-      <div className="mt-2 font-body text-[4rem] font-bold leading-none tracking-tight text-warm-900">
+      <p className="text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em]">Global Score</p>
+      <div className="mt-2 font-body text-[4rem] font-black leading-none tracking-tight text-warm-900 tabular-nums">
         <AnimatedNumber value={avgScore} />
       </div>
       <div className="mt-3">
@@ -46,7 +44,6 @@ export function BentoGlobalScore({
   );
 }
 
-/* ─── 2. AI Feed Widget ─── */
 export function BentoAIFeed({
   summaries,
   className,
@@ -57,19 +54,19 @@ export function BentoAIFeed({
   return (
     <GlassPanel hoverable className={cn("flex flex-col p-6", className)}>
       <div className="flex items-center gap-2 mb-4">
-        <MessageSquare className="h-4 w-4 text-warm-400" />
-        <p className="text-[12px] font-medium text-warm-400">AI Insights</p>
+        <MessageSquare className="h-4 w-4 text-warm-500" strokeWidth={1.5} />
+        <p className="text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em]">AI Insights</p>
       </div>
       <div className="flex flex-1 flex-col gap-3 overflow-hidden">
         {summaries.length === 0 ? (
-          <p className="text-[12px] text-warm-400 py-4 text-center">
+          <p className="text-[12px] text-warm-500 py-4 text-center">
             Run analyses to see AI summaries
           </p>
         ) : (
           summaries.map((s) => (
             <Link key={s.id} href={`/results/${s.id}`}>
-              <div className="rounded-xl bg-warm-100/60 p-3 transition-colors hover:bg-warm-100">
-                <p className="text-[11px] font-semibold text-warm-600 mb-1">{s.title}</p>
+              <div className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-3 transition-colors hover:bg-white/[0.08]">
+                <p className="text-[11px] font-semibold text-warm-700 mb-1">{s.title}</p>
                 <p className="text-[11px] leading-relaxed text-warm-500 line-clamp-2">{s.summary}</p>
               </div>
             </Link>
@@ -80,7 +77,6 @@ export function BentoAIFeed({
   );
 }
 
-/* ─── 3. Activity Chart Widget ─── */
 export function BentoActivityHeatmap({
   activityByMonth,
   className,
@@ -94,7 +90,7 @@ export function BentoActivityHeatmap({
 
   return (
     <GlassPanel hoverable className={cn("flex flex-col overflow-hidden p-6", className)}>
-      <p className="text-[12px] font-medium text-warm-400 mb-3">Activity</p>
+      <p className="text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em] mb-3">Activity</p>
       <div className="flex-1 min-h-0 overflow-hidden">
         <ActivityChart months={months} docsData={docsData} reposData={reposData} />
       </div>
@@ -102,7 +98,6 @@ export function BentoActivityHeatmap({
   );
 }
 
-/* ─── 4. Carry Streak Widget ─── */
 export function BentoCarryStreak({
   streak,
   className,
@@ -116,22 +111,21 @@ export function BentoCarryStreak({
       <Flame
         className={cn(
           "h-8 w-8 transition-colors",
-          isActive ? "text-red-500" : "text-warm-200"
+          isActive ? "text-amber-400" : "text-warm-300"
         )}
-        fill={isActive ? "#ef4444" : "none"}
-        strokeWidth={isActive ? 1.5 : 1}
+        fill={isActive ? "#FBBF24" : "none"}
+        strokeWidth={1.5}
       />
-      <div className="mt-2 font-body text-[2.5rem] font-bold leading-none text-warm-900">
+      <div className="mt-2 font-body text-[2.5rem] font-black leading-none text-warm-900 tabular-nums">
         {streak}
       </div>
-      <p className="mt-1 text-[11px] font-medium text-warm-400">
+      <p className="mt-1 text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em]">
         project streak
       </p>
     </GlassPanel>
   );
 }
 
-/* ─── 5. Recent Projects Widget ─── */
 export function BentoRecentProjects({
   analyses,
   className,
@@ -147,26 +141,26 @@ export function BentoRecentProjects({
 }) {
   return (
     <GlassPanel hoverable className={cn("flex flex-col p-6", className)}>
-      <p className="text-[12px] font-medium text-warm-400 mb-4">Recent Projects</p>
+      <p className="text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em] mb-4">Recent Projects</p>
       <div className="flex flex-1 flex-col gap-2">
         {analyses.length === 0 ? (
-          <p className="text-[12px] text-warm-400 py-4 text-center">No projects yet</p>
+          <p className="text-[12px] text-warm-500 py-4 text-center">No projects yet</p>
         ) : (
           analyses.map((a) => (
             <Link key={a._id} href={`/results/${a._id}`}>
-              <div className="group flex items-center gap-3 rounded-xl p-2.5 transition-colors hover:bg-warm-100/50">
+              <div className="group flex items-center gap-3 rounded-xl p-2.5 transition-colors hover:bg-white/[0.04]">
                 <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg", a.sourceType === "github_repo" ? "bg-repo-accent/10" : "bg-docs-accent/10")}>
                   {a.sourceType === "github_repo" ? (
-                    <GitBranch className="h-3.5 w-3.5 text-repo-accent" />
+                    <GitBranch className="h-3.5 w-3.5 text-repo-accent" strokeWidth={1.5} />
                   ) : (
-                    <FileText className="h-3.5 w-3.5 text-docs-accent" />
+                    <FileText className="h-3.5 w-3.5 text-docs-accent" strokeWidth={1.5} />
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-[12px] font-semibold text-warm-700">{a.title}</p>
-                  <p className="text-[10px] text-warm-400">{formatTimeAgo(a.createdAt)}</p>
+                  <p className="text-[10px] text-warm-500">{formatTimeAgo(a.createdAt)}</p>
                 </div>
-                <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-warm-300 transition-colors group-hover:text-warm-500" />
+                <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-warm-400 transition-colors group-hover:text-warm-600" strokeWidth={1.5} />
               </div>
             </Link>
           ))
