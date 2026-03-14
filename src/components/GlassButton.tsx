@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 
 interface GlassButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "danger";
   size?: "sm" | "md" | "lg";
 }
 
@@ -16,15 +16,28 @@ const sizeClasses = {
 const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
   ({ className, variant = "secondary", size = "md", children, ...props }, ref) => {
     const base =
-      "inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 disabled:pointer-events-none disabled:opacity-40";
+      "inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 disabled:pointer-events-none disabled:opacity-40 active:scale-[0.97]";
 
     const variants = {
-      primary:
-        "bg-warm-900 text-white shadow-layered hover:bg-warm-800 hover:shadow-layered-md hover:scale-[1.02] active:scale-[0.98]",
-      secondary:
-        "border border-warm-200 bg-white text-warm-700 shadow-card hover:-translate-y-0.5 hover:shadow-card-hover active:translate-y-0",
-      ghost:
-        "border border-warm-200 bg-transparent text-warm-600 hover:bg-warm-100 hover:text-warm-800 active:bg-warm-50",
+      primary: cn(
+        "bg-brand text-white font-semibold",
+        "shadow-[0_0_20px_rgba(124,111,255,0.3)]",
+        "hover:bg-brand-light hover:shadow-[0_0_30px_rgba(124,111,255,0.5)]",
+        "border border-brand/40",
+      ),
+      secondary: cn(
+        "border border-white/[0.10] bg-white/[0.06] text-warm-700",
+        "shadow-card hover:-translate-y-0.5 hover:shadow-card-hover",
+        "hover:bg-white/[0.10] hover:text-warm-800",
+      ),
+      ghost: cn(
+        "bg-white/[0.04] text-warm-600 border border-white/[0.08]",
+        "hover:bg-white/[0.08] hover:text-warm-800 hover:border-white/[0.14]",
+      ),
+      danger: cn(
+        "bg-danger/10 text-danger border border-danger/20",
+        "hover:bg-danger/20 hover:border-danger/40",
+      ),
     };
 
     return (
