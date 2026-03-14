@@ -10,34 +10,37 @@ interface TierBadgeProps {
 const TIER_CONFIG = {
   carry: {
     label: "LOCKED IN",
-    emoji: "🔒",
-    bg: "rgba(167,139,250,0.15)",
-    border: "rgba(167,139,250,0.35)",
-    text: "#A78BFA",
-    glow: "0 0 16px rgba(167,139,250,0.3)",
+    dotColor: "#8B7CF6",
+    bg: "rgba(139, 124, 246, 0.10)",
+    border: "rgba(139, 124, 246, 0.22)",
+    text: "#A89FFF",
   },
   solid: {
     label: "MID",
-    emoji: "📊",
-    bg: "rgba(52,211,153,0.12)",
-    border: "rgba(52,211,153,0.30)",
-    text: "#34D399",
-    glow: "0 0 12px rgba(52,211,153,0.2)",
+    dotColor: "#34C68C",
+    bg: "rgba(52, 198, 140, 0.08)",
+    border: "rgba(52, 198, 140, 0.20)",
+    text: "#4ECCA3",
   },
   ghost: {
     label: "SELLING",
-    emoji: "💀",
-    bg: "rgba(248,113,113,0.12)",
-    border: "rgba(248,113,113,0.30)",
+    dotColor: "#F06C6C",
+    bg: "rgba(240, 108, 108, 0.08)",
+    border: "rgba(240, 108, 108, 0.20)",
     text: "#F87171",
-    glow: "0 0 12px rgba(248,113,113,0.2)",
   },
 } as const;
 
 const SIZE_CLASSES = {
-  sm: "text-[10px] px-2 py-0.5 gap-1",
-  md: "text-[11px] px-2.5 py-1 gap-1.5",
-  lg: "text-[13px] px-3.5 py-1.5 gap-2 font-bold",
+  sm:  "text-[9px]  px-1.5 py-[3px] gap-[5px]  tracking-[0.07em]",
+  md:  "text-[10px] px-2   py-[4px] gap-[6px]  tracking-[0.08em]",
+  lg:  "text-[11px] px-2.5 py-[5px] gap-[7px]  tracking-[0.09em]",
+} as const;
+
+const DOT_SIZES = {
+  sm: "h-[5px] w-[5px]",
+  md: "h-[6px] w-[6px]",
+  lg: "h-[7px] w-[7px]",
 } as const;
 
 export function TierBadge({ tier, size = "md", className }: TierBadgeProps) {
@@ -45,7 +48,7 @@ export function TierBadge({ tier, size = "md", className }: TierBadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full font-semibold tracking-wide",
+        "inline-flex items-center rounded-full font-semibold uppercase",
         SIZE_CLASSES[size],
         className
       )}
@@ -53,10 +56,12 @@ export function TierBadge({ tier, size = "md", className }: TierBadgeProps) {
         backgroundColor: config.bg,
         border: `1px solid ${config.border}`,
         color: config.text,
-        boxShadow: config.glow,
       }}
     >
-      <span>{config.emoji}</span>
+      <span
+        className={cn("shrink-0 rounded-full", DOT_SIZES[size])}
+        style={{ backgroundColor: config.dotColor }}
+      />
       <span>{config.label}</span>
     </span>
   );
