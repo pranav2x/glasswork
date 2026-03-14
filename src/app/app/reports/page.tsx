@@ -103,9 +103,9 @@ function computeTeamAvg(
 // ─── Tier config ───────────────────────────────────────────────────────────
 
 const tierConfig = {
-  carry: { label: "LOCKED IN", bg: "bg-[#404040] text-white border-[#404040]" },
-  solid: { bg: "bg-[#5BA8C8]/20 text-[#5BA8C8] border-[#5BA8C8]/30", label: "MID" },
-  ghost: { bg: "bg-warm-100 text-warm-400 border-warm-200", label: "SELLING" },
+  carry: { label: "LOCKED IN", bg: "bg-carry/15 text-carry border-carry/30" },
+  solid: { bg: "bg-solid/15 text-solid border-solid/30", label: "MID" },
+  ghost: { bg: "bg-ghost/15 text-ghost border-ghost/30", label: "SELLING" },
 };
 
 // ─── Contributor Report Row ────────────────────────────────────────────────
@@ -141,7 +141,7 @@ function ContributorReportRow({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: rank * 0.08, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="flex flex-col rounded-2xl border border-white/50 bg-white/55 p-4 shadow-card backdrop-blur-xl"
+      className="flex flex-col rounded-2xl border border-white/[0.08] bg-white/[0.04] p-4 shadow-glass backdrop-blur-xl"
     >
       {/* Identity + Score */}
       <div className="flex items-center gap-3">
@@ -156,11 +156,11 @@ function ContributorReportRow({
               referrerPolicy="no-referrer"
             />
           ) : (
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-warm-100 text-[12px] font-bold text-warm-700">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-[12px] font-bold text-warm-600">
               {getInitials(contributor.name)}
             </div>
           )}
-          <span className="absolute -right-1 -top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-warm-200 text-[9px] font-bold text-warm-700">
+          <span className="absolute -right-1 -top-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-white/[0.10] text-[9px] font-bold text-warm-700">
             {rank + 1}
           </span>
         </div>
@@ -253,7 +253,7 @@ function ContributorReportRow({
 
       {/* Pattern badge */}
       <div className="mt-2">
-        <span className="rounded-full bg-warm-100 px-2 py-0.5 text-[10px] font-medium text-warm-600">
+        <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-medium text-warm-600">
           {pattern}
         </span>
       </div>
@@ -321,10 +321,10 @@ function ReportView({
   if (data === undefined) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-16 rounded-2xl bg-warm-100" />
-        <Skeleton className="h-24 rounded-2xl bg-warm-100" />
+        <Skeleton className="h-16 rounded-2xl bg-white/[0.06]" />
+        <Skeleton className="h-24 rounded-2xl bg-white/[0.06]" />
         {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-40 rounded-2xl bg-warm-100" />
+          <Skeleton key={i} className="h-40 rounded-2xl bg-white/[0.06]" />
         ))}
       </div>
     );
@@ -332,7 +332,7 @@ function ReportView({
 
   if (!data || data.status !== "ready" || data.contributors.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-warm-300 bg-warm-50/50 py-20">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.12] bg-white/[0.04]/50 py-20">
         <p className="text-[15px] font-semibold text-warm-700">
           {!data ? "Analysis not found" : "No contributors to report on"}
         </p>
@@ -353,7 +353,7 @@ function ReportView({
         <div className="flex items-start gap-3">
           <button
             onClick={() => router.replace("/app/reports")}
-            className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-warm-400 transition-colors hover:bg-warm-100 hover:text-warm-700"
+            className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-warm-400 transition-colors hover:bg-white/[0.06] hover:text-warm-700"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
@@ -361,7 +361,7 @@ function ReportView({
             <div className="flex items-center gap-2">
               <Badge
                 variant="outline"
-                className="text-[11px] font-medium border-warm-200 bg-warm-100/50 text-warm-500"
+                className="text-[11px] font-medium border-white/[0.08] bg-white/[0.06]/50 text-warm-500"
               >
                 {isDoc ? "Google Doc" : "GitHub Repo"}
               </Badge>
@@ -402,17 +402,17 @@ function ReportView({
               <span className="text-[11px] font-medium text-warm-400">Contributors</span>
               <span className="text-[20px] font-bold text-warm-900">{contributors.length}</span>
             </div>
-            <div className="w-px bg-warm-100" />
+            <div className="w-px bg-white/[0.06]" />
             <div className="flex flex-col">
               <span className="text-[11px] font-medium text-warm-400">Team avg score</span>
               <span className="text-[20px] font-bold text-warm-900">{avgScore}</span>
             </div>
-            <div className="w-px bg-warm-100" />
+            <div className="w-px bg-white/[0.06]" />
             <div className="flex flex-col">
               <span className="text-[11px] font-medium text-warm-400">Carrying</span>
               <span className="text-[20px] font-bold text-[#404040]">{carryCount}</span>
             </div>
-            <div className="w-px bg-warm-100" />
+            <div className="w-px bg-white/[0.06]" />
             <div className="flex flex-col">
               <span className="text-[11px] font-medium text-warm-400">Selling</span>
               <span className="text-[20px] font-bold text-warm-400">{ghostCount}</span>
@@ -447,7 +447,7 @@ function ProjectPicker() {
     return (
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-[100px] rounded-2xl bg-warm-100" />
+          <Skeleton key={i} className="h-[100px] rounded-2xl bg-white/[0.06]" />
         ))}
       </div>
     );
@@ -457,7 +457,7 @@ function ProjectPicker() {
 
   if (ready.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-warm-300 bg-warm-50/50 py-20">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.12] bg-white/[0.04]/50 py-20">
         <FolderKanban className="h-8 w-8 text-warm-300" />
         <p className="mt-3 text-[14px] font-semibold text-warm-700">No completed analyses yet</p>
         <p className="mt-1 text-[13px] text-warm-400">
@@ -539,7 +539,7 @@ function ReportsPage() {
       {analysisId ? (
         <div className="flex items-stretch gap-4">
           {/* Report content — takes all available space */}
-          <div className="min-w-0 flex-1 rounded-2xl border border-warm-200/60 bg-white/40 p-5">
+          <div className="min-w-0 flex-1 rounded-2xl border border-white/[0.08]/60 bg-white/40 p-5">
             <ReportView
               analysisId={analysisId}
               onReportContext={setReportContext}

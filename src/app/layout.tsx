@@ -16,7 +16,7 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 const caveat = Caveat({
@@ -71,10 +71,14 @@ export default function RootLayout({
           <AppShell>{children}</AppShell>
           <Toaster
             position="bottom-right"
+            theme="dark"
             toastOptions={{
               style: {
                 fontFamily: "var(--font-body)",
                 fontSize: "13px",
+                background: "#18181F",
+                border: "1px solid rgba(255,255,255,0.08)",
+                color: "#F5F5FA",
               },
             }}
           />
