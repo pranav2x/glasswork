@@ -6,33 +6,11 @@ import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { GlassInput } from "@/components/GlassInput";
 import { GlassButton } from "@/components/GlassButton";
+import { detectSourceType } from "@/lib/detect-source";
 
 interface NewAnalysisModalProps {
   isOpen: boolean;
   onClose: () => void;
-}
-
-function detectSourceType(input: string): { type: "google_doc" | "github_repo"; id: string } | null {
-  const trimmed = input.trim();
-
-  // Google Doc URL
-  const gdocMatch = trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (gdocMatch) {
-    return { type: "google_doc", id: gdocMatch[1] };
-  }
-
-  // GitHub repo URL like https://github.com/owner/repo
-  const ghUrlMatch = trimmed.match(/github\.com\/([a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+)/);
-  if (ghUrlMatch) {
-    return { type: "github_repo", id: ghUrlMatch[1].replace(/\.git$/, "") };
-  }
-
-  // GitHub repo shorthand like owner/repo
-  if (/^[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+$/.test(trimmed)) {
-    return { type: "github_repo", id: trimmed };
-  }
-
-  return null;
 }
 
 export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
