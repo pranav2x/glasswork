@@ -53,7 +53,11 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         className="animate-modal-overlay absolute inset-0 bg-warm-900/10 backdrop-blur-[3px]"
+        role="button"
+        tabIndex={-1}
+        aria-label="Close modal"
         onClick={onClose}
+        onKeyDown={(e) => e.key === "Escape" && onClose()}
       />
 
       <div className="animate-modal-enter relative w-full max-w-md rounded-2xl border border-white/40 bg-white/80 backdrop-blur-2xl p-8 shadow-layered-lg">
@@ -88,6 +92,7 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
               setError(null);
             }}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
           />
 

@@ -68,7 +68,11 @@ export function ReceiptCard({ title, contributors, onClose }: ReceiptCardProps) 
       >
         <div
           className="absolute inset-0 bg-warm-900/50 backdrop-blur-sm"
+          role="button"
+          tabIndex={-1}
+          aria-label="Close receipt"
           onClick={onClose}
+          onKeyDown={(e) => e.key === "Escape" && onClose()}
         />
 
         <motion.div
