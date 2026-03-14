@@ -4,6 +4,7 @@ import { useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useMutation } from "convex/react";
+import { toast } from "sonner";
 import { api } from "../../convex/_generated/api";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { formatTimeAgo } from "@/lib/formatters";
@@ -60,6 +61,10 @@ function CardMenu({ analysisId }: { analysisId: string }) {
     setDeleting(true);
     try {
       await deleteAnalysis({ analysisId: analysisId as Id<"analyses"> });
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete analysis"
+      );
     } finally {
       setDeleting(false);
       setOpen(false);
@@ -74,6 +79,8 @@ function CardMenu({ analysisId }: { analysisId: string }) {
           e.stopPropagation();
           setOpen((v) => !v);
         }}
+        aria-label="Analysis options"
+        aria-expanded={open}
         className="flex h-7 w-7 items-center justify-center rounded-lg text-warm-300 transition-colors hover:bg-warm-100 hover:text-warm-600"
       >
         <MoreHorizontal className="h-[18px] w-[18px]" />

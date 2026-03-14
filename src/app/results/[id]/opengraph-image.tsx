@@ -33,8 +33,8 @@ export default async function Image({ params }: { params: { id: string } }) {
         data = await res.json();
       }
     }
-  } catch {
-    // Use fallback data
+  } catch (error) {
+    console.warn("OG image data fetch failed, using fallback:", error);
   }
 
   return new ImageResponse(

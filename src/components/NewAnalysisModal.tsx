@@ -81,6 +81,7 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
       <div className="animate-modal-enter relative w-full max-w-md rounded-2xl border border-white/40 bg-white/80 backdrop-blur-2xl p-8 shadow-layered-lg">
         <button
           onClick={onClose}
+          aria-label="Close modal"
           className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-all duration-200 hover:bg-warm-100 hover:text-warm-600"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

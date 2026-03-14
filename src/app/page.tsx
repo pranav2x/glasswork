@@ -156,10 +156,10 @@ export default function WaitlistPage() {
           )}
         </AnimatePresence>
 
-        {/* Owner access — subtle, won't be noticed */}
         <div className="mt-10 flex justify-center">
           <button
             onClick={() => signIn("google", { redirectTo: "/app" })}
+            aria-label="Sign in with Google"
             className="font-body text-[11px] text-warm-200 hover:text-warm-400 transition-colors"
           >
             ·

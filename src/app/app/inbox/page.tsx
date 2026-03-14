@@ -166,7 +166,7 @@ function InboxPage() {
                     void deleteNotification({ notificationId: n._id });
                   }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-lg text-warm-300 transition-colors hover:bg-warm-100 hover:text-warm-600"
-                  title="Delete"
+                  aria-label="Delete notification"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

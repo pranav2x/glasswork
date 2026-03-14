@@ -1,9 +1,12 @@
 "use node";
 
 import { v } from "convex/values";
+import { GenericActionCtx } from "convex/server";
 import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
-import { googleFetch } from "./googleApi";
+import { Id } from "./_generated/dataModel";
+import type { DataModel } from "./_generated/dataModel";
+import { googleFetch, type GoogleUser } from "./googleApi";
 import DiffMatchPatch from "diff-match-patch";
 import {
   computeFairShareScores,
@@ -11,41 +14,7 @@ import {
   type ContributionInput,
 } from "./scoring";
 
-// ─── DEMO MODE ───────────────────────────────────────────────────────────────
-// Set to true when filming. Uses the real doc title but injects fake contributors.
-// Flip back to false before shipping.
-const DEMO_MODE = true;
-
-const DEMO_CONTRIBUTORS = [
-  {
-    name: "Aaryan Verma",
-    emailOrHandle: "aaryanthatguy@gmail.com",
-    avatarUrl: "/animepfp.jpeg",
-    score: 127,
-    tier: "solid" as const,
-    rawStats: { revisions: 31, charsAdded: 3761, wordsAdded: 724 },
-    heatmapData: [0.2,0.4,0.5,0.6,0.7,0.8,0.6,0.9,0.7,0.5,0.6,0.8,0.7,0.6,0.5,0.7,0.6,0.5,0.4,0.3],
-  },
-  {
-    name: "Rohan Bedi",
-    emailOrHandle: "rohanbedi2004@gmail.com",
-    avatarUrl: "/catpj.jpeg",
-    score: 68,
-    tier: "ghost" as const,
-    rawStats: { revisions: 18, charsAdded: 2404, wordsAdded: 463 },
-    heatmapData: [0.0,0.1,0.2,0.3,0.2,0.4,0.3,0.2,0.4,0.3,0.2,0.3,0.4,0.2,0.1,0.3,0.2,0.1,0.0,0.1],
-  },
-  {
-    name: "Jackie Lin",
-    emailOrHandle: "jackieli2101@gmail.com",
-    avatarUrl: "/voidman.jpeg",
-    score: 24,
-    tier: "ghost" as const,
-    rawStats: { revisions: 6, charsAdded: 1133, wordsAdded: 218 },
-    heatmapData: [0.0,0.0,0.1,0.0,0.0,0.2,0.0,0.1,0.0,0.0,0.0,0.1,0.0,0.0,0.2,0.0,0.0,0.0,0.1,0.0],
-  },
-];
-// ─────────────────────────────────────────────────────────────────────────────
+const DEMO_MODE = process.env.GLASSWORK_DEMO_MODE === "true";
 
 interface GoogleRevision {
   id: string;
@@ -63,9 +32,9 @@ interface GoogleFileMetadata {
 const MAX_REVISIONS_TO_DIFF = 50;
 
 async function exportRevisionText(
-  ctx: any,
-  userId: any,
-  user: any,
+  ctx: GenericActionCtx<DataModel>,
+  userId: Id<"users">,
+  user: GoogleUser,
   fileId: string,
   revisionId: string
 ): Promise<string | null> {
@@ -139,21 +108,20 @@ export const analyzeGoogleDoc = internalAction({
 
       const metadata: GoogleFileMetadata = await metaRes.json();
 
-      // ── Demo mode: skip real analysis, inject fake data ──
       if (DEMO_MODE) {
         const currentUserContributor = {
           name: user.name ?? "You",
-          emailOrHandle: user.email ?? "rapellipranav1@gmail.com",
+          emailOrHandle: user.email ?? undefined,
           avatarUrl: user.image ?? undefined,
           score: 189,
           tier: "carry" as const,
           rawStats: { revisions: 47, charsAdded: 5418, wordsAdded: 1043 },
           heatmapData: [0.5,0.7,0.8,0.9,1.0,0.9,1.0,0.9,0.8,1.0,0.9,1.0,0.8,0.9,1.0,0.9,0.7,0.8,0.9,0.8],
         };
-        const demoSummary = `${user.name ?? "You"} carried this doc hard — over a thousand words and a 189. Aaryan Verma showed up but wasn't all the way there. Rohan Bedi and Jackie Lin were basically selling the whole  time.`;
+        const demoSummary = `${user.name ?? "You"} carried this doc with a 189 fair share score.`;
         await ctx.runMutation(internal.analyses.writeContributors, {
           analysisId: args.analysisId,
-          contributors: [currentUserContributor, ...DEMO_CONTRIBUTORS],
+          contributors: [currentUserContributor],
         });
         await ctx.runMutation(internal.analyses.updateAnalysisStatus, {
           analysisId: args.analysisId,
@@ -166,7 +134,6 @@ export const analyzeGoogleDoc = internalAction({
         });
         return;
       }
-      // ─────────────────────────────────────────────────────
 
       const revisionsRes = await googleFetch(
         ctx,

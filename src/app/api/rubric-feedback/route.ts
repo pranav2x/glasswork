@@ -37,7 +37,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing rubric file or contributor data" }, { status: 400 });
     }
 
-    const contributors: ContributorInput[] = JSON.parse(contributorsJson);
+    let contributors: ContributorInput[];
+    try {
+      contributors = JSON.parse(contributorsJson);
+    } catch {
+      return NextResponse.json({ error: "Invalid contributor data format" }, { status: 400 });
+    }
 
     // Convert file to base64
     const bytes = await file.arrayBuffer();
@@ -141,10 +146,16 @@ Respond in this EXACT JSON format (no markdown, no code fences, just raw JSON):
       jsonStr = jsonStr.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
     }
 
-    const parsed = JSON.parse(jsonStr) as {
-      rubricName: string;
-      feedback: ContributorFeedback[];
-    };
+    let parsed: { rubricName: string; feedback: ContributorFeedback[] };
+    try {
+      parsed = JSON.parse(jsonStr);
+    } catch {
+      console.error("Failed to parse Claude response as JSON:", jsonStr.slice(0, 200));
+      return NextResponse.json(
+        { error: "AI returned an invalid response. Please try again." },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json(parsed);
   } catch (error) {
