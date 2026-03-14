@@ -1,121 +1,281 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useState, useEffect } from "react";
 import { useConvexAuth } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "next/navigation";
-import { motion, useInView } from "framer-motion";
-import { api } from "../../convex/_generated/api";
 import { TierBadge } from "@/components/TierBadge";
-import Image from "next/image";
+import type { ContributorTier } from "@/lib/types";
 
-const PLACEHOLDERS = [
-  "Paste your Google Doc link...",
-  "Paste your GitHub repo...",
+/* ─── Hero Input ─── */
+
+function LandingHeroInput() {
+  const router = useRouter();
+  const [value, setValue] = useState("");
+
+  function handleSubmit() {
+    if (!value.trim()) return;
+    router.push(`/app?prefill=${encodeURIComponent(value.trim())}`);
+  }
+
+  return (
+    <div style={{ display: "flex", gap: "8px", maxWidth: "440px" }}>
+      <input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+        placeholder="Paste a Google Doc or GitHub link..."
+        style={{
+          flex: 1,
+          height: "44px",
+          padding: "0 14px",
+          borderRadius: "10px",
+          border: "1px solid rgba(255, 255, 255, 0.10)",
+          background: "rgba(255, 255, 255, 0.04)",
+          color: "#F4F4F6",
+          fontSize: "13px",
+          fontWeight: 400,
+          letterSpacing: "0.005em",
+          outline: "none",
+          transition: "border-color 0.15s, background 0.15s",
+        }}
+        onFocus={(e) => {
+          e.target.style.borderColor = "rgba(139, 124, 246, 0.45)";
+          e.target.style.background = "rgba(255, 255, 255, 0.06)";
+        }}
+        onBlur={(e) => {
+          e.target.style.borderColor = "rgba(255, 255, 255, 0.10)";
+          e.target.style.background = "rgba(255, 255, 255, 0.04)";
+        }}
+      />
+      <button
+        onClick={handleSubmit}
+        style={{
+          height: "44px",
+          padding: "0 20px",
+          borderRadius: "10px",
+          border: "none",
+          background: "#6D63D4",
+          color: "#FFFFFF",
+          fontSize: "13px",
+          fontWeight: 600,
+          letterSpacing: "-0.01em",
+          cursor: "pointer",
+          whiteSpace: "nowrap",
+          transition: "background 0.15s, transform 0.1s",
+          flexShrink: 0,
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = "#7B72E0")}
+        onMouseLeave={(e) => (e.currentTarget.style.background = "#6D63D4")}
+        onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.97)")}
+        onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
+      >
+        Expose it →
+      </button>
+    </div>
+  );
+}
+
+/* ─── Hero Preview Cards ─── */
+
+const HERO_DEMO_CONTRIBUTORS = [
+  {
+    name: "Pranav",
+    avatarInitials: "P",
+    avatarUrl: null,
+    score: 189,
+    tier: "carry" as const,
+    rank: 1,
+  },
+  {
+    name: "Aaryan Verma",
+    avatarUrl: "/animepfp.jpeg",
+    avatarInitials: "AV",
+    score: 158,
+    tier: "carry" as const,
+    rank: 2,
+  },
+  {
+    name: "Rohan Bedi",
+    avatarUrl: "/catpj.jpeg",
+    avatarInitials: "RB",
+    score: 68,
+    tier: "ghost" as const,
+    rank: 3,
+  },
 ];
 
-function useTypingPlaceholder() {
-  const [index, setIndex] = useState(0);
-  const [text, setText] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
+const HERO_TIER_STYLE: Record<
+  ContributorTier,
+  { scoreColor: string; cardTopBorder: string; cardBg: string }
+> = {
+  carry: {
+    scoreColor: "#A89FFF",
+    cardTopBorder: "rgba(139, 124, 246, 0.35)",
+    cardBg: "rgba(139, 124, 246, 0.04)",
+  },
+  ghost: {
+    scoreColor: "#F87171",
+    cardTopBorder: "rgba(240, 108, 108, 0.30)",
+    cardBg: "rgba(240, 108, 108, 0.03)",
+  },
+  solid: {
+    scoreColor: "#4ECCA3",
+    cardTopBorder: "rgba(52, 198, 140, 0.30)",
+    cardBg: "rgba(52, 198, 140, 0.03)",
+  },
+};
 
-  useEffect(() => {
-    const current = PLACEHOLDERS[index];
-    let timeout: ReturnType<typeof setTimeout>;
-
-    if (!isDeleting && text.length < current.length) {
-      timeout = setTimeout(() => setText(current.slice(0, text.length + 1)), 50);
-    } else if (!isDeleting && text.length === current.length) {
-      timeout = setTimeout(() => setIsDeleting(true), 2500);
-    } else if (isDeleting && text.length > 0) {
-      timeout = setTimeout(() => setText(text.slice(0, -1)), 25);
-    } else if (isDeleting && text.length === 0) {
-      setIsDeleting(false);
-      setIndex((i) => (i + 1) % PLACEHOLDERS.length);
-    }
-
-    return () => clearTimeout(timeout);
-  }, [text, isDeleting, index]);
-
-  return text;
-}
-
-function FadeInSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
-
+function HeroPreviewCards() {
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 32 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        transform: "perspective(1000px) rotateY(-3deg) rotateX(1deg)",
+        transformOrigin: "center center",
+      }}
     >
-      {children}
-    </motion.div>
+      {HERO_DEMO_CONTRIBUTORS.map((contributor, i) => {
+        const tierStyle = HERO_TIER_STYLE[contributor.tier];
+        return (
+          <div
+            key={contributor.name}
+            style={{
+              background: tierStyle.cardBg,
+              border: "1px solid rgba(255, 255, 255, 0.07)",
+              borderTop: `1px solid ${tierStyle.cardTopBorder}`,
+              borderRadius: "14px",
+              padding: "16px 20px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "16px",
+              animation: `fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) ${i * 0.08}s both`,
+              boxShadow:
+                "0 1px 0 rgba(255,255,255,0.06) inset, 0 8px 24px rgba(0,0,0,0.25)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <span
+                style={{
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  color: "rgba(244, 244, 246, 0.25)",
+                  minWidth: "16px",
+                  letterSpacing: "0.02em",
+                }}
+              >
+                #{contributor.rank}
+              </span>
+
+              <div
+                style={{
+                  width: "34px",
+                  height: "34px",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  flexShrink: 0,
+                  background: "rgba(139, 124, 246, 0.15)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  color: "#A89FFF",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                {contributor.avatarUrl ? (
+                  <img
+                    src={contributor.avatarUrl}
+                    alt={contributor.name}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : (
+                  contributor.avatarInitials.slice(0, 1)
+                )}
+              </div>
+
+              <span
+                style={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  color: "#E8E8EE",
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {contributor.name}
+              </span>
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <span
+                style={{
+                  fontSize: "26px",
+                  fontWeight: 700,
+                  letterSpacing: "-0.03em",
+                  color: tierStyle.scoreColor,
+                  fontVariantNumeric: "tabular-nums",
+                  lineHeight: 1,
+                }}
+              >
+                {contributor.score}
+              </span>
+
+              <TierBadge tier={contributor.tier} size="sm" />
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
-function DemoContributorCard({
-  name,
-  score,
-  tier,
-  avatarUrl,
-  delay,
-}: {
-  name: string;
-  score: number;
-  tier: "carry" | "solid" | "ghost";
-  avatarUrl: string;
-  delay: number;
-}) {
-  const config = {
-    carry: { text: "#A78BFA", bg: "rgba(167,139,250,0.15)", border: "rgba(167,139,250,0.35)", glow: "0 0 30px rgba(167,139,250,0.25), 0 0 60px rgba(167,139,250,0.10)" },
-    solid: { text: "#34D399", bg: "rgba(52,211,153,0.12)", border: "rgba(52,211,153,0.30)", glow: "0 0 20px rgba(52,211,153,0.15)" },
-    ghost: { text: "#F87171", bg: "rgba(248,113,113,0.12)", border: "rgba(248,113,113,0.30)", glow: "0 0 20px rgba(248,113,113,0.15)" },
-  }[tier];
+/* ─── How Steps ─── */
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="relative"
-    >
-      {tier === "carry" && (
-        <div
-          className="absolute -inset-px rounded-2xl opacity-50 blur-xl"
-          style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(167,139,250,0.3) 0%, transparent 70%)" }}
-        />
-      )}
-      <div
-        className="relative rounded-2xl p-4 glass"
-        style={{ boxShadow: config.glow }}
-      >
-        <div className="h-[2px] w-full absolute top-0 left-0 right-0 rounded-t-2xl" style={{ backgroundColor: config.border }} />
-        <div className="flex items-center gap-3 mb-3 pt-1">
-          <Image src={avatarUrl} alt={name} width={36} height={36} className="rounded-full" />
-          <div>
-            <p className="text-[13px] font-bold text-warm-900">{name}</p>
-          </div>
-          <div className="ml-auto">
-            <TierBadge tier={tier} size="sm" />
-          </div>
-        </div>
-        <p className="text-[40px] font-black leading-none tabular-nums" style={{ color: config.text }}>
-          {score}
-        </p>
-      </div>
-    </motion.div>
-  );
-}
+const HOW_STEPS = [
+  {
+    number: "01",
+    title: "Paste a link",
+    body: "Google Doc or public GitHub repo. Nothing else required.",
+  },
+  {
+    number: "02",
+    title: "We analyze it",
+    body: "Diffs, commits, revisions \u2014 all recency-weighted. Takes 30 seconds.",
+  },
+  {
+    number: "03",
+    title: "See the truth",
+    body: "Every contributor ranked. No fluff. No hiding. Share the results.",
+  },
+];
+
+/* ─── Preview Contributors ─── */
+
+const PREVIEW_CONTRIBUTORS = [
+  { name: "Pranav", initials: "P", avatarUrl: null, score: 189, tier: "carry" as const },
+  { name: "Aaryan Verma", initials: "AV", avatarUrl: "/animepfp.jpeg", score: 158, tier: "carry" as const },
+  { name: "Rohan Bedi", initials: "RB", avatarUrl: "/catpj.jpeg", score: 68, tier: "ghost" as const },
+];
+
+/* ─── Trust Strip Schools ─── */
+
+const TRUST_SCHOOLS = [
+  "MIT", "Stanford", "UC Berkeley", "Harvard", "Princeton",
+  "YC", "Georgia Tech", "Carnegie Mellon", "Caltech", "Columbia",
+  "MIT", "Stanford", "UC Berkeley", "Harvard", "Princeton",
+  "YC", "Georgia Tech", "Carnegie Mellon", "Caltech", "Columbia",
+];
+
+/* ─── Landing Page ─── */
 
 export default function LandingPage() {
-  const { signIn } = useAuthActions();
   const { isAuthenticated, isLoading } = useConvexAuth();
+  const { signIn } = useAuthActions();
   const router = useRouter();
-  const placeholder = useTypingPlaceholder();
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
@@ -124,207 +284,489 @@ export default function LandingPage() {
   }, [isAuthenticated, isLoading, router]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      {/* Hero background gradient from chaotic image */}
-      <div
-        className="absolute inset-0 -z-10 opacity-40"
-        style={{
-          backgroundImage: "url('/Chaotic Gradient.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          filter: "blur(80px)",
-        }}
-      />
-
-      {/* Nav */}
-      <nav className="relative z-10 flex items-center justify-between px-6 py-5 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2.5">
-          <span className="animate-online-pulse inline-block h-2 w-2 rounded-full bg-emerald-400" />
-          <span className="font-black text-[20px] tracking-tight text-warm-900">
-            glass<span className="text-brand">work</span>
+    <div className="relative min-h-screen">
+      {/* ── Nav ── */}
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 sm:px-8">
+        <a href="/" className="flex items-center gap-2">
+          <span className="relative flex h-[7px] w-[7px]">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+            <span className="relative inline-flex h-[7px] w-[7px] rounded-full bg-emerald-500" />
           </span>
-        </div>
-        <button
-          onClick={() => signIn("google", { redirectTo: "/app" })}
-          className="rounded-xl bg-white/[0.06] border border-white/[0.10] px-4 py-2 text-[13px] font-semibold text-warm-700 transition-all hover:bg-white/[0.10] hover:text-warm-800 active:scale-[0.97]"
+          <span
+            style={{
+              fontSize: "15px",
+              fontWeight: 600,
+              letterSpacing: "-0.02em",
+              color: "#F4F4F6",
+            }}
+          >
+            glass<span style={{ color: "#8B7CF6" }}>work</span>
+          </span>
+        </a>
+
+        <a
+          href="/app"
+          className="flex items-center gap-1.5 rounded-lg border border-white/[0.10] bg-white/[0.04] px-4 py-2 text-[13px] font-medium text-white/70 transition-all duration-150 hover:border-white/[0.18] hover:bg-white/[0.07] hover:text-white/90 active:scale-[0.97]"
         >
-          Sign in with Google
-        </button>
+          Sign in
+        </a>
       </nav>
 
-      {/* Hero */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-24 lg:pt-24">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left: Copy */}
+      {/* ── Hero ── */}
+      <section
+        id="hero"
+        style={{ paddingTop: "120px", paddingBottom: "80px" }}
+        className="relative mx-auto max-w-[1200px] px-6 sm:px-8"
+      >
+        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
           <div>
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="text-[clamp(40px,6vw,72px)] font-black leading-[0.95] tracking-tight text-warm-900"
+            <div
+              className="mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1"
+              style={{
+                background: "rgba(139, 124, 246, 0.06)",
+                borderColor: "rgba(139, 124, 246, 0.18)",
+              }}
+            >
+              <span
+                className="h-[5px] w-[5px] rounded-full"
+                style={{ backgroundColor: "#8B7CF6" }}
+              />
+              <span
+                style={{
+                  fontSize: "11px",
+                  fontWeight: 600,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: "#A89FFF",
+                }}
+              >
+                Contributor Analytics
+              </span>
+            </div>
+
+            <h1
+              style={{
+                fontSize: "clamp(38px, 5vw, 58px)",
+                fontWeight: 600,
+                lineHeight: 1.08,
+                letterSpacing: "-0.025em",
+                color: "#F4F4F6",
+                marginBottom: "20px",
+              }}
             >
               Find out who
               <br />
-              actually{" "}
-              <span className="bg-gradient-to-r from-brand via-carry to-brand bg-clip-text text-transparent">
-                did the work.
-              </span>
-            </motion.h1>
+              actually did
+              <br />
+              <span style={{ color: "#8B7CF6" }}>the work.</span>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-6 text-[18px] leading-relaxed text-warm-600 max-w-lg"
+            <p
+              style={{
+                fontSize: "17px",
+                fontWeight: 400,
+                lineHeight: 1.6,
+                color: "rgba(244, 244, 246, 0.50)",
+                maxWidth: "420px",
+                marginBottom: "32px",
+                letterSpacing: "0.005em",
+              }}
             >
               Paste a Google Doc or GitHub repo.
               <br />
               Glasswork scores every contributor in 30 seconds.
-            </motion.p>
+            </p>
 
-            {/* CTA Input */}
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-8 flex gap-3 max-w-lg"
-            >
-              <div className="flex-1 relative">
-                <input
-                  type="text"
-                  placeholder={placeholder}
-                  onClick={() => signIn("google", { redirectTo: "/app" })}
-                  readOnly
-                  className="w-full h-14 rounded-xl border border-white/[0.12] bg-white/[0.06] backdrop-blur-lg px-5 text-[15px] text-warm-900 placeholder:text-warm-500 cursor-pointer transition-all hover:border-white/[0.20] hover:bg-white/[0.08] focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/20"
-                />
-              </div>
-              <button
-                onClick={() => signIn("google", { redirectTo: "/app" })}
-                className="h-14 rounded-xl bg-brand px-6 text-[15px] font-bold text-white shadow-glow-brand transition-all hover:bg-brand-light hover:shadow-[0_0_40px_rgba(124,111,255,0.5)] active:scale-[0.97] whitespace-nowrap"
-              >
-                Expose it →
-              </button>
-            </motion.div>
+            <LandingHeroInput />
 
-            {/* Demo link */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="mt-4 text-[13px] text-warm-500"
+            <a
+              href="#preview"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "4px",
+                marginTop: "16px",
+                fontSize: "12px",
+                fontWeight: 500,
+                color: "rgba(244, 244, 246, 0.35)",
+                textDecoration: "none",
+                transition: "color 0.15s",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.color = "rgba(244, 244, 246, 0.65)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.color = "rgba(244, 244, 246, 0.35)")
+              }
             >
-              <button
-                onClick={() => signIn("google", { redirectTo: "/app" })}
-                className="text-brand hover:text-brand-light transition-colors underline underline-offset-4 decoration-brand/30"
-              >
-                See a live example →
-              </button>
-            </motion.p>
+              See a live example
+              <span style={{ fontSize: "10px" }}>→</span>
+            </a>
           </div>
 
-          {/* Right: Demo Cards */}
           <div className="hidden lg:block">
-            <div className="space-y-4 animate-float">
-              <DemoContributorCard name="Pranav" score={189} tier="carry" avatarUrl="/logo.png" delay={0.4} />
-              <DemoContributorCard name="Aaryan Verma" score={158} tier="carry" avatarUrl="/animepfp.jpeg" delay={0.55} />
-              <DemoContributorCard name="Rohan Bedi" score={68} tier="ghost" avatarUrl="/catpj.jpeg" delay={0.7} />
-            </div>
+            <HeroPreviewCards />
           </div>
         </div>
       </section>
 
-      {/* Social Proof Strip */}
-      <FadeInSection>
-        <section className="relative z-10 border-t border-b border-white/[0.06] py-8">
-          <div className="max-w-7xl mx-auto px-6">
-            <p className="text-[11px] font-semibold text-warm-500 uppercase tracking-[0.15em] text-center mb-6">
-              Trusted by students and teams at
-            </p>
-            <div className="overflow-hidden">
-              <div className="animate-marquee flex items-center gap-16 whitespace-nowrap">
-                {["MIT", "Stanford", "UC Berkeley", "YC", "Princeton", "MIT", "Stanford", "UC Berkeley", "YC", "Princeton", "MIT", "Stanford", "UC Berkeley", "YC", "Princeton", "MIT", "Stanford", "UC Berkeley", "YC", "Princeton"].map((name, i) => (
-                  <span key={i} className="text-[14px] font-bold text-warm-400 tracking-wide">{name}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      </FadeInSection>
+      <div className="section-divider" />
 
-      {/* How It Works */}
-      <FadeInSection>
-        <section className="relative z-10 max-w-7xl mx-auto px-6 py-24">
-          <h2 className="text-[36px] font-black tracking-tight text-warm-900 text-center mb-16">
-            How it works
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { step: "01", icon: "📎", title: "Paste a link", desc: "Google Doc or public GitHub repo. That's it." },
-              { step: "02", icon: "⚡", title: "We analyze it", desc: "Diffs, commits, revisions — all recency weighted." },
-              { step: "03", icon: "🏆", title: "See the truth", desc: "Every contributor ranked. No fluff. No hiding." },
-            ].map((item, i) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      {/* ── Trust Strip ── */}
+      <section
+        id="trust"
+        style={{ padding: "48px 0 40px" }}
+        className="overflow-hidden"
+      >
+        <p
+          style={{
+            textAlign: "center",
+            fontSize: "11px",
+            fontWeight: 600,
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            color: "rgba(244, 244, 246, 0.25)",
+            marginBottom: "20px",
+          }}
+        >
+          Trusted by students and teams at
+        </p>
+
+        <div className="relative">
+          <div
+            className="pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10"
+            style={{ background: "linear-gradient(to right, #09090E, transparent)" }}
+          />
+          <div
+            className="pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10"
+            style={{ background: "linear-gradient(to left, #09090E, transparent)" }}
+          />
+
+          <div
+            className="flex animate-scroll-left gap-12 whitespace-nowrap"
+            style={{ width: "max-content" }}
+          >
+            {TRUST_SCHOOLS.map((name, i) => (
+              <span
+                key={i}
+                style={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  color: "rgba(244, 244, 246, 0.22)",
+                  letterSpacing: "-0.01em",
+                }}
               >
-                <div className="glass rounded-2xl p-8 h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-glass-hover cursor-default">
-                  <span className="text-[11px] font-bold text-brand tracking-widest">{item.step}</span>
-                  <div className="mt-4 text-[32px]">{item.icon}</div>
-                  <h3 className="mt-4 text-[18px] font-bold text-warm-900">{item.title}</h3>
-                  <p className="mt-2 text-[14px] leading-relaxed text-warm-600">{item.desc}</p>
-                </div>
-              </motion.div>
+                {name}
+              </span>
             ))}
           </div>
-        </section>
-      </FadeInSection>
+        </div>
+      </section>
 
-      {/* What You Get — Demo results */}
-      <FadeInSection>
-        <section className="relative z-10 max-w-7xl mx-auto px-6 pb-24">
-          <h2 className="text-[36px] font-black tracking-tight text-warm-900 text-center mb-4">
+      <div className="section-divider" />
+
+      {/* ── How it works ── */}
+      <section
+        id="how"
+        style={{ padding: "80px 0" }}
+        className="mx-auto max-w-[1200px] px-6 sm:px-8"
+      >
+        <div style={{ textAlign: "center", marginBottom: "52px" }}>
+          <h2
+            style={{
+              fontSize: "clamp(28px, 3.5vw, 40px)",
+              fontWeight: 600,
+              letterSpacing: "-0.02em",
+              color: "#F4F4F6",
+              lineHeight: 1.15,
+            }}
+          >
+            How it works
+          </h2>
+        </div>
+
+        <div
+          className="grid grid-cols-1 md:grid-cols-3"
+          style={{ gap: "12px" }}
+        >
+          {HOW_STEPS.map((step) => (
+            <div
+              key={step.number}
+              style={{
+                background: "rgba(255, 255, 255, 0.02)",
+                border: "1px solid rgba(255, 255, 255, 0.06)",
+                borderRadius: "16px",
+                padding: "28px 24px",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  letterSpacing: "0.1em",
+                  color: "#6D63D4",
+                  textTransform: "uppercase",
+                  marginBottom: "20px",
+                }}
+              >
+                {step.number}
+              </div>
+
+              <h3
+                style={{
+                  fontSize: "18px",
+                  fontWeight: 600,
+                  letterSpacing: "-0.015em",
+                  color: "#F4F4F6",
+                  marginBottom: "10px",
+                  lineHeight: 1.3,
+                }}
+              >
+                {step.title}
+              </h3>
+
+              <p
+                style={{
+                  fontSize: "14px",
+                  fontWeight: 400,
+                  lineHeight: 1.6,
+                  color: "rgba(244, 244, 246, 0.45)",
+                  letterSpacing: "0.005em",
+                }}
+              >
+                {step.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="section-divider" />
+
+      {/* ── What you get ── */}
+      <section
+        id="preview"
+        style={{ padding: "80px 0" }}
+        className="mx-auto max-w-[1200px] px-6 sm:px-8"
+      >
+        <div style={{ textAlign: "center", marginBottom: "48px" }}>
+          <h2
+            style={{
+              fontSize: "clamp(28px, 3.5vw, 40px)",
+              fontWeight: 600,
+              letterSpacing: "-0.02em",
+              color: "#F4F4F6",
+              lineHeight: 1.15,
+              marginBottom: "12px",
+            }}
+          >
             What you get
           </h2>
-          <p className="text-[16px] text-warm-600 text-center mb-12 max-w-md mx-auto">
+          <p
+            style={{
+              fontSize: "16px",
+              fontWeight: 400,
+              color: "rgba(244, 244, 246, 0.40)",
+              letterSpacing: "0.005em",
+            }}
+          >
             Every contributor scored, ranked, and exposed. In seconds.
           </p>
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <DemoContributorCard name="Pranav" score={189} tier="carry" avatarUrl="/logo.png" delay={0} />
-            <DemoContributorCard name="Aaryan Verma" score={158} tier="carry" avatarUrl="/animepfp.jpeg" delay={0.1} />
-            <DemoContributorCard name="Rohan Bedi" score={68} tier="ghost" avatarUrl="/catpj.jpeg" delay={0.2} />
-          </div>
-        </section>
-      </FadeInSection>
-
-      {/* Final CTA */}
-      <FadeInSection>
-        <section className="relative z-10 max-w-7xl mx-auto px-6 pb-24 text-center">
-          <h2 className="text-[32px] font-black tracking-tight text-warm-900 mb-4">
-            Your group project deserves the truth.
-          </h2>
-          <button
-            onClick={() => signIn("google", { redirectTo: "/app" })}
-            className="mt-4 rounded-xl bg-brand px-8 py-4 text-[16px] font-bold text-white shadow-glow-brand transition-all hover:bg-brand-light hover:shadow-[0_0_50px_rgba(124,111,255,0.5)] hover:scale-105 active:scale-95"
-          >
-            Start for free →
-          </button>
-        </section>
-      </FadeInSection>
-
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-white/[0.06] py-8">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-[12px] text-warm-500">
-            © 2025 Glasswork ·{" "}
-            <a href="/privacy" className="hover:text-warm-700 transition-colors">Privacy</a>
-          </p>
-          <p className="text-[12px] text-warm-500">
-            Built by a 16yo in New York
-          </p>
         </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "12px",
+            maxWidth: "900px",
+            margin: "0 auto",
+          }}
+        >
+          {PREVIEW_CONTRIBUTORS.map((c) => {
+            const tierStyle = HERO_TIER_STYLE[c.tier];
+            return (
+              <div
+                key={c.name}
+                style={{
+                  background: tierStyle.cardBg,
+                  border: "1px solid rgba(255, 255, 255, 0.07)",
+                  borderTop: `1px solid ${tierStyle.cardTopBorder}`,
+                  borderRadius: "14px",
+                  padding: "20px",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: "16px",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <div
+                      style={{
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "50%",
+                        overflow: "hidden",
+                        background: "rgba(139, 124, 246, 0.12)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        color: "#A89FFF",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {c.avatarUrl ? (
+                        <img
+                          src={c.avatarUrl}
+                          alt={c.name}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                      ) : (
+                        c.initials.slice(0, 1)
+                      )}
+                    </div>
+                    <span
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        color: "#E8E8EE",
+                        letterSpacing: "-0.01em",
+                      }}
+                    >
+                      {c.name}
+                    </span>
+                  </div>
+                  <TierBadge tier={c.tier} size="sm" />
+                </div>
+
+                <div
+                  style={{
+                    fontSize: "52px",
+                    fontWeight: 700,
+                    letterSpacing: "-0.03em",
+                    color: tierStyle.scoreColor,
+                    lineHeight: 1,
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
+                  {c.score}
+                </div>
+                <div
+                  style={{
+                    marginTop: "4px",
+                    fontSize: "11px",
+                    fontWeight: 600,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    color: "rgba(244, 244, 246, 0.30)",
+                  }}
+                >
+                  Fair Share Score
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <div className="section-divider" />
+
+      {/* ── CTA ── */}
+      <section
+        id="cta"
+        style={{ padding: "80px 0 120px" }}
+        className="mx-auto max-w-[700px] px-6 text-center sm:px-8"
+      >
+        <h2
+          style={{
+            fontSize: "clamp(28px, 4vw, 44px)",
+            fontWeight: 600,
+            letterSpacing: "-0.02em",
+            color: "#F4F4F6",
+            lineHeight: 1.15,
+            marginBottom: "16px",
+          }}
+        >
+          Your group project deserves the truth.
+        </h2>
+        <p
+          style={{
+            fontSize: "16px",
+            color: "rgba(244, 244, 246, 0.40)",
+            marginBottom: "32px",
+            lineHeight: 1.6,
+          }}
+        >
+          Paste any link. Find out in 30 seconds.
+        </p>
+        <a
+          href="/app"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            height: "46px",
+            padding: "0 28px",
+            borderRadius: "11px",
+            background: "#6D63D4",
+            color: "#FFFFFF",
+            fontSize: "14px",
+            fontWeight: 600,
+            letterSpacing: "-0.01em",
+            textDecoration: "none",
+            transition: "background 0.15s",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#7B72E0")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "#6D63D4")}
+        >
+          Start for free →
+        </a>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer
+        style={{
+          borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+          padding: "24px 32px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "8px",
+        }}
+      >
+        <span
+          style={{
+            fontSize: "12px",
+            color: "rgba(244, 244, 246, 0.25)",
+            letterSpacing: "0.01em",
+          }}
+        >
+          © 2025 Glasswork · Built by a 16yo in New York
+        </span>
+        <a
+          href="/privacy"
+          style={{
+            fontSize: "12px",
+            color: "rgba(244, 244, 246, 0.25)",
+            textDecoration: "none",
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.color = "rgba(244, 244, 246, 0.55)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.color = "rgba(244, 244, 246, 0.25)")
+          }
+        >
+          Privacy
+        </a>
       </footer>
     </div>
   );
