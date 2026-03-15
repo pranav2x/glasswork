@@ -4,14 +4,48 @@
 
 @layer base {
   :root {
+    /* Light mode — default */
+    --background: 0 0% 96%;
+    --foreground: 0 0% 7%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 7%;
+    --primary: 248 62% 61%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 93%;
+    --secondary-foreground: 0 0% 20%;
+    --muted: 0 0% 93%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 93%;
+    --accent-foreground: 0 0% 20%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 248 62% 61%;
+    --radius: 0.75rem;
+
+    /* Page-level tokens */
+    --page-bg: #F5F5F5;
+    --page-text: #111111;
+    --page-text-muted: #6B7280;
+    --card-bg: #FFFFFF;
+    --card-border: #E5E5E5;
+    --nav-border: #E5E5E5;
+    --section-divider: #E5E5E5;
+  }
+
+  .dark {
+    /* Dark mode overrides */
     --background: 240 10% 4%;
     --foreground: 240 10% 96%;
     --card: 240 8% 8%;
     --card-foreground: 240 10% 96%;
     --popover: 240 10% 6%;
     --popover-foreground: 240 10% 96%;
-    --primary: 252 90% 70%;
-    --primary-foreground: 240 10% 4%;
+    --primary: 248 62% 61%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 240 8% 14%;
     --secondary-foreground: 240 10% 96%;
     --muted: 240 8% 12%;
@@ -22,25 +56,37 @@
     --destructive-foreground: 240 10% 96%;
     --border: 240 8% 14%;
     --input: 240 8% 14%;
-    --ring: 252 90% 70%;
-    --radius: 0.75rem;
+    --ring: 248 62% 61%;
+
+    --page-bg: #09090E;
+    --page-text: #F4F4F6;
+    --page-text-muted: #8888A8;
+    --card-bg: rgba(255,255,255,0.03);
+    --card-border: rgba(255,255,255,0.07);
+    --nav-border: rgba(255,255,255,0.06);
+    --section-divider: rgba(255,255,255,0.06);
   }
 
   html {
-    color-scheme: dark;
     scroll-behavior: smooth;
   }
 
+  .dark {
+    color-scheme: dark;
+  }
+
   body {
-    background-color: #09090E;
-    color: #F4F4F6;
+    background-color: var(--page-bg);
+    color: var(--page-text);
     min-height: 100svh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-variant-numeric: tabular-nums;
+    font-family: var(--font-inter), Inter, system-ui, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  body::before {
+  .dark body::before {
     content: "";
     position: fixed;
     inset: 0;
@@ -52,7 +98,7 @@
     pointer-events: none;
   }
 
-  * {
+  .dark * {
     border-color: rgba(255, 255, 255, 0.08);
   }
 
