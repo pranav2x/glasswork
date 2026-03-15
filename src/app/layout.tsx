@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Inter, Caveat, Cormorant_Garamond } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { AppShell } from "@/components/AppShell";
 import { Toaster } from "sonner";
@@ -14,7 +15,7 @@ const dmSans = DM_Sans({
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-inter",
   display: "swap",
   weight: ["400", "500", "600", "700", "800", "900"],
 });
@@ -63,26 +64,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body
         className={`${dmSans.variable} ${inter.variable} ${caveat.variable} ${cormorant.variable} font-body antialiased grain-overlay`}
       >
-        <ConvexClientProvider>
-          <AppShell>{children}</AppShell>
-          <Toaster
-            position="bottom-right"
-            theme="dark"
-            toastOptions={{
-              style: {
-                fontFamily: "var(--font-body)",
-                fontSize: "13px",
-                background: "#18181F",
-                border: "1px solid rgba(255,255,255,0.08)",
-                color: "#F5F5FA",
-              },
-            }}
-          />
-        </ConvexClientProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <ConvexClientProvider>
+            <AppShell>{children}</AppShell>
+            <Toaster
+              position="bottom-right"
+              theme="dark"
+              toastOptions={{
+                style: {
+                  fontFamily: "var(--font-body)",
+                  fontSize: "13px",
+                  background: "#18181F",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  color: "#F5F5FA",
+                },
+              }}
+            />
+          </ConvexClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
