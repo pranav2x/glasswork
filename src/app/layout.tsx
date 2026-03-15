@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, JetBrains_Mono, Caveat } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { AppShell } from "@/components/AppShell";
 import { Toaster } from "sonner";
@@ -63,26 +64,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body
         className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} ${caveat.variable} font-sans antialiased`}
       >
-        <ConvexClientProvider>
-          <AppShell>{children}</AppShell>
-          <Toaster
-            position="bottom-right"
-            theme="dark"
-            toastOptions={{
-              style: {
-                fontFamily: "var(--font-body)",
-                fontSize: "13px",
-                background: "#18181F",
-                border: "1px solid rgba(255,255,255,0.08)",
-                color: "#F5F5FA",
-              },
-            }}
-          />
-        </ConvexClientProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+          <ConvexClientProvider>
+            <AppShell>{children}</AppShell>
+            <Toaster
+              position="bottom-right"
+              theme="dark"
+              toastOptions={{
+                style: {
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "13px",
+                  background: "#232323",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  color: "#F4F4F6",
+                },
+              }}
+            />
+          </ConvexClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
