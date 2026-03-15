@@ -10,6 +10,7 @@ import { GlassButton } from "@/components/GlassButton";
 interface NewAnalysisModalProps {
   isOpen: boolean;
   onClose: () => void;
+  prefillValue?: string;
 }
 
 const PLACEHOLDERS = [
@@ -64,7 +65,7 @@ function detectSourceType(input: string): { type: "google_doc" | "github_repo"; 
   return null;
 }
 
-export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
+export function NewAnalysisModal({ isOpen, onClose, prefillValue }: NewAnalysisModalProps) {
   const router = useRouter();
   const createAnalysis = useMutation(api.analyses.createAnalysis);
   const [input, setInput] = useState("");
@@ -78,6 +79,12 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (prefillValue) {
+      setInput(prefillValue);
+    }
+  }, [prefillValue]);
 
   if (!isOpen) return null;
 
@@ -115,10 +122,10 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
         onClick={onClose}
       />
 
-      <div className="animate-modal-enter relative w-full max-w-md rounded-2xl border border-white/[0.10] bg-surface-2 backdrop-blur-2xl p-8 shadow-layered-lg">
+      <div className="animate-modal-enter relative w-full max-w-md rounded-2xl border border-[var(--app-card-border)] backdrop-blur-2xl p-8 shadow-layered-lg" style={{ background: "var(--app-card-bg)" }}>
         <button
           onClick={onClose}
-          className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-all duration-200 hover:bg-white/[0.06] hover:text-warm-600"
+          className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-lg text-[color:var(--app-text-faint)] transition-all duration-200 hover:bg-[var(--app-hover-bg)] hover:text-[color:var(--app-text-muted)]"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path
@@ -130,10 +137,10 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
           </svg>
         </button>
 
-        <h2 className="font-display text-2xl font-bold tracking-tight text-warm-900">
+        <h2 className="font-display text-2xl font-bold tracking-tight text-[color:var(--app-text)]">
           Who actually did the work?
         </h2>
-        <p className="mt-1.5 text-[13px] text-warm-500">
+        <p className="mt-1.5 text-[13px] text-[color:var(--app-text-muted)]">
           Paste a Google Doc or GitHub repo — we&apos;ll settle the score.
         </p>
 
@@ -150,9 +157,9 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
           />
 
           {detected && (
-            <p className="px-1 text-[11px] text-warm-400">
+            <p className="px-1 text-[11px] text-[color:var(--app-text-faint)]">
               Detected:{" "}
-              <span className="font-semibold text-warm-700">
+              <span className="font-semibold text-[color:var(--app-text)]">
                 {detected.type === "google_doc" ? "Google Doc" : `GitHub · ${detected.id}`}
               </span>
             </p>
@@ -168,7 +175,7 @@ export function NewAnalysisModal({ isOpen, onClose }: NewAnalysisModalProps) {
           {isSubmitting ? "Creating..." : "Run Analysis →"}
         </GlassButton>
 
-        <p className="mt-3 text-center text-[11px] text-warm-400">
+        <p className="mt-3 text-center text-[11px] text-[color:var(--app-text-faint)]">
           Results in ~30 seconds
         </p>
 

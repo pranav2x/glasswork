@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useConvexAuth, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { NewAnalysisModal } from "@/components/NewAnalysisModal";
@@ -52,6 +52,8 @@ export default function DashboardPageWrapper() {
 
 function DashboardPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const prefillUrl = searchParams.get("prefill");
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const user = useQuery(api.users.getCurrentUser);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -65,16 +67,23 @@ function DashboardPage() {
     }
   }, [isAuthenticated, isAuthLoading, router]);
 
+  useEffect(() => {
+    if (prefillUrl && !isModalOpen) {
+      setIsModalOpen(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefillUrl]);
+
   if (isAuthLoading || dashboardData === undefined || analyses === undefined) {
     return (
       <div className="space-y-4 p-6">
-        <div className="h-8 w-48 rounded-xl bg-white/[0.04] shimmer-bg" />
+        <div className="h-8 w-48 rounded-xl bg-[var(--app-hover-bg)] shimmer-bg" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-4">
-          <div className="h-[200px] rounded-2xl bg-white/[0.04] shimmer-bg" />
-          <div className="col-span-2 h-[200px] rounded-2xl bg-white/[0.04] shimmer-bg" />
-          <div className="row-span-2 h-[416px] rounded-2xl bg-white/[0.04] shimmer-bg" />
-          <div className="h-[200px] rounded-2xl bg-white/[0.04] shimmer-bg" />
-          <div className="h-[200px] rounded-2xl bg-white/[0.04] shimmer-bg" />
+          <div className="h-[200px] rounded-2xl bg-[var(--app-hover-bg)] shimmer-bg" />
+          <div className="col-span-2 h-[200px] rounded-2xl bg-[var(--app-hover-bg)] shimmer-bg" />
+          <div className="row-span-2 h-[416px] rounded-2xl bg-[var(--app-hover-bg)] shimmer-bg" />
+          <div className="h-[200px] rounded-2xl bg-[var(--app-hover-bg)] shimmer-bg" />
+          <div className="h-[200px] rounded-2xl bg-[var(--app-hover-bg)] shimmer-bg" />
         </div>
       </div>
     );
@@ -102,25 +111,25 @@ function DashboardPage() {
       <div className="space-y-6 p-6">
         {/* Header */}
         <div className="hero-fade-in">
-          <p className="text-[13px] font-medium text-warm-500">
+          <p className="text-[13px] font-medium text-[color:var(--app-text-muted)]">
             {getGreeting()}, {firstName}. Let&apos;s see who&apos;s actually working.
           </p>
-          <h1 className="mt-0.5 text-[28px] font-bold tracking-tight text-warm-900">
+          <h1 className="mt-0.5 text-[28px] font-bold tracking-tight text-[color:var(--app-text)]">
             Home
           </h1>
         </div>
 
         {/* Empty State */}
         {isEmpty ? (
-          <div className="hero-fade-in flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.12] bg-white/[0.02] py-20" style={{ animationDelay: "0.08s" }}>
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand/10 border border-brand/20">
-              <Plus className="h-6 w-6 text-brand" strokeWidth={1.5} />
+          <div className="hero-fade-in flex flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--app-card-border)] bg-[var(--app-card-bg)] py-20" style={{ animationDelay: "0.08s" }}>
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--app-accent-muted)] border border-[var(--app-accent-border)]">
+              <Plus className="h-6 w-6 text-[color:var(--app-accent)]" strokeWidth={1.5} />
             </div>
-            <h3 className="mt-4 text-[16px] font-semibold text-warm-800">Drop your first link</h3>
-            <p className="mt-1 text-[13px] text-warm-500">Paste a Google Doc or GitHub repo to get started</p>
+            <h3 className="mt-4 text-[16px] font-semibold text-[color:var(--app-text)]">Drop your first link</h3>
+            <p className="mt-1 text-[13px] text-[color:var(--app-text-muted)]">Paste a Google Doc or GitHub repo to get started</p>
             <button
               onClick={() => setIsModalOpen(true)}
-              className="mt-5 rounded-xl bg-brand px-5 py-2.5 text-[13px] font-semibold text-white shadow-[0_0_20px_rgba(124,111,255,0.3)] transition-all hover:bg-brand-light hover:shadow-[0_0_30px_rgba(124,111,255,0.5)] hover:scale-105 active:scale-95"
+              className="mt-5 rounded-xl bg-[var(--app-accent)] px-5 py-2.5 text-[13px] font-semibold text-white shadow-[0_0_20px_rgba(124,111,255,0.3)] transition-all hover:bg-[var(--app-accent-hover)] hover:shadow-[0_0_30px_rgba(124,111,255,0.5)] hover:scale-105 active:scale-95"
             >
               New Analysis
             </button>
@@ -155,7 +164,7 @@ function DashboardPage() {
       {/* FAB */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="ripple-effect group fixed bottom-8 right-8 z-30 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-brand shadow-glow-brand ring-2 ring-brand/20 transition-all duration-200 hover:scale-110 hover:shadow-[0_0_50px_rgba(124,111,255,0.5)] active:scale-95"
+        className="ripple-effect group fixed bottom-8 right-8 z-30 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-[var(--app-accent)] shadow-glow-brand ring-2 ring-brand/20 transition-all duration-200 hover:scale-110 hover:shadow-[0_0_50px_rgba(124,111,255,0.5)] active:scale-95"
         aria-label="New analysis"
       >
         <Plus className="fab-icon h-6 w-6 text-white" strokeWidth={2.5} />
@@ -164,6 +173,7 @@ function DashboardPage() {
       <NewAnalysisModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        prefillValue={prefillUrl ?? undefined}
       />
     </PageTransition>
   );
