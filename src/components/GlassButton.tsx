@@ -14,40 +14,36 @@ const sizeClasses = {
 };
 
 const variants = {
-  primary: [
+  primary: cn(
     "bg-[#6D63D4] text-white font-semibold",
     "border border-[#6D63D4]",
     "hover:bg-[#7B72E0]",
-    "active:scale-[0.97]",
-    "transition-all duration-150",
+    "active:scale-[0.97] transition-all duration-150",
     "disabled:opacity-40 disabled:cursor-not-allowed",
-  ].join(" "),
-
-  secondary: [
-    "bg-white/[0.04] text-white/70 font-medium",
-    "border border-white/[0.09]",
-    "hover:bg-white/[0.07] hover:text-white/90 hover:border-white/[0.16]",
-    "active:scale-[0.97]",
-    "transition-all duration-150",
+  ),
+  secondary: cn(
+    "bg-white text-[#374151] font-medium border border-[#E5E5E5]",
+    "hover:bg-[#F9FAFB] hover:border-[#D1D5DB]",
+    "dark:bg-white/[0.04] dark:text-white/70 dark:border-white/[0.09]",
+    "dark:hover:bg-white/[0.07] dark:hover:text-white/90 dark:hover:border-white/[0.16]",
+    "active:scale-[0.97] transition-all duration-150",
     "disabled:opacity-40 disabled:cursor-not-allowed",
-  ].join(" "),
-
-  ghost: [
-    "bg-white/[0.04] text-white/70 font-medium",
-    "border border-white/[0.09]",
-    "hover:bg-white/[0.07] hover:text-white/90 hover:border-white/[0.16]",
-    "active:scale-[0.97]",
-    "transition-all duration-150",
+  ),
+  ghost: cn(
+    "bg-transparent text-[#374151] font-medium border border-[#E5E5E5]",
+    "hover:bg-[#F3F4F6]",
+    "dark:text-white/70 dark:border-white/[0.09]",
+    "dark:hover:bg-white/[0.06] dark:hover:text-white/90",
+    "active:scale-[0.97] transition-all duration-150",
     "disabled:opacity-40 disabled:cursor-not-allowed",
-  ].join(" "),
-
-  danger: [
-    "bg-[#F06C6C]/[0.08] text-[#F87171] font-medium",
-    "border border-[#F06C6C]/[0.20]",
-    "hover:bg-[#F06C6C]/[0.14] hover:border-[#F06C6C]/[0.35]",
-    "active:scale-[0.97]",
-    "transition-all duration-150",
-  ].join(" "),
+  ),
+  danger: cn(
+    "bg-red-50 text-red-600 font-medium border border-red-200",
+    "hover:bg-red-100 hover:border-red-300",
+    "dark:bg-[#F06C6C]/[0.08] dark:text-[#F87171] dark:border-[#F06C6C]/[0.20]",
+    "dark:hover:bg-[#F06C6C]/[0.14] dark:hover:border-[#F06C6C]/[0.35]",
+    "active:scale-[0.97] transition-all duration-150",
+  ),
 };
 
 const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
