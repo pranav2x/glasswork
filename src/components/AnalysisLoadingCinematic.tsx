@@ -9,22 +9,26 @@ interface AnalysisLoadingCinematicProps {
 }
 
 const GITHUB_STEPS = [
-  { text: "Fetching repository info", detail: null },
-  { text: "Analyzing commit history", detail: { label: "commits", target: 2847 } },
-  { text: "Detecting co-authors", detail: { label: "contributors", target: 24 } },
-  { text: "Computing Fair Share Scores", detail: null },
-  { text: "Calculating MVP ratings", detail: null },
+  { text: "Fetching commit history", detail: null },
+  { text: "Reading contributor statistics", detail: { label: "commits", target: 2847 } },
+  { text: "Analyzing 847 lines of diffs", detail: { label: "contributors", target: 24 } },
+  { text: "Calculating Fair Share Scores", detail: null },
+  { text: "Ranking contributors", detail: null },
+  { text: "Generating AI summary", detail: null },
+  { text: "Almost done", detail: null },
 ];
 
 const DOC_STEPS = [
-  { text: "Fetching document metadata", detail: null },
-  { text: "Loading revision history", detail: { label: "revisions", target: 156 } },
-  { text: "Diffing character changes", detail: { label: "characters", target: 48200 } },
-  { text: "Computing Fair Share Scores", detail: null },
-  { text: "Finalizing rankings", detail: null },
+  { text: "Reading revision history", detail: null },
+  { text: "Analyzing edit timestamps", detail: { label: "revisions", target: 156 } },
+  { text: "Measuring word contributions", detail: { label: "characters", target: 48200 } },
+  { text: "Weighing recency of edits", detail: null },
+  { text: "Calculating Fair Share Scores", detail: null },
+  { text: "Generating AI summary", detail: null },
+  { text: "Almost done", detail: null },
 ];
 
-const STEP_DURATIONS = [1200, 900, 800, 600, 500];
+const STEP_DURATIONS = [1200, 900, 800, 700, 600, 500, 400];
 
 function AnimatedCounter({ target }: { target: number }) {
   const [count, setCount] = useState(0);
@@ -61,7 +65,7 @@ function StepIndicator({ state }: { state: "completed" | "active" | "pending" })
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 500, damping: 22 }}
-        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand"
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--app-accent)]"
       >
         <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />
       </motion.div>
@@ -81,7 +85,7 @@ function StepIndicator({ state }: { state: "completed" | "active" | "pending" })
           animate={{ scale: [1, 2.4, 1], opacity: [0.4, 0, 0.4] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
         />
-        <div className="h-2.5 w-2.5 rounded-full bg-brand" />
+        <div className="h-2.5 w-2.5 rounded-full bg-[var(--app-accent)]" />
       </div>
     );
   }
@@ -120,7 +124,7 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
 
   return (
     <div className="flex flex-col items-center justify-center py-16">
-      <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-[20px] shadow-glass px-8 py-9">
+      <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-[var(--app-card-border)] bg-[var(--app-hover-bg)] backdrop-blur-[20px] shadow-glass px-8 py-9">
 
         {/* Icon + circular progress ring */}
         <div className="relative mx-auto mb-9 h-20 w-20">
@@ -163,7 +167,7 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
           </svg>
 
           <div className="absolute inset-0 flex items-center justify-center p-2.5">
-            <div className="flex h-full w-full items-center justify-center rounded-[14px] bg-surface-2 shadow-layered border border-white/[0.06]">
+            <div className="flex h-full w-full items-center justify-center rounded-[14px] shadow-layered border border-[var(--app-card-border)]" style={{ background: "var(--app-card-bg)" }}>
               {isDoc ? (
                 <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
                   <path
@@ -183,7 +187,7 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
                   />
                 </svg>
               ) : (
-                <Github className="h-6 w-6 text-brand" strokeWidth={1.5} />
+                <Github className="h-6 w-6 text-[color:var(--app-accent)]" strokeWidth={1.5} />
               )}
             </div>
           </div>
@@ -223,16 +227,16 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
                     className={[
                       "text-[13px] leading-5 transition-colors duration-300",
                       state === "active"
-                        ? "font-semibold text-warm-900"
+                        ? "font-semibold text-[color:var(--app-text)]"
                         : state === "completed"
-                        ? "font-medium text-warm-500"
-                        : "font-medium text-warm-600",
+                        ? "font-medium text-[color:var(--app-text-muted)]"
+                        : "font-medium text-[color:var(--app-text-muted)]",
                     ].join(" ")}
                   >
                     {step.text}
                     {state === "active" && (
                       <motion.span
-                        className="text-warm-400"
+                        className="text-[color:var(--app-text-faint)]"
                         animate={{ opacity: [1, 0.2, 1] }}
                         transition={{ duration: 1.3, repeat: Infinity }}
                       >
@@ -259,9 +263,9 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
         </div>
 
         {/* Progress bar */}
-        <div className="h-[3px] overflow-hidden rounded-full bg-white/[0.06]">
+        <div className="h-[3px] overflow-hidden rounded-full bg-[var(--app-hover-bg)]">
           <motion.div
-            className="h-full rounded-full bg-brand"
+            className="h-full rounded-full bg-[var(--app-accent)]"
             initial={{ width: "0%" }}
             animate={{ width: `${progressFraction * 100}%` }}
             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
@@ -269,10 +273,10 @@ export function AnalysisLoadingCinematic({ sourceType }: AnalysisLoadingCinemati
         </div>
 
         <div className="mt-2.5 flex items-center justify-between">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-warm-400">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-[color:var(--app-text-faint)]">
             Analyzing
           </span>
-          <span className="font-mono text-[10px] text-warm-400">
+          <span className="font-mono text-[10px] text-[color:var(--app-text-faint)]">
             {currentStep + 1}&thinsp;/&thinsp;{steps.length}
           </span>
         </div>
