@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,6 +10,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
+        sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
         display: ["var(--font-display)", "sans-serif"],
         body: ["var(--font-body)", "sans-serif"],
         hand: ["var(--font-hand)", "cursive"],
@@ -48,6 +50,12 @@ const config: Config = {
         "docs-accent": "#4285F4",
         "repo-accent": "#34D399",
         danger: "#F87171",
+
+        "page-bg": "var(--page-bg)",
+        "page-text": "var(--page-text)",
+        "page-text-muted": "var(--page-text-muted)",
+        "card-bg": "var(--card-bg)",
+        "card-border": "var(--card-border)",
 
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -104,6 +112,9 @@ const config: Config = {
         "card-hover": "0 8px 30px rgba(0,0,0,0.4)",
         "hero-card": "0 1px 0 0 rgba(255,255,255,0.08) inset, 0 0 0 1px rgba(255,255,255,0.06), 0 16px 32px rgba(0,0,0,0.35)",
         "hero-card-top": "0 0 0 1px rgba(255,255,255,0.08), 0 -1px 0 0 rgba(255,255,255,0.12) inset",
+        "card-light": "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+        "card-light-hover": "0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)",
+        "card-light-featured": "0 0 0 1px rgba(109,99,212,0.15), 0 4px 16px rgba(109,99,212,0.08)",
       },
       borderRadius: {
         lg: "var(--radius)",
