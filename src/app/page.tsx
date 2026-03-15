@@ -4,7 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { useConvexAuth } from "convex/react";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { motion, useInView } from "framer-motion";
+import { Moon, Sun } from "lucide-react";
+import { TierBadge } from "@/components/TierBadge";
 
 /* ─── Animated Section Wrapper ─── */
 
@@ -33,6 +36,78 @@ function FadeIn({
   );
 }
 
+/* ─── Demo Data ─── */
+
+const DEMO_CONTRIBUTORS = [
+  {
+    name: "Pranav",
+    initials: "P",
+    avatarUrl: null,
+    score: 189,
+    tier: "carry" as const,
+    rank: 1,
+    label: "189 commits · 12 revisions",
+  },
+  {
+    name: "Aaryan Verma",
+    initials: "AV",
+    avatarUrl: "/animepfp.jpeg",
+    score: 158,
+    tier: "carry" as const,
+    rank: 2,
+    label: "847 lines added · 31 revisions",
+  },
+  {
+    name: "Rohan Bedi",
+    initials: "RB",
+    avatarUrl: "/catpj.jpeg",
+    score: 68,
+    tier: "ghost" as const,
+    rank: 3,
+    label: "3 commits · 2 revisions",
+  },
+];
+
+const TIER_CARD_COLORS = {
+  carry: {
+    scoreColor: "#4B83F5",
+    borderAccent: "#4B83F5",
+    avatarRing: "#93B8FA",
+    avatarBg: "rgba(75, 131, 245, 0.12)",
+    avatarText: "#4B83F5",
+  },
+  solid: {
+    scoreColor: "#34D399",
+    borderAccent: "#34D399",
+    avatarRing: "#6EE7B7",
+    avatarBg: "rgba(52, 211, 153, 0.12)",
+    avatarText: "#34D399",
+  },
+  ghost: {
+    scoreColor: "#F87171",
+    borderAccent: "#F87171",
+    avatarRing: "#FCA5A5",
+    avatarBg: "rgba(248, 113, 113, 0.12)",
+    avatarText: "#F87171",
+  },
+};
+
+/* ─── Theme Toggle ─── */
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  return (
+    <button
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#DADDD8] bg-[#FAFAFF] text-[#6B7280] transition-all hover:border-[#D1D5DB] hover:text-[#1C1C1C] dark:border-white/[0.09] dark:bg-white/[0.04] dark:text-white/50 dark:hover:border-white/[0.18] dark:hover:text-white/80"
+      aria-label="Toggle theme"
+    >
+      <Sun className="h-4 w-4 dark:hidden" strokeWidth={1.5} />
+      <Moon className="hidden h-4 w-4 dark:block" strokeWidth={1.5} />
+    </button>
+  );
+}
+
 /* ─── Nav ─── */
 
 function Nav() {
@@ -51,29 +126,50 @@ function Nav() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 sm:px-10 transition-all duration-300 ${
         scrolled
-          ? "py-3 bg-bg/80 backdrop-blur-xl border-b border-[rgba(248,245,239,0.06)]"
-          : "py-5 bg-transparent"
+          ? "py-3 backdrop-blur-xl border-b border-[#DADDD8] bg-[#EEF0F2]/90 dark:border-white/[0.06] dark:bg-[#1C1C1C]/90"
+          : "py-4 bg-transparent"
       }`}
     >
+      {/* Logo */}
       <a href="/" className="flex items-center gap-2.5">
-        <div className="w-[22px] h-[22px] rounded-full bg-fg flex items-center justify-center">
-          <div className="w-[8px] h-[8px] rounded-full bg-bg" />
-        </div>
-        <span className="text-[15px] font-semibold tracking-[-0.02em] text-fg">
-          glasswork
+        <span className="relative flex h-[7px] w-[7px]">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+          <span className="relative inline-flex h-[7px] w-[7px] rounded-full bg-emerald-500" />
+        </span>
+        <span className="text-[15px] font-semibold tracking-[-0.02em] text-[#1C1C1C] dark:text-[#F4F4F6]">
+          glass<span className="text-[#4B83F5]">work</span>
         </span>
       </a>
 
-      <div className="flex items-center gap-3">
+      {/* Center nav pill */}
+      <div className="hidden sm:flex items-center gap-1 rounded-full border border-[#DADDD8] dark:border-white/[0.10] px-1.5 py-1">
+        {[
+          { label: "Features", href: "#features" },
+          { label: "How it works", href: "#how" },
+          { label: "About", href: "#about" },
+        ].map((link) => (
+          <a
+            key={link.label}
+            href={link.href}
+            className="px-3.5 py-1.5 rounded-full text-[13px] font-medium text-[#6B7280] hover:text-[#1C1C1C] dark:text-white/50 dark:hover:text-white/80 transition-colors"
+          >
+            {link.label}
+          </a>
+        ))}
+      </div>
+
+      {/* Right side */}
+      <div className="flex items-center gap-2.5">
+        <ThemeToggle />
         <button
           onClick={() => signIn("google", { redirectTo: "/app" })}
-          className="text-[13px] font-medium text-fg/60 hover:text-fg transition-colors px-3 py-1.5"
+          className="text-[13px] font-medium text-[#6B7280] hover:text-[#1C1C1C] dark:text-white/50 dark:hover:text-white/80 transition-colors px-3 py-1.5 hidden sm:block"
         >
           Log in
         </button>
         <button
           onClick={() => signIn("google", { redirectTo: "/app" })}
-          className="text-[13px] font-semibold text-bg bg-fg hover:bg-fg/90 px-4 py-2 rounded-lg transition-all active:scale-[0.97]"
+          className="h-8 px-4 rounded-lg text-[13px] font-semibold text-white bg-[#4B83F5] hover:bg-[#5B93F7] active:scale-[0.97] transition-all"
         >
           Sign up
         </button>
@@ -86,43 +182,59 @@ function Nav() {
 
 function Hero() {
   const { signIn } = useAuthActions();
+  const router = useRouter();
+  const [inputValue, setInputValue] = useState("");
+
+  function handleSubmit() {
+    if (!inputValue.trim()) {
+      signIn("google", { redirectTo: "/app" });
+      return;
+    }
+    router.push(`/app?prefill=${encodeURIComponent(inputValue.trim())}`);
+  }
 
   return (
-    <section className="relative pt-[140px] pb-[80px] sm:pt-[160px] sm:pb-[100px]">
-      <div className="mx-auto max-w-container px-6 sm:px-10 text-center">
+    <section className="relative pt-[140px] pb-[60px] sm:pt-[160px] sm:pb-[80px]">
+      <div className="mx-auto max-w-[1200px] px-6 sm:px-10 text-center">
+        {/* Eyebrow */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-8"
+          className="mb-7"
         >
-          <span className="inline-flex items-center gap-2 text-[12px] font-mono font-medium tracking-[0.06em] uppercase text-fg/40">
-            <span className="w-1.5 h-1.5 rounded-full bg-solid" />
-            Contributor Analytics
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#DADDD8] dark:border-white/[0.10] px-3 py-1.5">
+            <span className="h-[5px] w-[5px] rounded-full bg-[#4B83F5]" />
+            <span className="text-[11px] font-semibold tracking-[0.08em] uppercase text-[#6B7280] dark:text-white/40">
+              Contributor Analytics
+            </span>
           </span>
         </motion.div>
 
+        {/* Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="font-serif text-[clamp(42px,7vw,76px)] font-bold leading-[1.05] tracking-[-0.02em] text-fg mb-6 text-balance"
+          className="text-[clamp(38px,6vw,64px)] font-bold leading-[1.06] tracking-[-0.025em] text-[#1C1C1C] dark:text-[#F4F4F6] mb-5 text-balance"
         >
           Find out who actually
           <br />
-          did <span className="italic text-brand-light">the work.</span>
+          did the work.
         </motion.h1>
 
+        {/* Subtitle */}
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="text-[17px] sm:text-[19px] leading-[1.6] text-fg/45 max-w-[520px] mx-auto mb-10"
+          className="text-[17px] leading-[1.6] text-[#6B7280] dark:text-[#888888] max-w-[520px] mx-auto mb-9"
         >
           Paste a Google Doc or GitHub repo. Glasswork scores every
           contributor in 30 seconds. No more guessing.
         </motion.p>
 
+        {/* CTA buttons */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -131,7 +243,7 @@ function Hero() {
         >
           <button
             onClick={() => signIn("google", { redirectTo: "/app" })}
-            className="h-[48px] px-7 rounded-[10px] bg-fg text-bg text-[14px] font-semibold tracking-[-0.01em] hover:bg-fg/90 active:scale-[0.97] transition-all"
+            className="h-[44px] px-6 rounded-lg bg-[#4B83F5] text-white text-[14px] font-semibold tracking-[-0.01em] hover:bg-[#5B93F7] active:scale-[0.97] transition-all"
           >
             Get started free
           </button>
@@ -140,7 +252,7 @@ function Hero() {
               const el = document.getElementById("how");
               el?.scrollIntoView({ behavior: "smooth" });
             }}
-            className="h-[48px] px-7 rounded-[10px] border border-fg/12 text-fg/60 text-[14px] font-medium hover:border-fg/20 hover:text-fg/80 transition-all"
+            className="h-[44px] px-6 rounded-lg border border-[#DADDD8] dark:border-white/[0.10] text-[#6B7280] dark:text-white/50 text-[14px] font-medium hover:border-[#D1D5DB] dark:hover:border-white/[0.18] hover:text-[#1C1C1C] dark:hover:text-white/80 transition-all"
           >
             See how it works
           </button>
@@ -153,81 +265,84 @@ function Hero() {
           transition={{ duration: 1, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="mt-16 sm:mt-20 mx-auto max-w-[880px]"
         >
-          <div className="rounded-xl border border-fg/[0.08] bg-surface-1/50 p-1.5 shadow-layered-lg">
-            <div className="rounded-lg bg-surface-1 border border-fg/[0.06] overflow-hidden">
-              {/* Mock App Header */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-fg/[0.06]">
+          <div className="rounded-2xl border border-[#DADDD8] dark:border-white/[0.08] bg-[#FAFAFF] dark:bg-white/[0.02] p-1.5 shadow-card-light dark:shadow-layered-lg">
+            <div className="rounded-xl bg-white dark:bg-[#1C1C1C] border border-[#DADDD8] dark:border-white/[0.06] overflow-hidden">
+              {/* Mock browser chrome */}
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-[#DADDD8] dark:border-white/[0.06]">
                 <div className="flex gap-1.5">
-                  <div className="w-[10px] h-[10px] rounded-full bg-fg/[0.08]" />
-                  <div className="w-[10px] h-[10px] rounded-full bg-fg/[0.08]" />
-                  <div className="w-[10px] h-[10px] rounded-full bg-fg/[0.08]" />
+                  <div className="w-[10px] h-[10px] rounded-full bg-[#E5E7EB] dark:bg-white/[0.08]" />
+                  <div className="w-[10px] h-[10px] rounded-full bg-[#E5E7EB] dark:bg-white/[0.08]" />
+                  <div className="w-[10px] h-[10px] rounded-full bg-[#E5E7EB] dark:bg-white/[0.08]" />
                 </div>
                 <div className="flex-1 flex justify-center">
-                  <div className="h-[26px] w-[240px] rounded-md bg-fg/[0.04] flex items-center justify-center">
-                    <span className="text-[11px] text-fg/25 font-mono">glasswork.app/results</span>
+                  <div className="h-[26px] w-[240px] rounded-md bg-[#F3F4F6] dark:bg-white/[0.04] flex items-center justify-center">
+                    <span className="text-[11px] text-[#9CA3AF] dark:text-white/25 font-mono">glasswork.app/results</span>
                   </div>
                 </div>
               </div>
-              {/* Mock Results */}
+
+              {/* Mock results */}
               <div className="p-6 sm:p-8">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 rounded-lg bg-brand/20 flex items-center justify-center">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-brand-light">
+                  <div className="w-8 h-8 rounded-lg bg-[#4B83F5]/10 flex items-center justify-center">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#4B83F5]">
                       <path d="M9 12l2 2 4-4" />
                       <circle cx="12" cy="12" r="10" />
                     </svg>
                   </div>
                   <div>
-                    <div className="text-[14px] font-semibold text-fg">Analysis Complete</div>
-                    <div className="text-[12px] text-fg/35">3 contributors found · Google Docs</div>
+                    <div className="text-[14px] font-semibold text-[#1C1C1C] dark:text-[#F4F4F6]">Analysis Complete</div>
+                    <div className="text-[12px] text-[#9CA3AF] dark:text-white/35">3 contributors found · Google Docs</div>
                   </div>
                 </div>
-                {/* Contributor Rows */}
-                {[
-                  { name: "Pranav", score: 189, tier: "carry", color: "#8B7CF6" },
-                  { name: "Aaryan V.", score: 158, tier: "carry", color: "#8B7CF6" },
-                  { name: "Rohan B.", score: 68, tier: "ghost", color: "#F87171" },
-                ].map((c, i) => (
-                  <div
-                    key={c.name}
-                    className="flex items-center justify-between py-3.5 border-b border-fg/[0.05] last:border-0"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-[11px] font-mono text-fg/20 w-4 text-right">
-                        {i + 1}
-                      </span>
-                      <div
-                        className="w-[32px] h-[32px] rounded-full flex items-center justify-center text-[11px] font-bold"
-                        style={{
-                          backgroundColor: `${c.color}15`,
-                          color: c.color,
-                        }}
-                      >
-                        {c.name[0]}
+
+                {/* Contributor rows */}
+                {DEMO_CONTRIBUTORS.map((c, i) => {
+                  const colors = TIER_CARD_COLORS[c.tier];
+                  return (
+                    <div
+                      key={c.name}
+                      className="flex items-center justify-between py-3.5 border-b border-[#F3F4F6] dark:border-white/[0.05] last:border-0"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-[11px] font-mono text-[#D1D5DB] dark:text-white/20 w-4 text-right">
+                          {i + 1}
+                        </span>
+                        <div
+                          className="w-[32px] h-[32px] rounded-full flex items-center justify-center text-[11px] font-bold overflow-hidden"
+                          style={{
+                            backgroundColor: colors.avatarBg,
+                            color: colors.avatarText,
+                            border: `2px solid ${colors.avatarRing}`,
+                          }}
+                        >
+                          {c.avatarUrl ? (
+                            <img src={c.avatarUrl} alt={c.name} className="w-full h-full object-cover" />
+                          ) : (
+                            c.initials.slice(0, 1)
+                          )}
+                        </div>
+                        <div>
+                          <span className="text-[14px] font-medium text-[#374151] dark:text-white/80 block">
+                            {c.name}
+                          </span>
+                          <span className="text-[11px] text-[#9CA3AF] dark:text-white/30">
+                            {c.label}
+                          </span>
+                        </div>
                       </div>
-                      <span className="text-[14px] font-medium text-fg/80">
-                        {c.name}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="text-[22px] font-bold tracking-[-0.03em] tabular-nums"
+                          style={{ color: colors.scoreColor }}
+                        >
+                          {c.score}
+                        </span>
+                        <TierBadge tier={c.tier} size="sm" theme="dark" />
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="text-[22px] font-bold tracking-[-0.03em] tabular-nums"
-                        style={{ color: c.color }}
-                      >
-                        {c.score}
-                      </span>
-                      <span
-                        className="text-[10px] font-semibold tracking-[0.06em] uppercase px-2 py-0.5 rounded-full"
-                        style={{
-                          backgroundColor: `${c.color}12`,
-                          color: c.color,
-                        }}
-                      >
-                        {c.tier}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -259,23 +374,17 @@ function TrustStrip() {
   }, []);
 
   return (
-    <section className="py-16 overflow-hidden">
+    <section className="py-14 overflow-hidden">
       <FadeIn>
-        <p className="text-center text-[14px] text-fg/35 mb-6">
-          Built and used by students at top{" "}
-          <span className="text-fg/60 font-medium">{TRUST_WORDS[currentWord]}</span>.
+        <p className="text-center text-[13px] font-medium text-[#9CA3AF] dark:text-white/30 mb-6">
+          Built and used by people at top{" "}
+          <span className="text-[#6B7280] dark:text-white/50 font-semibold">{TRUST_WORDS[currentWord]}</span>.
         </p>
       </FadeIn>
 
       <div className="relative">
-        <div
-          className="pointer-events-none absolute left-0 top-0 bottom-0 w-32 z-10"
-          style={{ background: "linear-gradient(to right, #0F1013, transparent)" }}
-        />
-        <div
-          className="pointer-events-none absolute right-0 top-0 bottom-0 w-32 z-10"
-          style={{ background: "linear-gradient(to left, #0F1013, transparent)" }}
-        />
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-r from-[#EEF0F2] to-transparent dark:from-[#1C1C1C]" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-l from-[#EEF0F2] to-transparent dark:from-[#1C1C1C]" />
 
         <div
           className="flex animate-scroll-left gap-16 whitespace-nowrap"
@@ -284,7 +393,7 @@ function TrustStrip() {
           {TRUST_NAMES.map((name, i) => (
             <span
               key={i}
-              className="text-[15px] font-medium text-fg/18 tracking-[-0.01em]"
+              className="text-[14px] font-medium text-[#D1D5DB] dark:text-white/18 tracking-[-0.01em]"
             >
               {name}
             </span>
@@ -354,12 +463,12 @@ function FeatureShowcase() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section className="py-section mx-auto max-w-container px-6 sm:px-10">
+    <section id="features" className="py-[80px] sm:py-[100px] mx-auto max-w-[1200px] px-6 sm:px-10">
       <FadeIn>
-        <h2 className="font-serif text-[clamp(32px,5vw,52px)] font-bold leading-[1.1] tracking-[-0.02em] text-fg mb-4">
-          One tool for the truth
+        <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[#1C1C1C] dark:text-[#F4F4F6] mb-4">
+          One place for the truth
         </h2>
-        <p className="text-[17px] text-fg/40 max-w-[480px] mb-14 leading-relaxed">
+        <p className="text-[16px] text-[#6B7280] dark:text-[#888888] max-w-[480px] mb-14 leading-relaxed">
           Everything you need to analyze contributions, score teammates, and settle it once and for all.
         </p>
       </FadeIn>
@@ -372,14 +481,14 @@ function FeatureShowcase() {
                 onClick={() => setActiveIndex(i)}
                 className={`w-full text-left p-5 rounded-xl transition-all duration-300 ${
                   activeIndex === i
-                    ? "bg-fg/[0.04] border border-fg/[0.08]"
-                    : "border border-transparent hover:bg-fg/[0.02]"
+                    ? "bg-[#F3F4F6] dark:bg-white/[0.04] border border-[#DADDD8] dark:border-white/[0.08]"
+                    : "border border-transparent hover:bg-[#F9FAFB] dark:hover:bg-white/[0.02]"
                 }`}
               >
                 <div className="flex items-start gap-4">
                   <div
                     className={`mt-0.5 transition-colors duration-300 ${
-                      activeIndex === i ? "text-brand-light" : "text-fg/30"
+                      activeIndex === i ? "text-[#4B83F5]" : "text-[#D1D5DB] dark:text-white/30"
                     }`}
                   >
                     {feature.icon}
@@ -387,7 +496,7 @@ function FeatureShowcase() {
                   <div>
                     <h3
                       className={`text-[16px] font-semibold tracking-[-0.01em] mb-1.5 transition-colors duration-300 ${
-                        activeIndex === i ? "text-fg" : "text-fg/55"
+                        activeIndex === i ? "text-[#1C1C1C] dark:text-[#F4F4F6]" : "text-[#9CA3AF] dark:text-white/45"
                       }`}
                     >
                       {feature.title}
@@ -397,7 +506,7 @@ function FeatureShowcase() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         transition={{ duration: 0.3 }}
-                        className="text-[14px] leading-[1.65] text-fg/40"
+                        className="text-[14px] leading-[1.65] text-[#6B7280] dark:text-[#888888]"
                       >
                         {feature.description}
                       </motion.p>
@@ -410,15 +519,15 @@ function FeatureShowcase() {
         </div>
 
         <FadeIn delay={0.2} className="hidden lg:block">
-          <div className="rounded-xl border border-fg/[0.08] bg-surface-1/50 p-6 h-full min-h-[380px] flex items-center justify-center">
+          <div className="rounded-xl border border-[#DADDD8] dark:border-white/[0.08] bg-[#F9FAFB] dark:bg-white/[0.02] p-6 h-full min-h-[380px] flex items-center justify-center">
             <div className="text-center">
-              <div className="w-16 h-16 rounded-2xl bg-brand/10 flex items-center justify-center mx-auto mb-4">
-                <div className="text-brand-light">{FEATURES[activeIndex].icon}</div>
+              <div className="w-16 h-16 rounded-2xl bg-[#4B83F5]/10 flex items-center justify-center mx-auto mb-4">
+                <div className="text-[#4B83F5]">{FEATURES[activeIndex].icon}</div>
               </div>
-              <p className="text-[22px] font-serif font-semibold text-fg/80 mb-2">
+              <p className="text-[22px] font-semibold text-[#374151] dark:text-white/80 mb-2">
                 {FEATURES[activeIndex].title}
               </p>
-              <p className="text-[14px] text-fg/35 max-w-[280px] mx-auto leading-relaxed">
+              <p className="text-[14px] text-[#9CA3AF] dark:text-white/35 max-w-[280px] mx-auto leading-relaxed">
                 {FEATURES[activeIndex].description}
               </p>
             </div>
@@ -435,29 +544,32 @@ const HOW_STEPS = [
   {
     number: "01",
     title: "Paste a link",
-    description: "Google Doc or public GitHub repo. That's it. No setup, no integrations, no waiting.",
+    description:
+      "Google Doc or public GitHub repo. Nothing else. No install, no sign-up for your teammates, no BS.",
   },
   {
     number: "02",
-    title: "We analyze everything",
-    description: "Diffs, commits, revisions — all parsed and recency-weighted. Takes about 30 seconds.",
+    title: "We analyze it",
+    description:
+      "Every revision, every commit, every edit — weighted by recency. Not self-reported. From the actual work.",
   },
   {
     number: "03",
-    title: "See the truth",
-    description: "Every contributor ranked with a Fair Share Score. Share the results with one click.",
+    title: "See who carried",
+    description:
+      "Every contributor scored: LOCKED IN, MID, or SELLING. Share it, screenshot it, send it to your professor.",
   },
 ];
 
 function HowItWorks() {
   return (
-    <section id="how" className="py-section mx-auto max-w-container px-6 sm:px-10">
+    <section id="how" className="py-[80px] sm:py-[100px] mx-auto max-w-[1200px] px-6 sm:px-10">
       <FadeIn>
-        <div className="text-center mb-16">
-          <h2 className="font-serif text-[clamp(32px,5vw,52px)] font-bold leading-[1.1] tracking-[-0.02em] text-fg mb-4">
+        <div className="text-center mb-14">
+          <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[#1C1C1C] dark:text-[#F4F4F6] mb-4">
             How it works
           </h2>
-          <p className="text-[17px] text-fg/40 max-w-[440px] mx-auto leading-relaxed">
+          <p className="text-[16px] text-[#6B7280] dark:text-[#888888] max-w-[440px] mx-auto leading-relaxed">
             Three steps. Thirty seconds. The truth about your team.
           </p>
         </div>
@@ -466,14 +578,14 @@ function HowItWorks() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {HOW_STEPS.map((step, i) => (
           <FadeIn key={step.number} delay={i * 0.1}>
-            <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-7 h-full">
-              <div className="font-mono text-[12px] font-semibold tracking-[0.1em] text-brand-light mb-6">
-                [ {step.number} ]
+            <div className="rounded-xl border border-[#DADDD8] dark:border-white/[0.07] bg-[#F3F4F6] dark:bg-white/[0.02] p-7 h-full transition-colors duration-200">
+              <div className="text-[12px] font-semibold tracking-[0.1em] text-[#4B83F5] mb-6 uppercase">
+                {step.number}
               </div>
-              <h3 className="text-[18px] font-semibold tracking-[-0.015em] text-fg mb-3 leading-tight">
+              <h3 className="text-[18px] font-semibold tracking-[-0.015em] text-[#1C1C1C] dark:text-[#F4F4F6] mb-3 leading-tight">
                 {step.title}
               </h3>
-              <p className="text-[14px] leading-[1.7] text-fg/40">
+              <p className="text-[14px] leading-[1.7] text-[#6B7280] dark:text-[#888888]">
                 {step.description}
               </p>
             </div>
@@ -484,26 +596,92 @@ function HowItWorks() {
   );
 }
 
+/* ─── Contributor Score Preview ─── */
+
+function ScorePreview() {
+  return (
+    <section className="py-[80px] sm:py-[100px] mx-auto max-w-[1200px] px-6 sm:px-10">
+      <FadeIn>
+        <div className="text-center mb-12">
+          <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[#1C1C1C] dark:text-[#F4F4F6] mb-3">
+            The receipt your group project deserves
+          </h2>
+          <p className="text-[16px] text-[#6B7280] dark:text-[#888888]">
+            Objective scores. No surveys. No one lying about what they did.
+          </p>
+        </div>
+      </FadeIn>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mx-auto max-w-[860px]">
+        {DEMO_CONTRIBUTORS.map((c, i) => {
+          const colors = TIER_CARD_COLORS[c.tier];
+          return (
+            <FadeIn key={c.name} delay={i * 0.1}>
+              <div
+                className="rounded-xl border border-[#DADDD8] dark:border-white/[0.06] bg-[#FAFAFF] dark:bg-white/[0.02] p-6 shadow-card-light dark:shadow-none transition-colors duration-200"
+                style={{ borderTop: `2px solid ${colors.borderAccent}` }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div
+                      className="w-[38px] h-[38px] rounded-full overflow-hidden flex items-center justify-center text-[12px] font-bold flex-shrink-0"
+                      style={{
+                        background: colors.avatarBg,
+                        color: colors.avatarText,
+                        border: `2px solid ${colors.avatarRing}`,
+                      }}
+                    >
+                      {c.avatarUrl ? (
+                        <img src={c.avatarUrl} alt={c.name} className="w-full h-full object-cover" />
+                      ) : (
+                        c.initials.slice(0, 1)
+                      )}
+                    </div>
+                    <span className="text-[14px] font-semibold tracking-[-0.01em] text-[#1C1C1C] dark:text-[#F4F4F6]">
+                      {c.name}
+                    </span>
+                  </div>
+                  <TierBadge tier={c.tier} size="sm" theme="dark" />
+                </div>
+
+                <div
+                  className="text-[52px] font-extrabold tracking-[-0.03em] leading-none tabular-nums"
+                  style={{ color: colors.scoreColor }}
+                >
+                  {c.score}
+                </div>
+                <div className="mt-1 text-[11px] font-semibold tracking-[0.08em] uppercase text-[#9CA3AF] dark:text-white/30">
+                  Fair Share Score
+                </div>
+              </div>
+            </FadeIn>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 /* ─── Testimonial ─── */
 
 function Testimonial() {
   return (
-    <section className="py-section mx-auto max-w-container-xs px-6 sm:px-10">
+    <section className="py-[80px] sm:py-[100px] mx-auto max-w-[680px] px-6 sm:px-10">
       <FadeIn>
         <div className="flex flex-col items-start">
-          <div className="w-[52px] h-[52px] rounded-full bg-surface-2 border border-fg/[0.08] mb-8 flex items-center justify-center overflow-hidden">
-            <span className="text-[18px] font-bold text-fg/30">J</span>
+          <div className="w-[52px] h-[52px] rounded-full bg-[#F3F4F6] dark:bg-white/[0.04] border border-[#E5E7EB] dark:border-white/[0.08] mb-8 flex items-center justify-center overflow-hidden">
+            <span className="text-[18px] font-bold text-[#D1D5DB] dark:text-white/30">J</span>
           </div>
 
-          <blockquote className="font-serif text-[clamp(22px,3.5vw,32px)] font-medium leading-[1.4] tracking-[-0.01em] text-fg/85 mb-8">
+          <blockquote className="text-[clamp(20px,3vw,28px)] font-medium leading-[1.45] tracking-[-0.01em] text-[#374151] dark:text-white/80 mb-8">
             &ldquo;We had a group member who claimed they did everything. Glasswork ran the numbers and it turned out they contributed 12%. The professor saw the report and adjusted grades. This tool is brutal and I love it.&rdquo;
           </blockquote>
 
           <div>
-            <div className="text-[14px] font-semibold text-fg/70">
+            <div className="text-[14px] font-semibold text-[#374151] dark:text-white/70">
               Jason Park
             </div>
-            <div className="text-[13px] text-fg/35">
+            <div className="text-[13px] text-[#9CA3AF] dark:text-white/35">
               CS Student, Georgia Tech
             </div>
           </div>
@@ -517,13 +695,13 @@ function Testimonial() {
 
 function Integrations() {
   return (
-    <section className="py-section mx-auto max-w-container px-6 sm:px-10">
+    <section className="py-[80px] sm:py-[100px] mx-auto max-w-[1200px] px-6 sm:px-10">
       <FadeIn>
         <div className="text-center mb-14">
-          <h2 className="font-serif text-[clamp(32px,5vw,52px)] font-bold leading-[1.1] tracking-[-0.02em] text-fg mb-4">
+          <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[#1C1C1C] dark:text-[#F4F4F6] mb-4">
             Works with your stack
           </h2>
-          <p className="text-[17px] text-fg/40 max-w-[460px] mx-auto leading-relaxed">
+          <p className="text-[16px] text-[#6B7280] dark:text-[#888888] max-w-[460px] mx-auto leading-relaxed">
             Paste a link from the tools you already use. We handle the rest.
           </p>
         </div>
@@ -540,10 +718,10 @@ function Integrations() {
           ].map((tool) => (
             <div
               key={tool.name}
-              className="flex items-center gap-2.5 px-5 py-3 rounded-xl border border-fg/[0.06] bg-fg/[0.02] hover:border-fg/[0.12] hover:bg-fg/[0.04] transition-all"
+              className="flex items-center gap-2.5 px-5 py-3 rounded-xl border border-[#DADDD8] dark:border-white/[0.06] bg-[#F9FAFB] dark:bg-white/[0.02] hover:border-[#D1D5DB] dark:hover:border-white/[0.12] hover:bg-[#F3F4F6] dark:hover:bg-white/[0.04] transition-all"
             >
               <span className="text-[20px]">{tool.icon}</span>
-              <span className="text-[14px] font-medium text-fg/55">{tool.name}</span>
+              <span className="text-[14px] font-medium text-[#6B7280] dark:text-white/55">{tool.name}</span>
             </div>
           ))}
         </div>
@@ -559,15 +737,15 @@ function Integrations() {
           ].map((stat) => (
             <div
               key={stat.label}
-              className="rounded-xl border border-fg/[0.06] bg-fg/[0.02] p-5 text-center"
+              className="rounded-xl border border-[#DADDD8] dark:border-white/[0.06] bg-[#F9FAFB] dark:bg-white/[0.02] p-5 text-center"
             >
-              <div className="text-[28px] font-bold tracking-[-0.03em] text-fg mb-1 tabular-nums">
+              <div className="text-[28px] font-bold tracking-[-0.03em] text-[#1C1C1C] dark:text-[#F4F4F6] mb-1 tabular-nums">
                 {stat.value}
               </div>
-              <div className="text-[13px] font-semibold text-fg/50 mb-1">
+              <div className="text-[13px] font-semibold text-[#6B7280] dark:text-white/50 mb-1">
                 {stat.label}
               </div>
-              <div className="text-[12px] text-fg/30">
+              <div className="text-[12px] text-[#9CA3AF] dark:text-white/30">
                 {stat.desc}
               </div>
             </div>
@@ -582,40 +760,38 @@ function Integrations() {
 
 function BentoGrid() {
   return (
-    <section className="py-section mx-auto max-w-container px-6 sm:px-10">
+    <section className="py-[80px] sm:py-[100px] mx-auto max-w-[1200px] px-6 sm:px-10">
       <FadeIn>
-        <h2 className="font-serif text-[clamp(32px,5vw,52px)] font-bold leading-[1.1] tracking-[-0.02em] text-fg mb-4">
-          Built to be trusted
+        <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[#1C1C1C] dark:text-[#F4F4F6] mb-4">
+          Built to scale with you
         </h2>
-        <p className="text-[17px] text-fg/40 max-w-[500px] mb-14 leading-relaxed">
+        <p className="text-[16px] text-[#6B7280] dark:text-[#888888] max-w-[500px] mb-14 leading-relaxed">
           Enterprise-grade analysis with the simplicity of pasting a link.
         </p>
       </FadeIn>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Speed — wide card */}
         <FadeIn delay={0}>
-          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-7 h-full">
-            <h3 className="text-[16px] font-semibold text-fg mb-2">Speed</h3>
-            <p className="text-[14px] text-fg/35 leading-relaxed mb-8">
+          <div className="rounded-xl border border-[#DADDD8] dark:border-white/[0.07] bg-[#F9FAFB] dark:bg-white/[0.02] p-7 h-full">
+            <h3 className="text-[16px] font-semibold text-[#1C1C1C] dark:text-[#F4F4F6] mb-2">Speed</h3>
+            <p className="text-[14px] text-[#6B7280] dark:text-[#888888] leading-relaxed mb-8">
               Results in 30 seconds. Not minutes, not hours. Blazing fast keyboard shortcuts and navigation.
             </p>
             <div className="flex items-center gap-4">
-              <div className="h-[48px] w-[48px] rounded-xl bg-fg/[0.05] border border-fg/[0.08] flex items-center justify-center">
-                <span className="text-[14px] font-mono text-fg/40">⌘</span>
+              <div className="h-[48px] w-[48px] rounded-xl bg-[#F3F4F6] dark:bg-white/[0.05] border border-[#E5E7EB] dark:border-white/[0.08] flex items-center justify-center">
+                <span className="text-[14px] font-mono text-[#9CA3AF] dark:text-white/40">⌘</span>
               </div>
-              <div className="h-[48px] w-[48px] rounded-xl bg-fg/[0.05] border border-fg/[0.08] flex items-center justify-center">
-                <span className="text-[14px] font-mono text-fg/40">K</span>
+              <div className="h-[48px] w-[48px] rounded-xl bg-[#F3F4F6] dark:bg-white/[0.05] border border-[#E5E7EB] dark:border-white/[0.08] flex items-center justify-center">
+                <span className="text-[14px] font-mono text-[#9CA3AF] dark:text-white/40">K</span>
               </div>
             </div>
           </div>
         </FadeIn>
 
-        {/* Accuracy — wide card */}
         <FadeIn delay={0.08}>
-          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-7 h-full">
-            <h3 className="text-[16px] font-semibold text-fg mb-2">Accuracy</h3>
-            <p className="text-[14px] text-fg/35 leading-relaxed mb-8">
+          <div className="rounded-xl border border-[#DADDD8] dark:border-white/[0.07] bg-[#F9FAFB] dark:bg-white/[0.02] p-7 h-full">
+            <h3 className="text-[16px] font-semibold text-[#1C1C1C] dark:text-[#F4F4F6] mb-2">Accuracy</h3>
+            <p className="text-[14px] text-[#6B7280] dark:text-[#888888] leading-relaxed mb-8">
               Revision-level analysis. Every edit, every commit, weighted fairly.
             </p>
             <div className="flex items-end gap-1.5 h-[48px]">
@@ -625,7 +801,7 @@ function BentoGrid() {
                   className="flex-1 rounded-sm transition-all"
                   style={{
                     height: `${h}%`,
-                    backgroundColor: h > 70 ? "rgba(139, 124, 246, 0.4)" : "rgba(248, 245, 239, 0.06)",
+                    backgroundColor: h > 70 ? "rgba(75, 131, 245, 0.4)" : "rgba(200, 200, 200, 0.15)",
                   }}
                 />
               ))}
@@ -633,75 +809,37 @@ function BentoGrid() {
           </div>
         </FadeIn>
 
-        {/* Security — tall card */}
         <FadeIn delay={0.12}>
-          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-7 h-full flex flex-col">
+          <div className="rounded-xl border border-[#DADDD8] dark:border-white/[0.07] bg-[#F9FAFB] dark:bg-white/[0.02] p-7 h-full flex flex-col">
             <div className="flex-1">
-              <h3 className="text-[16px] font-semibold text-fg mb-2">Security</h3>
-              <p className="text-[14px] text-fg/35 leading-relaxed">
+              <h3 className="text-[16px] font-semibold text-[#1C1C1C] dark:text-[#F4F4F6] mb-2">Security</h3>
+              <p className="text-[14px] text-[#6B7280] dark:text-[#888888] leading-relaxed">
                 Your data is encrypted in transit and at rest. We never store your documents.
               </p>
             </div>
             <div className="mt-8 flex flex-col items-center gap-2">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-solid/60">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-[#34D399]/60">
                 <path d="M9 12l2 2 4-4" />
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               </svg>
-              <span className="text-[11px] font-medium text-fg/25 uppercase tracking-wider">Encrypted &amp; ephemeral</span>
+              <span className="text-[11px] font-medium text-[#9CA3AF] dark:text-white/25 uppercase tracking-wider">Encrypted &amp; ephemeral</span>
             </div>
           </div>
         </FadeIn>
 
-        {/* Privacy + Shareable stacked */}
         <FadeIn delay={0.16}>
           <div className="space-y-4 h-full flex flex-col">
-            <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-7 flex-1">
-              <h3 className="text-[16px] font-semibold text-fg mb-2">Privacy</h3>
-              <p className="text-[14px] text-fg/35 leading-relaxed">
+            <div className="rounded-xl border border-[#DADDD8] dark:border-white/[0.07] bg-[#F9FAFB] dark:bg-white/[0.02] p-7 flex-1">
+              <h3 className="text-[16px] font-semibold text-[#1C1C1C] dark:text-[#F4F4F6] mb-2">Privacy</h3>
+              <p className="text-[14px] text-[#6B7280] dark:text-[#888888] leading-relaxed">
                 Read-only access. We analyze metadata and diffs — never store your content.
               </p>
             </div>
-            <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-7 flex-1">
-              <h3 className="text-[16px] font-semibold text-fg mb-2">Shareable</h3>
-              <p className="text-[14px] text-fg/35 leading-relaxed">
-                One-click share links. Send results to professors, managers, or teammates.
+            <div className="rounded-xl border border-[#DADDD8] dark:border-white/[0.07] bg-[#F9FAFB] dark:bg-white/[0.02] p-7 flex-1">
+              <h3 className="text-[16px] font-semibold text-[#1C1C1C] dark:text-[#F4F4F6] mb-2">Mobile &amp; Chrome</h3>
+              <p className="text-[14px] text-[#6B7280] dark:text-[#888888] leading-relaxed">
+                There wherever you need it — desktop, tablet, phone. No app to install.
               </p>
-            </div>
-          </div>
-        </FadeIn>
-
-        {/* Works everywhere — full width */}
-        <FadeIn delay={0.2} className="md:col-span-2">
-          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-7">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <h3 className="text-[16px] font-semibold text-fg mb-2">Works everywhere</h3>
-                <p className="text-[14px] text-fg/35 leading-relaxed">
-                  Desktop, tablet, phone. Check results anywhere, anytime. No app to install.
-                </p>
-              </div>
-              <div className="flex items-center gap-3 shrink-0">
-                <div className="h-[40px] w-[40px] rounded-lg bg-fg/[0.04] border border-fg/[0.06] flex items-center justify-center">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-fg/30">
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                    <line x1="8" y1="21" x2="16" y2="21" />
-                    <line x1="12" y1="17" x2="12" y2="21" />
-                  </svg>
-                </div>
-                <div className="h-[40px] w-[40px] rounded-lg bg-fg/[0.04] border border-fg/[0.06] flex items-center justify-center">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-fg/30">
-                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-                    <line x1="12" y1="18" x2="12.01" y2="18" />
-                  </svg>
-                </div>
-                <div className="h-[40px] w-[40px] rounded-lg bg-fg/[0.04] border border-fg/[0.06] flex items-center justify-center">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-fg/30">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="2" y1="12" x2="22" y2="12" />
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                  </svg>
-                </div>
-              </div>
             </div>
           </div>
         </FadeIn>
@@ -714,47 +852,46 @@ function BentoGrid() {
 
 function FounderSection() {
   return (
-    <section className="py-section mx-auto max-w-container-xs px-6 sm:px-10">
+    <section id="about" className="py-[80px] sm:py-[100px] mx-auto max-w-[680px] px-6 sm:px-10">
       <FadeIn>
         <div className="space-y-8">
-          <p className="font-serif text-[clamp(20px,3vw,28px)] leading-[1.55] text-fg/80">
+          <p className="text-[clamp(18px,2.5vw,24px)] leading-[1.55] text-[#374151] dark:text-white/75">
             I built Glasswork because I was tired of{" "}
-            <span className="text-fg underline decoration-fg/20 underline-offset-4">
+            <span className="text-[#1C1C1C] dark:text-[#F4F4F6] underline decoration-[#D1D5DB] dark:decoration-white/20 underline-offset-4">
               carrying group projects
             </span>{" "}
             and having no way to prove it.
           </p>
 
-          <p className="font-serif text-[clamp(20px,3vw,28px)] leading-[1.55] text-fg/80">
+          <p className="text-[clamp(18px,2.5vw,24px)] leading-[1.55] text-[#374151] dark:text-white/75">
             Glasswork is{" "}
-            <span className="text-fg underline decoration-fg/20 underline-offset-4">
+            <span className="text-[#1C1C1C] dark:text-[#F4F4F6] underline decoration-[#D1D5DB] dark:decoration-white/20 underline-offset-4">
               one tool
             </span>{" "}
             that analyzes your docs and repos — and gives every contributor a score that speaks for itself.
           </p>
 
-          <p className="font-serif text-[clamp(20px,3vw,28px)] leading-[1.55] text-fg/80">
+          <p className="text-[clamp(18px,2.5vw,24px)] leading-[1.55] text-[#374151] dark:text-white/75">
             I&apos;m building for{" "}
-            <span className="text-fg underline decoration-fg/20 underline-offset-4">
+            <span className="text-[#1C1C1C] dark:text-[#F4F4F6] underline decoration-[#D1D5DB] dark:decoration-white/20 underline-offset-4">
               students, TAs, and teams
             </span>{" "}
             who care about fairness and want the truth — without the awkward confrontation.
           </p>
 
-          {/* Signature */}
           <div className="pt-4">
-            <div className="font-hand text-[36px] text-fg/50 mb-3">
+            <div className="font-hand text-[36px] text-[#9CA3AF] dark:text-white/40 mb-3">
               Pranav
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-[40px] h-[40px] rounded-full bg-brand/15 flex items-center justify-center text-[14px] font-bold text-brand-light">
+              <div className="w-[40px] h-[40px] rounded-full bg-[#4B83F5]/15 flex items-center justify-center text-[14px] font-bold text-[#4B83F5]">
                 P
               </div>
               <div>
-                <div className="text-[14px] font-semibold text-fg/70">
+                <div className="text-[14px] font-semibold text-[#374151] dark:text-white/70">
                   Pranav
                 </div>
-                <div className="text-[13px] text-fg/35">
+                <div className="text-[13px] text-[#9CA3AF] dark:text-white/35">
                   Builder of Glasswork · 16, New York
                 </div>
               </div>
@@ -772,30 +909,28 @@ function BottomCTA() {
   const { signIn } = useAuthActions();
 
   return (
-    <section className="py-section mx-auto max-w-container px-6 sm:px-10">
+    <section className="py-[80px] sm:py-[100px] mx-auto max-w-[1200px] px-6 sm:px-10">
       <FadeIn>
-        <div className="rounded-2xl border border-fg/[0.08] bg-fg/[0.02] p-10 sm:p-16 text-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-brand/[0.06] via-transparent to-solid/[0.04] pointer-events-none" />
+        <div className="rounded-2xl border border-[#DADDD8] dark:border-white/[0.08] bg-[#F3F4F6] dark:bg-white/[0.02] p-10 sm:p-16 text-center relative overflow-hidden">
           <div className="relative z-10">
-            <h2 className="font-serif text-[clamp(36px,6vw,64px)] font-bold leading-[1.08] tracking-[-0.02em] text-fg mb-4">
-              The truth.
+            <h2 className="text-[clamp(32px,5vw,56px)] font-bold leading-[1.08] tracking-[-0.025em] text-[#1C1C1C] dark:text-[#F4F4F6] mb-4">
+              Stop guessing
               <br />
-              <span className="italic text-fg/50">In 30 seconds.</span>
+              who did what.
             </h2>
-            <p className="text-[17px] text-fg/40 max-w-[420px] mx-auto mb-10 leading-relaxed">
-              Paste any link. See who actually contributed.
-              No sign-up required to start.
+            <p className="text-[16px] text-[#6B7280] dark:text-[#888888] max-w-[420px] mx-auto mb-10 leading-relaxed">
+              Paste any link. See who actually contributed. No sign-up required to start.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <button
                 onClick={() => signIn("google", { redirectTo: "/app" })}
-                className="h-[48px] px-8 rounded-[10px] bg-fg text-bg text-[14px] font-semibold hover:bg-fg/90 active:scale-[0.97] transition-all"
+                className="h-[46px] px-7 rounded-lg bg-[#4B83F5] text-white text-[14px] font-semibold hover:bg-[#5B93F7] active:scale-[0.97] transition-all"
               >
                 Get started free
               </button>
               <a
                 href="#how"
-                className="h-[48px] px-8 rounded-[10px] border border-fg/12 text-fg/55 text-[14px] font-medium hover:border-fg/20 hover:text-fg/75 transition-all flex items-center"
+                className="h-[46px] px-7 rounded-lg border border-[#DADDD8] dark:border-white/[0.10] text-[#6B7280] dark:text-white/50 text-[14px] font-medium hover:border-[#D1D5DB] dark:hover:border-white/[0.18] hover:text-[#1C1C1C] dark:hover:text-white/80 transition-all flex items-center"
               >
                 Learn more
               </a>
@@ -811,41 +946,41 @@ function BottomCTA() {
 
 function Footer() {
   return (
-    <footer className="py-12 mx-auto max-w-container px-6 sm:px-10">
-      <div className="border-t border-fg/[0.06] pt-8">
+    <footer className="py-10 mx-auto max-w-[1200px] px-6 sm:px-10">
+      <div className="border-t border-[#DADDD8] dark:border-white/[0.06] pt-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-[18px] h-[18px] rounded-full bg-fg flex items-center justify-center">
-                <div className="w-[6px] h-[6px] rounded-full bg-bg" />
-              </div>
-              <span className="text-[14px] font-semibold tracking-[-0.02em] text-fg/70">
-                glasswork
+              <span className="relative flex h-[6px] w-[6px]">
+                <span className="relative inline-flex h-[6px] w-[6px] rounded-full bg-emerald-500" />
+              </span>
+              <span className="text-[14px] font-semibold tracking-[-0.02em] text-[#374151] dark:text-white/70">
+                glass<span className="text-[#4B83F5]">work</span>
               </span>
             </div>
-            <p className="text-[13px] text-fg/30">
-              Contributor analytics for group projects and teams.
+            <p className="text-[13px] text-[#9CA3AF] dark:text-white/30">
+              One workspace for contributor analytics and team fairness.
             </p>
           </div>
 
           <div className="flex items-center gap-6">
             <a
               href="/privacy"
-              className="text-[13px] text-fg/30 hover:text-fg/55 transition-colors"
+              className="text-[13px] text-[#9CA3AF] dark:text-white/30 hover:text-[#6B7280] dark:hover:text-white/55 transition-colors"
             >
               Privacy
             </a>
             <a
               href="mailto:support@glasswork.app"
-              className="text-[13px] text-fg/30 hover:text-fg/55 transition-colors"
+              className="text-[13px] text-[#9CA3AF] dark:text-white/30 hover:text-[#6B7280] dark:hover:text-white/55 transition-colors"
             >
               Contact
             </a>
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-fg/[0.04]">
-          <p className="text-[12px] text-fg/20">
+        <div className="mt-8 pt-6 border-t border-[#E5E7EB] dark:border-white/[0.04]">
+          <p className="text-[12px] text-[#D1D5DB] dark:text-white/20">
             &copy; {new Date().getFullYear()} Glasswork &middot; Built by a 16yo in New York
           </p>
         </div>
@@ -867,24 +1002,26 @@ export default function LandingPage() {
   }, [isAuthenticated, isLoading, router]);
 
   return (
-    <div className="relative min-h-screen bg-bg">
+    <div className="relative min-h-screen bg-[#EEF0F2] dark:bg-[#1C1C1C] transition-colors duration-200">
       <Nav />
       <Hero />
-      <div className="section-divider" />
+      <div className="h-px mx-auto max-w-[900px] bg-[#DADDD8] dark:bg-white/[0.06]" />
       <TrustStrip />
-      <div className="section-divider" />
+      <div className="h-px mx-auto max-w-[900px] bg-[#DADDD8] dark:bg-white/[0.06]" />
       <FeatureShowcase />
-      <div className="section-divider" />
+      <div className="h-px mx-auto max-w-[900px] bg-[#DADDD8] dark:bg-white/[0.06]" />
       <HowItWorks />
-      <div className="section-divider" />
+      <div className="h-px mx-auto max-w-[900px] bg-[#DADDD8] dark:bg-white/[0.06]" />
+      <ScorePreview />
+      <div className="h-px mx-auto max-w-[900px] bg-[#DADDD8] dark:bg-white/[0.06]" />
       <Testimonial />
-      <div className="section-divider" />
+      <div className="h-px mx-auto max-w-[900px] bg-[#DADDD8] dark:bg-white/[0.06]" />
       <Integrations />
-      <div className="section-divider" />
+      <div className="h-px mx-auto max-w-[900px] bg-[#DADDD8] dark:bg-white/[0.06]" />
       <BentoGrid />
-      <div className="section-divider" />
+      <div className="h-px mx-auto max-w-[900px] bg-[#DADDD8] dark:bg-white/[0.06]" />
       <FounderSection />
-      <div className="section-divider" />
+      <div className="h-px mx-auto max-w-[900px] bg-[#DADDD8] dark:bg-white/[0.06]" />
       <BottomCTA />
       <Footer />
     </div>
