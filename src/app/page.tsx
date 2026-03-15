@@ -182,16 +182,6 @@ function Nav() {
 
 function Hero() {
   const { signIn } = useAuthActions();
-  const router = useRouter();
-  const [inputValue, setInputValue] = useState("");
-
-  function handleSubmit() {
-    if (!inputValue.trim()) {
-      signIn("google", { redirectTo: "/app" });
-      return;
-    }
-    router.push(`/app?prefill=${encodeURIComponent(inputValue.trim())}`);
-  }
 
   return (
     <section className="relative pt-[140px] pb-[60px] sm:pt-[160px] sm:pb-[80px]">
