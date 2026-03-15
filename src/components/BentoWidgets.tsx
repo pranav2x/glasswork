@@ -33,8 +33,8 @@ export function BentoGlobalScore({
 }) {
   return (
     <GlassPanel hoverable className={cn("flex flex-col justify-center p-6", className)}>
-      <p className="text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em]">Global Score</p>
-      <div className="mt-2 font-body text-[4rem] font-black leading-none tracking-tight text-warm-900 tabular-nums">
+      <p className="text-[10px] font-semibold text-[color:var(--app-text-muted)] uppercase tracking-[0.1em]">Global Score</p>
+      <div className="mt-2 font-body text-[4rem] font-black leading-none tracking-tight text-[color:var(--app-text)] tabular-nums">
         <AnimatedNumber value={avgScore} />
       </div>
       <div className="mt-3">
@@ -54,20 +54,20 @@ export function BentoAIFeed({
   return (
     <GlassPanel hoverable className={cn("flex flex-col p-6", className)}>
       <div className="flex items-center gap-2 mb-4">
-        <MessageSquare className="h-4 w-4 text-warm-500" strokeWidth={1.5} />
-        <p className="text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em]">AI Insights</p>
+        <MessageSquare className="h-4 w-4 text-[color:var(--app-text-muted)]" strokeWidth={1.5} />
+        <p className="text-[10px] font-semibold text-[color:var(--app-text-muted)] uppercase tracking-[0.1em]">AI Insights</p>
       </div>
       <div className="flex flex-1 flex-col gap-3 overflow-hidden">
         {summaries.length === 0 ? (
-          <p className="text-[12px] text-warm-500 py-4 text-center">
+          <p className="text-[12px] text-[color:var(--app-text-muted)] py-4 text-center">
             Run analyses to see AI summaries
           </p>
         ) : (
           summaries.map((s) => (
             <Link key={s.id} href={`/results/${s.id}`}>
-              <div className="rounded-xl bg-white/[0.04] border border-white/[0.06] p-3 transition-colors hover:bg-white/[0.08]">
-                <p className="text-[11px] font-semibold text-warm-700 mb-1">{s.title}</p>
-                <p className="text-[11px] leading-relaxed text-warm-500 line-clamp-2">{s.summary}</p>
+              <div className="rounded-xl bg-[var(--app-hover-bg)] border border-[var(--app-card-border)] p-3 transition-colors hover:bg-[var(--app-hover-bg)]">
+                <p className="text-[11px] font-semibold text-[color:var(--app-text)] mb-1">{s.title}</p>
+                <p className="text-[11px] leading-relaxed text-[color:var(--app-text-muted)] line-clamp-2">{s.summary}</p>
               </div>
             </Link>
           ))
@@ -89,9 +89,9 @@ export function BentoActivityHeatmap({
   const reposData = activityByMonth.map((m) => m.reposCount);
 
   return (
-    <GlassPanel hoverable className={cn("flex flex-col overflow-hidden p-6", className)}>
-      <p className="text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em] mb-3">Activity</p>
-      <div className="flex-1 min-h-0 overflow-hidden">
+    <GlassPanel hoverable className={cn("flex flex-col p-6", className)}>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-3" style={{ color: "rgba(255,255,255,0.40)" }}>Activity</p>
+      <div className="flex-1 min-h-0">
         <ActivityChart months={months} docsData={docsData} reposData={reposData} />
       </div>
     </GlassPanel>
@@ -116,10 +116,10 @@ export function BentoCarryStreak({
         fill={isActive ? "#FBBF24" : "none"}
         strokeWidth={1.5}
       />
-      <div className="mt-2 font-body text-[2.5rem] font-black leading-none text-warm-900 tabular-nums">
+      <div className="mt-2 font-body text-[2.5rem] font-black leading-none text-[color:var(--app-text)] tabular-nums">
         {streak}
       </div>
-      <p className="mt-1 text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em]">
+      <p className="mt-1 text-[10px] font-semibold text-[color:var(--app-text-muted)] uppercase tracking-[0.1em]">
         project streak
       </p>
     </GlassPanel>
@@ -141,14 +141,14 @@ export function BentoRecentProjects({
 }) {
   return (
     <GlassPanel hoverable className={cn("flex flex-col p-6", className)}>
-      <p className="text-[10px] font-semibold text-warm-500 uppercase tracking-[0.1em] mb-4">Recent Projects</p>
+      <p className="text-[10px] font-semibold text-[color:var(--app-text-muted)] uppercase tracking-[0.1em] mb-4">Recent Projects</p>
       <div className="flex flex-1 flex-col gap-2">
         {analyses.length === 0 ? (
-          <p className="text-[12px] text-warm-500 py-4 text-center">No projects yet</p>
+          <p className="text-[12px] text-[color:var(--app-text-muted)] py-4 text-center">No projects yet</p>
         ) : (
           analyses.map((a) => (
             <Link key={a._id} href={`/results/${a._id}`}>
-              <div className="group flex items-center gap-3 rounded-xl p-2.5 transition-colors hover:bg-white/[0.04]">
+              <div className="group flex items-center gap-3 rounded-xl p-2.5 transition-colors hover:bg-[var(--app-hover-bg)]">
                 <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg", a.sourceType === "github_repo" ? "bg-repo-accent/10" : "bg-docs-accent/10")}>
                   {a.sourceType === "github_repo" ? (
                     <GitBranch className="h-3.5 w-3.5 text-repo-accent" strokeWidth={1.5} />
@@ -157,10 +157,10 @@ export function BentoRecentProjects({
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[12px] font-semibold text-warm-700">{a.title}</p>
-                  <p className="text-[10px] text-warm-500">{formatTimeAgo(a.createdAt)}</p>
+                  <p className="truncate text-[12px] font-semibold text-[color:var(--app-text)]">{a.title}</p>
+                  <p className="text-[10px] text-[color:var(--app-text-muted)]">{formatTimeAgo(a.createdAt)}</p>
                 </div>
-                <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-warm-400 transition-colors group-hover:text-warm-600" strokeWidth={1.5} />
+                <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-[color:var(--app-text-faint)] transition-colors group-hover:text-[color:var(--app-text-muted)]" strokeWidth={1.5} />
               </div>
             </Link>
           ))

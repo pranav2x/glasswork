@@ -21,8 +21,8 @@ export function DonutChart({ segments }: DonutChartProps) {
   if (total === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-8">
-        <div className="h-[200px] w-[200px] rounded-full border-[14px] border-white/[0.06]" />
-        <p className="mt-3 text-[12px] font-medium text-warm-500">No analyses yet</p>
+        <div className="h-[200px] w-[200px] rounded-full border-[14px] border-[var(--app-hover-bg)]" />
+        <p className="mt-3 text-[12px] font-medium text-[color:var(--app-text-muted)]">No analyses yet</p>
       </div>
     );
   }
@@ -66,7 +66,7 @@ export function DonutChart({ segments }: DonutChartProps) {
               className="h-2 w-2 rounded-full"
               style={{ backgroundColor: seg.color }}
             />
-            <span className="text-[11px] font-medium text-warm-500">
+            <span className="text-[11px] font-medium text-[color:var(--app-text-muted)]">
               {seg.label}: {seg.value}
             </span>
           </div>
@@ -90,17 +90,17 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
   if (docsTotal === 0 && reposTotal === 0) {
     return (
       <div className="flex items-center justify-center py-10">
-        <p className="text-[12px] font-medium text-warm-500">No activity yet</p>
+        <p className="text-[12px] font-medium text-[color:var(--app-text-muted)]">No activity yet</p>
       </div>
     );
   }
 
-  const width = 320;
-  const height = 180;
-  const padL = 8;
-  const padR = 8;
-  const padT = 20;
-  const padB = 36;
+  const width = 400;
+  const height = 200;
+  const padL = 24;
+  const padR = 12;
+  const padT = 16;
+  const padB = 40;
 
   const chartW = width - padL - padR;
   const chartH = height - padT - padB;
@@ -126,14 +126,14 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
     <div className="flex h-full flex-col">
       <div className="mb-2 flex items-center gap-4">
         <div className="flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-          <span className="text-[10px] font-medium text-warm-500">
+          <span className="h-1.5 w-1.5 rounded-full" style={{ background: "#518BDB" }} />
+          <span className="text-[10px] font-medium text-[color:var(--app-text-muted)]">
             Docs: {docsTotal.toLocaleString()}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-repo-accent" />
-          <span className="text-[10px] font-medium text-warm-500">
+          <span className="text-[10px] font-medium text-[color:var(--app-text-muted)]">
             Repos: {reposTotal.toLocaleString()}
           </span>
         </div>
@@ -142,8 +142,8 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full flex-1" preserveAspectRatio="xMidYMid meet">
         <defs>
           <linearGradient id="docsAreaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#7C6FFF" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="#7C6FFF" stopOpacity="0" />
+            <stop offset="0%" stopColor="#518BDB" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="#518BDB" stopOpacity="0" />
           </linearGradient>
         </defs>
 
@@ -156,15 +156,15 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
                 y1={padT + chartH * (1 - pct)}
                 x2={width - padR}
                 y2={padT + chartH * (1 - pct)}
-                stroke="rgba(255,255,255,0.06)"
-                strokeWidth="0.5"
+                stroke="rgba(255,255,255,0.10)"
+                strokeWidth="0.7"
               />
               <text
                 x={padL + 12}
                 y={padT + chartH * (1 - pct) + 3}
                 textAnchor="end"
-                fontSize="8"
-                fill="#5A5A78"
+                fontSize="9"
+                fill="rgba(255,255,255,0.35)"
                 fontFamily="inherit"
               >
                 {yVal}
@@ -178,8 +178,8 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
         <polyline
           points={docsPoints}
           fill="none"
-          stroke="#7C6FFF"
-          strokeWidth="2"
+          stroke="#518BDB"
+          strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -188,14 +188,14 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
           points={reposPoints}
           fill="none"
           stroke="#34D399"
-          strokeWidth="2"
+          strokeWidth="2.5"
           strokeDasharray="4 3"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
 
         {docsData.map((v, i) => (
-          <circle key={`d-${i}`} cx={getX(i)} cy={getY(v)} r="2.5" fill="#7C6FFF" />
+          <circle key={`d-${i}`} cx={getX(i)} cy={getY(v)} r="2.5" fill="#518BDB" />
         ))}
         {reposData.map((v, i) => (
           <circle key={`r-${i}`} cx={getX(i)} cy={getY(v)} r="2" fill="#34D399" />
@@ -207,8 +207,8 @@ export function ActivityChart({ months, docsData, reposData }: ActivityChartProp
             x={getX(i)}
             y={height - 10}
             textAnchor="middle"
-            fontSize="9"
-            fill="#8888A8"
+            fontSize="10"
+            fill="rgba(255,255,255,0.50)"
             fontWeight="500"
             fontFamily="inherit"
           >
@@ -234,14 +234,14 @@ export function ScoreBar({ label, count, total, percentage, color, delay = 0 }: 
   return (
     <div className="hero-fade-in" style={{ animationDelay: `${delay}s` }}>
       <div className="flex items-center justify-between">
-        <span className="text-[13px] font-medium text-warm-700">{label}</span>
-        <div className="flex items-center gap-2 text-[12px] text-warm-500">
+        <span className="text-[13px] font-medium text-[color:var(--app-text)]">{label}</span>
+        <div className="flex items-center gap-2 text-[12px] text-[color:var(--app-text-muted)]">
           <span>{count}</span>
-          <span className="text-warm-400">|</span>
+          <span className="text-[color:var(--app-text-faint)]">|</span>
           <span>{total}</span>
         </div>
       </div>
-      <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+      <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-[var(--app-hover-bg)]">
         <div
           className="h-full rounded-full transition-all duration-1000 ease-out"
           style={{ width: `${percentage}%`, backgroundColor: color }}
@@ -264,7 +264,7 @@ interface AnalysisItemProps {
 export function AnalysisItem({ icon, iconBg, title, description, isComplete = false, delay = 0 }: AnalysisItemProps) {
   return (
     <div
-      className="hero-fade-in group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-white/[0.04]"
+      className="hero-fade-in group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[var(--app-hover-bg)]"
       style={{ animationDelay: `${delay}s` }}
     >
       <div
@@ -274,8 +274,8 @@ export function AnalysisItem({ icon, iconBg, title, description, isComplete = fa
         {icon}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[13px] font-semibold text-warm-800">{title}</p>
-        <p className="mt-0.5 truncate text-[11px] leading-relaxed text-warm-500">{description}</p>
+        <p className="truncate text-[13px] font-semibold text-[color:var(--app-text)]">{title}</p>
+        <p className="mt-0.5 truncate text-[11px] leading-relaxed text-[color:var(--app-text-muted)]">{description}</p>
       </div>
       <div
         className={cn(
@@ -306,18 +306,18 @@ interface ReportItemProps {
 
 export function ReportItem({ label, title, time, icon, iconBg }: ReportItemProps) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-white/[0.08] p-3.5 transition-colors hover:border-white/[0.14] hover:bg-white/[0.04]">
+    <div className="flex items-center justify-between rounded-xl border border-[var(--app-card-border)] p-3.5 transition-colors hover:border-[var(--app-card-border)] hover:bg-[var(--app-hover-bg)]">
       <div className="min-w-0">
-        <p className="text-[10px] font-medium uppercase tracking-wider text-warm-500">{label}</p>
-        <p className="mt-0.5 text-[13px] font-semibold text-warm-800">{title}</p>
+        <p className="text-[10px] font-medium uppercase tracking-wider text-[color:var(--app-text-muted)]">{label}</p>
+        <p className="mt-0.5 text-[13px] font-semibold text-[color:var(--app-text)]">{title}</p>
         <div className="mt-1 flex items-center gap-2">
-          <span className="text-[11px] font-medium text-warm-500">{time}</span>
+          <span className="text-[11px] font-medium text-[color:var(--app-text-muted)]">{time}</span>
           <div className="flex h-5 w-5 items-center justify-center rounded-md" style={{ backgroundColor: iconBg }}>
             {icon}
           </div>
         </div>
       </div>
-      <button className="flex h-7 w-7 items-center justify-center rounded-lg text-warm-400 transition-colors hover:bg-white/[0.06] hover:text-warm-600">
+      <button className="flex h-7 w-7 items-center justify-center rounded-lg text-[color:var(--app-text-faint)] transition-colors hover:bg-[var(--app-hover-bg)] hover:text-[color:var(--app-text-muted)]">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M4 10L10 4M10 4H5M10 4V9" />
         </svg>
@@ -340,7 +340,7 @@ export function ContributorTicket({ name, message, avatarColor, initials, avatar
   const [imgError, setImgError] = useState(false);
   const showAvatar = avatarUrl && !imgError;
   return (
-    <div className="rounded-xl border border-white/[0.08] p-3.5 transition-colors hover:border-white/[0.14] hover:bg-white/[0.04]">
+    <div className="rounded-xl border border-[var(--app-card-border)] p-3.5 transition-colors hover:border-[var(--app-card-border)] hover:bg-[var(--app-hover-bg)]">
       <div className="flex items-start gap-3">
         <div
           className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full text-[11px] font-bold text-white"
@@ -361,8 +361,8 @@ export function ContributorTicket({ name, message, avatarColor, initials, avatar
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-semibold text-warm-800">{name}</p>
-          <p className="mt-0.5 text-[11px] leading-relaxed text-warm-500">{message}</p>
+          <p className="text-[13px] font-semibold text-[color:var(--app-text)]">{name}</p>
+          <p className="mt-0.5 text-[11px] leading-relaxed text-[color:var(--app-text-muted)]">{message}</p>
         </div>
       </div>
       <div className="mt-2.5 flex justify-end">
@@ -372,12 +372,12 @@ export function ContributorTicket({ name, message, avatarColor, initials, avatar
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="rounded-lg border border-white/[0.10] px-3 py-1 text-[11px] font-medium text-warm-500 transition-all hover:border-white/[0.16] hover:text-warm-700"
+            className="rounded-lg border border-[var(--app-card-border)] px-3 py-1 text-[11px] font-medium text-[color:var(--app-text-muted)] transition-all hover:border-[var(--app-card-border)] hover:text-[color:var(--app-text)]"
           >
             View &rsaquo;
           </a>
         ) : (
-          <button className="rounded-lg border border-white/[0.10] px-3 py-1 text-[11px] font-medium text-warm-500 transition-all hover:border-white/[0.16] hover:text-warm-700">
+          <button className="rounded-lg border border-[var(--app-card-border)] px-3 py-1 text-[11px] font-medium text-[color:var(--app-text-muted)] transition-all hover:border-[var(--app-card-border)] hover:text-[color:var(--app-text)]">
             View &rsaquo;
           </button>
         )}
