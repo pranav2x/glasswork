@@ -4,107 +4,48 @@
 
 @layer base {
   :root {
-    /* Light mode — default */
-    --background: 0 0% 96%;
-    --foreground: 0 0% 7%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 7%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 7%;
-    --primary: 248 62% 61%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 93%;
-    --secondary-foreground: 0 0% 20%;
-    --muted: 0 0% 93%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 0 0% 93%;
-    --accent-foreground: 0 0% 20%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 248 62% 61%;
-    --radius: 0.75rem;
-
-    /* Page-level tokens */
-    --page-bg: #F5F5F5;
-    --page-text: #111111;
-    --page-text-muted: #6B7280;
-    --card-bg: #FFFFFF;
-    --card-border: #E5E5E5;
-    --nav-border: #E5E5E5;
-    --section-divider: #E5E5E5;
-  }
-
-  .dark {
-    /* Dark mode overrides */
-    --background: 240 10% 4%;
-    --foreground: 240 10% 96%;
-    --card: 240 8% 8%;
-    --card-foreground: 240 10% 96%;
-    --popover: 240 10% 6%;
-    --popover-foreground: 240 10% 96%;
-    --primary: 248 62% 61%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 8% 14%;
-    --secondary-foreground: 240 10% 96%;
-    --muted: 240 8% 12%;
-    --muted-foreground: 240 8% 55%;
-    --accent: 240 8% 14%;
-    --accent-foreground: 240 10% 96%;
+    --background: 228 12% 7%;
+    --foreground: 40 33% 95%;
+    --card: 228 10% 9%;
+    --card-foreground: 40 33% 95%;
+    --popover: 228 12% 6%;
+    --popover-foreground: 40 33% 95%;
+    --primary: 246 56% 61%;
+    --primary-foreground: 40 33% 95%;
+    --secondary: 228 10% 14%;
+    --secondary-foreground: 40 33% 95%;
+    --muted: 228 10% 12%;
+    --muted-foreground: 228 8% 55%;
+    --accent: 228 10% 14%;
+    --accent-foreground: 40 33% 95%;
     --destructive: 0 70% 65%;
-    --destructive-foreground: 240 10% 96%;
-    --border: 240 8% 14%;
-    --input: 240 8% 14%;
-    --ring: 248 62% 61%;
-
-    --page-bg: #09090E;
-    --page-text: #F4F4F6;
-    --page-text-muted: #8888A8;
-    --card-bg: rgba(255,255,255,0.03);
-    --card-border: rgba(255,255,255,0.07);
-    --nav-border: rgba(255,255,255,0.06);
-    --section-divider: rgba(255,255,255,0.06);
+    --destructive-foreground: 40 33% 95%;
+    --border: 228 10% 14%;
+    --input: 228 10% 14%;
+    --ring: 246 56% 61%;
+    --radius: 0.75rem;
   }
 
   html {
+    color-scheme: dark;
     scroll-behavior: smooth;
   }
 
-  .dark {
-    color-scheme: dark;
-  }
-
   body {
-    background-color: var(--page-bg);
-    color: var(--page-text);
+    background-color: #0F1013;
+    color: #F8F5EF;
     min-height: 100svh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-variant-numeric: tabular-nums;
-    font-family: var(--font-inter), Inter, system-ui, sans-serif;
-    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  .dark body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background:
-      radial-gradient(ellipse 70% 50% at 15% -5%, rgba(109, 99, 212, 0.11) 0%, transparent 55%),
-      radial-gradient(ellipse 50% 35% at 85% 5%, rgba(109, 99, 212, 0.06) 0%, transparent 50%),
-      radial-gradient(ellipse 40% 30% at 50% 100%, rgba(52, 198, 140, 0.04) 0%, transparent 55%);
-    pointer-events: none;
-  }
-
-  .dark * {
-    border-color: rgba(255, 255, 255, 0.08);
+  * {
+    border-color: rgba(248, 245, 239, 0.08);
   }
 
   ::selection {
-    background: rgba(109, 99, 212, 0.25);
-    color: #F4F4F6;
+    background: rgba(109, 99, 212, 0.30);
+    color: #F8F5EF;
   }
 }
 
@@ -112,25 +53,39 @@
   .text-balance {
     text-wrap: balance;
   }
-
-  .tracking-display {
-    letter-spacing: -0.04em;
-  }
-
-  .tracking-micro {
-    letter-spacing: 0.2em;
-  }
 }
 
-/* Premium glass surface */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(248, 245, 239, 0.06) 30%, rgba(248, 245, 239, 0.06) 70%, transparent);
+  margin: 0 auto;
+  max-width: 900px;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 .glass-surface {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(248, 245, 239, 0.03);
+  border: 1px solid rgba(248, 245, 239, 0.07);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
-/* Subtle text gradient for one accent word only */
+.glass {
+  background: rgba(248, 245, 239, 0.04);
+  border: 1px solid rgba(248, 245, 239, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.glass-strong {
+  background: rgba(248, 245, 239, 0.07);
+  border: 1px solid rgba(248, 245, 239, 0.12);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+}
+
 .text-gradient-brand {
   background: linear-gradient(135deg, #8B7CF6 0%, #6D63D4 100%);
   -webkit-background-clip: text;
@@ -138,56 +93,10 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* Shimmer skeleton */
 .shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(255,255,255,0.00) 0%,
-    rgba(255,255,255,0.04) 50%,
-    rgba(255,255,255,0.00) 100%
-  );
+  background: linear-gradient(90deg, rgba(248,245,239,0.00) 0%, rgba(248,245,239,0.04) 50%, rgba(248,245,239,0.00) 100%);
   background-size: 200% 100%;
   animation: shimmer 2.5s linear infinite;
-}
-
-/* Section divider */
-.section-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.06) 70%, transparent);
-  margin: 0 auto;
-  max-width: 900px;
-}
-
-/* Hide scrollbar but keep functionality */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* Glass utilities (modals/dropdowns only) */
-.glass {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-.glass-strong {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-}
-
-/* Noise/grain overlay for depth */
-.grain-overlay::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 256px 256px;
 }
 
 /* ─── Animations ─── */
@@ -198,12 +107,12 @@
 }
 
 @keyframes heroFadeIn {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .hero-fade-in {
-  animation: heroFadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: heroFadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @keyframes marquee {
@@ -219,7 +128,6 @@
   animation-play-state: paused;
 }
 
-/* FAB rotation on hover */
 .fab-icon {
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -228,7 +136,6 @@ button:hover .fab-icon {
   transform: rotate(45deg);
 }
 
-/* Modal entrance */
 @keyframes modal-enter {
   from { opacity: 0; transform: scale(0.95) translateY(8px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
@@ -247,7 +154,6 @@ button:hover .fab-icon {
   animation: modal-overlay 0.2s ease-out both;
 }
 
-/* Staggered card entrance */
 @keyframes card-enter {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
@@ -257,7 +163,6 @@ button:hover .fab-icon {
   animation: card-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Ripple effect for FAB */
 @keyframes ripple {
   0% { transform: scale(0); opacity: 0.4; }
   100% { transform: scale(2.5); opacity: 0; }
@@ -268,7 +173,7 @@ button:hover .fab-icon {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(248, 245, 239, 0.15);
   transform: scale(0);
   opacity: 0;
 }
@@ -277,28 +182,23 @@ button:hover .fab-icon {
   animation: ripple 0.5s ease-out;
 }
 
-/* Dashboard bar animation */
 @keyframes barGrow { from { width: 0; } }
 .animate-bar-grow { animation: barGrow 0.8s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
-/* Donut segment animation */
 @keyframes donutDraw { from { stroke-dashoffset: 220; } }
 .animate-donut-draw { animation: donutDraw 1s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
-/* Subtle pulse for active elements */
 @keyframes subtlePulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
 }
 .animate-subtle-pulse { animation: subtlePulse 2s ease-in-out infinite; }
 
-/* Shimmer keyframes */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
-/* Radar pulse for cinematic loading */
 @keyframes radar-pulse {
   0% { transform: scale(0.8); opacity: 0.6; }
   50% { transform: scale(1.1); opacity: 0.2; }
@@ -310,7 +210,6 @@ button:hover .fab-icon {
   100% { transform: rotate(360deg); }
 }
 
-/* Typewriter cursor blink */
 @keyframes cursor-blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
@@ -320,7 +219,6 @@ button:hover .fab-icon {
   animation: cursor-blink 1s step-end infinite;
 }
 
-/* Staggered fade-in for hero content */
 @keyframes calm-fade-in {
   0% { opacity: 0; transform: translateY(24px); }
   100% { opacity: 1; transform: translateY(0); }
@@ -330,7 +228,6 @@ button:hover .fab-icon {
   animation: calm-fade-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Dot pulse for decorative indicators */
 @keyframes dot-fade {
   0% { opacity: 0; transform: scale(0.5); }
   100% { opacity: 1; transform: scale(1); }
@@ -340,7 +237,6 @@ button:hover .fab-icon {
   animation: dot-fade 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Online pulse dot */
 @keyframes online-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.6; transform: scale(1.3); }

@@ -1,23 +1,30 @@
 import type { Metadata } from "next";
-import { DM_Sans, Inter, Caveat, Cormorant_Garamond } from "next/font/google";
-import { ThemeProvider } from "next-themes";
+import { Inter, Playfair_Display, JetBrains_Mono, Caveat } from "next/font/google";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { AppShell } from "@/components/AppShell";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-body",
+  variable: "--font-sans",
   display: "swap",
   weight: ["400", "500", "600", "700"],
 });
 
-const inter = Inter({
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-serif",
   display: "swap",
   weight: ["400", "500", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
 
 const caveat = Caveat({
@@ -25,14 +32,6 @@ const caveat = Caveat({
   variable: "--font-hand",
   display: "swap",
   weight: ["400", "500"],
-});
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  variable: "--font-myflora",
-  display: "swap",
-  weight: ["300", "400", "500", "600"],
-  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -64,28 +63,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en">
       <body
-        className={`${dmSans.variable} ${inter.variable} ${caveat.variable} ${cormorant.variable} font-body antialiased grain-overlay`}
+        className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} ${caveat.variable} font-sans antialiased`}
       >
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-          <ConvexClientProvider>
-            <AppShell>{children}</AppShell>
-            <Toaster
-              position="bottom-right"
-              theme="dark"
-              toastOptions={{
-                style: {
-                  fontFamily: "var(--font-body)",
-                  fontSize: "13px",
-                  background: "#18181F",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  color: "#F5F5FA",
-                },
-              }}
-            />
-          </ConvexClientProvider>
-        </ThemeProvider>
+        <ConvexClientProvider>
+          <AppShell>{children}</AppShell>
+          <Toaster
+            position="bottom-right"
+            theme="dark"
+            toastOptions={{
+              style: {
+                fontFamily: "var(--font-body)",
+                fontSize: "13px",
+                background: "#18181F",
+                border: "1px solid rgba(255,255,255,0.08)",
+                color: "#F5F5FA",
+              },
+            }}
+          />
+        </ConvexClientProvider>
       </body>
     </html>
   );
