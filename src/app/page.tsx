@@ -136,7 +136,7 @@ function Nav() {
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
           <span className="relative inline-flex h-[7px] w-[7px] rounded-full bg-emerald-500" />
         </span>
-        <span className="text-[15px] font-semibold tracking-[-0.02em] text-[var(--page-text)]">
+        <span className="text-[15px] font-semibold tracking-[-0.02em] text-[color:var(--page-text)]">
           glass<span className="text-[#4B83F5]">work</span>
         </span>
       </a>
@@ -151,7 +151,7 @@ function Nav() {
           <a
             key={link.label}
             href={link.href}
-            className="px-3.5 py-1.5 rounded-full text-[13px] font-medium text-[var(--page-text-muted)] hover:text-[var(--page-text)] transition-colors"
+            className="px-3.5 py-1.5 rounded-full text-[13px] font-medium text-[color:var(--page-text-muted)] hover:text-[color:var(--page-text)] transition-colors"
           >
             {link.label}
           </a>
@@ -163,7 +163,7 @@ function Nav() {
         <ThemeToggle />
         <button
           onClick={() => signIn("google", { redirectTo: "/app" })}
-          className="text-[13px] font-medium text-[var(--page-text-muted)] hover:text-[var(--page-text)] transition-colors px-3 py-1.5 hidden sm:block"
+          className="text-[13px] font-medium text-[color:var(--page-text-muted)] hover:text-[color:var(--page-text)] transition-colors px-3 py-1.5 hidden sm:block"
         >
           Log in
         </button>
@@ -206,7 +206,7 @@ function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="text-[clamp(38px,6vw,64px)] font-bold leading-[1.06] tracking-[-0.025em] text-[var(--page-text)] mb-5 text-balance"
+          className="text-[clamp(38px,6vw,64px)] font-bold leading-[1.06] tracking-[-0.025em] text-[color:var(--page-text)] mb-5 text-balance"
         >
           Find out who actually
           <br />
@@ -218,7 +218,7 @@ function Hero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="text-[17px] leading-[1.6] text-[var(--page-text-muted)] max-w-[520px] mx-auto mb-9"
+          className="text-[17px] leading-[1.6] text-[color:var(--page-text-muted)] max-w-[520px] mx-auto mb-9"
         >
           Paste a Google Doc or GitHub repo. Glasswork scores every
           contributor in 30 seconds. No more guessing.
@@ -242,7 +242,7 @@ function Hero() {
               const el = document.getElementById("how");
               el?.scrollIntoView({ behavior: "smooth" });
             }}
-            className="h-[44px] px-6 rounded-lg border border-[var(--card-border)] text-[#6B7280] dark:text-white/50 text-[14px] font-medium hover:border-[#D1D5DB] dark:hover:border-white/[0.18] hover:text-[#1C1C1C] dark:hover:text-white/80 transition-all"
+            className="h-[44px] px-6 rounded-lg border border-[var(--card-border)] text-[color:var(--page-text-muted)] text-[14px] font-medium hover:text-[color:var(--page-text)] transition-all"
           >
             See how it works
           </button>
@@ -281,7 +281,7 @@ function Hero() {
                     </svg>
                   </div>
                   <div>
-                    <div className="text-[14px] font-semibold text-[var(--page-text)]">Analysis Complete</div>
+                    <div className="text-[14px] font-semibold text-[color:var(--page-text)]">Analysis Complete</div>
                     <div className="text-[12px] text-[#9CA3AF] dark:text-white/35">3 contributors found · Google Docs</div>
                   </div>
                 </div>
@@ -313,10 +313,10 @@ function Hero() {
                           )}
                         </div>
                         <div>
-                          <span className="text-[14px] font-medium text-[var(--page-text)] block">
+                          <span className="text-[14px] font-medium text-[color:var(--page-text)] block">
                             {c.name}
                           </span>
-                          <span className="text-[11px] text-[var(--page-text-muted)] opacity-60">
+                          <span className="text-[11px] text-[color:var(--page-text-muted)] opacity-60">
                             {c.label}
                           </span>
                         </div>
@@ -366,7 +366,7 @@ function TrustStrip() {
   return (
     <section className="py-14 overflow-hidden">
       <FadeIn>
-        <p className="text-center text-[13px] font-medium text-[var(--page-text-muted)] opacity-60 mb-6">
+        <p className="text-center text-[13px] font-medium text-[color:var(--page-text-muted)] opacity-60 mb-6">
           Built and used by people at top{" "}
           <span className="text-[#6B7280] dark:text-white/50 font-semibold">{TRUST_WORDS[currentWord]}</span>.
         </p>
@@ -455,10 +455,10 @@ function FeatureShowcase() {
   return (
     <section id="features" className="py-[80px] sm:py-[100px] mx-auto max-w-[1200px] px-6 sm:px-10">
       <FadeIn>
-        <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[var(--page-text)] mb-4">
+        <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[color:var(--page-text)] mb-4">
           One place for the truth
         </h2>
-        <p className="text-[16px] text-[var(--page-text-muted)] max-w-[480px] mb-14 leading-relaxed">
+        <p className="text-[16px] text-[color:var(--page-text-muted)] max-w-[480px] mb-14 leading-relaxed">
           Everything you need to analyze contributions, score teammates, and settle it once and for all.
         </p>
       </FadeIn>
@@ -486,7 +486,7 @@ function FeatureShowcase() {
                   <div>
                     <h3
                       className={`text-[16px] font-semibold tracking-[-0.01em] mb-1.5 transition-colors duration-300 ${
-                        activeIndex === i ? "text-[var(--page-text)]" : "text-[#9CA3AF] dark:text-white/45"
+                        activeIndex === i ? "text-[color:var(--page-text)]" : "text-[#9CA3AF] dark:text-white/45"
                       }`}
                     >
                       {feature.title}
@@ -496,7 +496,7 @@ function FeatureShowcase() {
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         transition={{ duration: 0.3 }}
-                        className="text-[14px] leading-[1.65] text-[var(--page-text-muted)]"
+                        className="text-[14px] leading-[1.65] text-[color:var(--page-text-muted)]"
                       >
                         {feature.description}
                       </motion.p>
@@ -514,7 +514,7 @@ function FeatureShowcase() {
               <div className="w-16 h-16 rounded-2xl bg-[#4B83F5]/10 flex items-center justify-center mx-auto mb-4">
                 <div className="text-[#4B83F5]">{FEATURES[activeIndex].icon}</div>
               </div>
-              <p className="text-[22px] font-semibold text-[var(--page-text)] mb-2">
+              <p className="text-[22px] font-semibold text-[color:var(--page-text)] mb-2">
                 {FEATURES[activeIndex].title}
               </p>
               <p className="text-[14px] text-[#9CA3AF] dark:text-white/35 max-w-[280px] mx-auto leading-relaxed">
@@ -556,10 +556,10 @@ function HowItWorks() {
     <section id="how" className="py-[80px] sm:py-[100px] mx-auto max-w-[1200px] px-6 sm:px-10">
       <FadeIn>
         <div className="text-center mb-14">
-          <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[var(--page-text)] mb-4">
+          <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[color:var(--page-text)] mb-4">
             How it works
           </h2>
-          <p className="text-[16px] text-[var(--page-text-muted)] max-w-[440px] mx-auto leading-relaxed">
+          <p className="text-[16px] text-[color:var(--page-text-muted)] max-w-[440px] mx-auto leading-relaxed">
             Three steps. Thirty seconds. The truth about your team.
           </p>
         </div>
@@ -572,10 +572,10 @@ function HowItWorks() {
               <div className="text-[12px] font-semibold tracking-[0.1em] text-[#4B83F5] mb-6 uppercase">
                 {step.number}
               </div>
-              <h3 className="text-[18px] font-semibold tracking-[-0.015em] text-[var(--page-text)] mb-3 leading-tight">
+              <h3 className="text-[18px] font-semibold tracking-[-0.015em] text-[color:var(--page-text)] mb-3 leading-tight">
                 {step.title}
               </h3>
-              <p className="text-[14px] leading-[1.7] text-[var(--page-text-muted)]">
+              <p className="text-[14px] leading-[1.7] text-[color:var(--page-text-muted)]">
                 {step.description}
               </p>
             </div>
@@ -593,10 +593,10 @@ function ScorePreview() {
     <section className="py-[80px] sm:py-[100px] mx-auto max-w-[1200px] px-6 sm:px-10">
       <FadeIn>
         <div className="text-center mb-12">
-          <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[var(--page-text)] mb-3">
+          <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[color:var(--page-text)] mb-3">
             The receipt your group project deserves
           </h2>
-          <p className="text-[16px] text-[var(--page-text-muted)]">
+          <p className="text-[16px] text-[color:var(--page-text-muted)]">
             Objective scores. No surveys. No one lying about what they did.
           </p>
         </div>
@@ -627,7 +627,7 @@ function ScorePreview() {
                         c.initials.slice(0, 1)
                       )}
                     </div>
-                    <span className="text-[14px] font-semibold tracking-[-0.01em] text-[var(--page-text)]">
+                    <span className="text-[14px] font-semibold tracking-[-0.01em] text-[color:var(--page-text)]">
                       {c.name}
                     </span>
                   </div>
@@ -640,7 +640,7 @@ function ScorePreview() {
                 >
                   {c.score}
                 </div>
-                <div className="mt-1 text-[11px] font-semibold tracking-[0.08em] uppercase text-[var(--page-text-muted)] opacity-60">
+                <div className="mt-1 text-[11px] font-semibold tracking-[0.08em] uppercase text-[color:var(--page-text-muted)] opacity-60">
                   Fair Share Score
                 </div>
               </div>
@@ -663,12 +663,12 @@ function Testimonial() {
             <span className="text-[18px] font-bold text-[#D1D5DB] dark:text-white/30">J</span>
           </div>
 
-          <blockquote className="text-[clamp(20px,3vw,28px)] font-medium leading-[1.45] tracking-[-0.01em] text-[var(--page-text)] mb-8">
+          <blockquote className="text-[clamp(20px,3vw,28px)] font-medium leading-[1.45] tracking-[-0.01em] text-[color:var(--page-text)] mb-8">
             &ldquo;We had a group member who claimed they did everything. Glasswork ran the numbers and it turned out they contributed 12%. The professor saw the report and adjusted grades. This tool is brutal and I love it.&rdquo;
           </blockquote>
 
           <div>
-            <div className="text-[14px] font-semibold text-[var(--page-text)] opacity-80">
+            <div className="text-[14px] font-semibold text-[color:var(--page-text)] opacity-80">
               Jason Park
             </div>
             <div className="text-[13px] text-[#9CA3AF] dark:text-white/35">
@@ -688,10 +688,10 @@ function Integrations() {
     <section className="py-[80px] sm:py-[100px] mx-auto max-w-[1200px] px-6 sm:px-10">
       <FadeIn>
         <div className="text-center mb-14">
-          <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[var(--page-text)] mb-4">
+          <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[color:var(--page-text)] mb-4">
             Works with your stack
           </h2>
-          <p className="text-[16px] text-[var(--page-text-muted)] max-w-[460px] mx-auto leading-relaxed">
+          <p className="text-[16px] text-[color:var(--page-text-muted)] max-w-[460px] mx-auto leading-relaxed">
             Paste a link from the tools you already use. We handle the rest.
           </p>
         </div>
@@ -729,13 +729,13 @@ function Integrations() {
               key={stat.label}
               className="rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-5 text-center"
             >
-              <div className="text-[28px] font-bold tracking-[-0.03em] text-[var(--page-text)] mb-1 tabular-nums">
+              <div className="text-[28px] font-bold tracking-[-0.03em] text-[color:var(--page-text)] mb-1 tabular-nums">
                 {stat.value}
               </div>
               <div className="text-[13px] font-semibold text-[#6B7280] dark:text-white/50 mb-1">
                 {stat.label}
               </div>
-              <div className="text-[12px] text-[var(--page-text-muted)] opacity-60">
+              <div className="text-[12px] text-[color:var(--page-text-muted)] opacity-60">
                 {stat.desc}
               </div>
             </div>
@@ -752,10 +752,10 @@ function BentoGrid() {
   return (
     <section className="py-[80px] sm:py-[100px] mx-auto max-w-[1200px] px-6 sm:px-10">
       <FadeIn>
-        <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[var(--page-text)] mb-4">
+        <h2 className="text-[clamp(28px,4vw,42px)] font-bold leading-[1.1] tracking-[-0.02em] text-[color:var(--page-text)] mb-4">
           Built to scale with you
         </h2>
-        <p className="text-[16px] text-[var(--page-text-muted)] max-w-[500px] mb-14 leading-relaxed">
+        <p className="text-[16px] text-[color:var(--page-text-muted)] max-w-[500px] mb-14 leading-relaxed">
           Enterprise-grade analysis with the simplicity of pasting a link.
         </p>
       </FadeIn>
@@ -763,16 +763,16 @@ function BentoGrid() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FadeIn delay={0}>
           <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-7 h-full">
-            <h3 className="text-[16px] font-semibold text-[var(--page-text)] mb-2">Speed</h3>
-            <p className="text-[14px] text-[var(--page-text-muted)] leading-relaxed mb-8">
+            <h3 className="text-[16px] font-semibold text-[color:var(--page-text)] mb-2">Speed</h3>
+            <p className="text-[14px] text-[color:var(--page-text-muted)] leading-relaxed mb-8">
               Results in 30 seconds. Not minutes, not hours. Blazing fast keyboard shortcuts and navigation.
             </p>
             <div className="flex items-center gap-4">
               <div className="h-[48px] w-[48px] rounded-xl bg-[#F3F4F6] dark:bg-white/[0.05] border border-[#E5E7EB] dark:border-white/[0.08] flex items-center justify-center">
-                <span className="text-[14px] font-mono text-[var(--page-text-muted)] opacity-70">⌘</span>
+                <span className="text-[14px] font-mono text-[color:var(--page-text-muted)] opacity-70">⌘</span>
               </div>
               <div className="h-[48px] w-[48px] rounded-xl bg-[#F3F4F6] dark:bg-white/[0.05] border border-[#E5E7EB] dark:border-white/[0.08] flex items-center justify-center">
-                <span className="text-[14px] font-mono text-[var(--page-text-muted)] opacity-70">K</span>
+                <span className="text-[14px] font-mono text-[color:var(--page-text-muted)] opacity-70">K</span>
               </div>
             </div>
           </div>
@@ -780,8 +780,8 @@ function BentoGrid() {
 
         <FadeIn delay={0.08}>
           <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-7 h-full">
-            <h3 className="text-[16px] font-semibold text-[var(--page-text)] mb-2">Accuracy</h3>
-            <p className="text-[14px] text-[var(--page-text-muted)] leading-relaxed mb-8">
+            <h3 className="text-[16px] font-semibold text-[color:var(--page-text)] mb-2">Accuracy</h3>
+            <p className="text-[14px] text-[color:var(--page-text-muted)] leading-relaxed mb-8">
               Revision-level analysis. Every edit, every commit, weighted fairly.
             </p>
             <div className="flex items-end gap-1.5 h-[48px]">
@@ -802,8 +802,8 @@ function BentoGrid() {
         <FadeIn delay={0.12}>
           <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-7 h-full flex flex-col">
             <div className="flex-1">
-              <h3 className="text-[16px] font-semibold text-[var(--page-text)] mb-2">Security</h3>
-              <p className="text-[14px] text-[var(--page-text-muted)] leading-relaxed">
+              <h3 className="text-[16px] font-semibold text-[color:var(--page-text)] mb-2">Security</h3>
+              <p className="text-[14px] text-[color:var(--page-text-muted)] leading-relaxed">
                 Your data is encrypted in transit and at rest. We never store your documents.
               </p>
             </div>
@@ -820,14 +820,14 @@ function BentoGrid() {
         <FadeIn delay={0.16}>
           <div className="space-y-4 h-full flex flex-col">
             <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-7 flex-1">
-              <h3 className="text-[16px] font-semibold text-[var(--page-text)] mb-2">Privacy</h3>
-              <p className="text-[14px] text-[var(--page-text-muted)] leading-relaxed">
+              <h3 className="text-[16px] font-semibold text-[color:var(--page-text)] mb-2">Privacy</h3>
+              <p className="text-[14px] text-[color:var(--page-text-muted)] leading-relaxed">
                 Read-only access. We analyze metadata and diffs — never store your content.
               </p>
             </div>
             <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] p-7 flex-1">
-              <h3 className="text-[16px] font-semibold text-[var(--page-text)] mb-2">Mobile &amp; Chrome</h3>
-              <p className="text-[14px] text-[var(--page-text-muted)] leading-relaxed">
+              <h3 className="text-[16px] font-semibold text-[color:var(--page-text)] mb-2">Mobile &amp; Chrome</h3>
+              <p className="text-[14px] text-[color:var(--page-text-muted)] leading-relaxed">
                 There wherever you need it — desktop, tablet, phone. No app to install.
               </p>
             </div>
@@ -845,32 +845,32 @@ function FounderSection() {
     <section id="about" className="py-[80px] sm:py-[100px] mx-auto max-w-[680px] px-6 sm:px-10">
       <FadeIn>
         <div className="space-y-8">
-          <p className="text-[clamp(18px,2.5vw,24px)] leading-[1.55] text-[var(--page-text)] opacity-80">
+          <p className="text-[clamp(18px,2.5vw,24px)] leading-[1.55] text-[color:var(--page-text)] opacity-80">
             I built Glasswork because I was tired of{" "}
-            <span className="text-[var(--page-text)] underline decoration-[#D1D5DB] dark:decoration-white/20 underline-offset-4">
+            <span className="text-[color:var(--page-text)] underline decoration-[#D1D5DB] dark:decoration-white/20 underline-offset-4">
               carrying group projects
             </span>{" "}
             and having no way to prove it.
           </p>
 
-          <p className="text-[clamp(18px,2.5vw,24px)] leading-[1.55] text-[var(--page-text)] opacity-80">
+          <p className="text-[clamp(18px,2.5vw,24px)] leading-[1.55] text-[color:var(--page-text)] opacity-80">
             Glasswork is{" "}
-            <span className="text-[var(--page-text)] underline decoration-[#D1D5DB] dark:decoration-white/20 underline-offset-4">
+            <span className="text-[color:var(--page-text)] underline decoration-[#D1D5DB] dark:decoration-white/20 underline-offset-4">
               one tool
             </span>{" "}
             that analyzes your docs and repos — and gives every contributor a score that speaks for itself.
           </p>
 
-          <p className="text-[clamp(18px,2.5vw,24px)] leading-[1.55] text-[var(--page-text)] opacity-80">
+          <p className="text-[clamp(18px,2.5vw,24px)] leading-[1.55] text-[color:var(--page-text)] opacity-80">
             I&apos;m building for{" "}
-            <span className="text-[var(--page-text)] underline decoration-[#D1D5DB] dark:decoration-white/20 underline-offset-4">
+            <span className="text-[color:var(--page-text)] underline decoration-[#D1D5DB] dark:decoration-white/20 underline-offset-4">
               students, TAs, and teams
             </span>{" "}
             who care about fairness and want the truth — without the awkward confrontation.
           </p>
 
           <div className="pt-4">
-            <div className="font-hand text-[36px] text-[var(--page-text-muted)] opacity-70 mb-3">
+            <div className="font-hand text-[36px] text-[color:var(--page-text-muted)] opacity-70 mb-3">
               Pranav
             </div>
             <div className="flex items-center gap-3">
@@ -878,7 +878,7 @@ function FounderSection() {
                 P
               </div>
               <div>
-                <div className="text-[14px] font-semibold text-[var(--page-text)] opacity-80">
+                <div className="text-[14px] font-semibold text-[color:var(--page-text)] opacity-80">
                   Pranav
                 </div>
                 <div className="text-[13px] text-[#9CA3AF] dark:text-white/35">
@@ -903,12 +903,12 @@ function BottomCTA() {
       <FadeIn>
         <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] p-10 sm:p-16 text-center relative overflow-hidden">
           <div className="relative z-10">
-            <h2 className="text-[clamp(32px,5vw,56px)] font-bold leading-[1.08] tracking-[-0.025em] text-[var(--page-text)] mb-4">
+            <h2 className="text-[clamp(32px,5vw,56px)] font-bold leading-[1.08] tracking-[-0.025em] text-[color:var(--page-text)] mb-4">
               Stop guessing
               <br />
               who did what.
             </h2>
-            <p className="text-[16px] text-[var(--page-text-muted)] max-w-[420px] mx-auto mb-10 leading-relaxed">
+            <p className="text-[16px] text-[color:var(--page-text-muted)] max-w-[420px] mx-auto mb-10 leading-relaxed">
               Paste any link. See who actually contributed. No sign-up required to start.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -920,7 +920,7 @@ function BottomCTA() {
               </button>
               <a
                 href="#how"
-                className="h-[46px] px-7 rounded-lg border border-[var(--card-border)] text-[#6B7280] dark:text-white/50 text-[14px] font-medium hover:border-[#D1D5DB] dark:hover:border-white/[0.18] hover:text-[#1C1C1C] dark:hover:text-white/80 transition-all flex items-center"
+                className="h-[46px] px-7 rounded-lg border border-[var(--card-border)] text-[color:var(--page-text-muted)] text-[14px] font-medium hover:text-[color:var(--page-text)] transition-all flex items-center"
               >
                 Learn more
               </a>
@@ -944,11 +944,11 @@ function Footer() {
               <span className="relative flex h-[6px] w-[6px]">
                 <span className="relative inline-flex h-[6px] w-[6px] rounded-full bg-emerald-500" />
               </span>
-              <span className="text-[14px] font-semibold tracking-[-0.02em] text-[var(--page-text)] opacity-80">
+              <span className="text-[14px] font-semibold tracking-[-0.02em] text-[color:var(--page-text)] opacity-80">
                 glass<span className="text-[#4B83F5]">work</span>
               </span>
             </div>
-            <p className="text-[13px] text-[var(--page-text-muted)] opacity-60">
+            <p className="text-[13px] text-[color:var(--page-text-muted)] opacity-60">
               One workspace for contributor analytics and team fairness.
             </p>
           </div>
@@ -956,13 +956,13 @@ function Footer() {
           <div className="flex items-center gap-6">
             <a
               href="/privacy"
-              className="text-[13px] text-[var(--page-text-muted)] opacity-60 hover:text-[#6B7280] dark:hover:text-white/55 transition-colors"
+              className="text-[13px] text-[color:var(--page-text-muted)] opacity-60 hover:text-[#6B7280] dark:hover:text-white/55 transition-colors"
             >
               Privacy
             </a>
             <a
               href="mailto:support@glasswork.app"
-              className="text-[13px] text-[var(--page-text-muted)] opacity-60 hover:text-[#6B7280] dark:hover:text-white/55 transition-colors"
+              className="text-[13px] text-[color:var(--page-text-muted)] opacity-60 hover:text-[#6B7280] dark:hover:text-white/55 transition-colors"
             >
               Contact
             </a>
