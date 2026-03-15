@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,7 +10,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        sans: ["var(--font-sans)", "Inter", "system-ui", "sans-serif"],
         serif: ["var(--font-serif)", "Georgia", "serif"],
         mono: ["var(--font-mono)", "monospace"],
         hand: ["var(--font-hand)", "cursive"],
@@ -17,37 +18,37 @@ const config: Config = {
         body: ["var(--font-sans)", "system-ui", "sans-serif"],
       },
       colors: {
-        bg: "#0F1013",
-        "bg-deep": "#050607",
-        fg: "#F8F5EF",
-        "fg-muted": "rgba(248, 245, 239, 0.55)",
-        "fg-subtle": "rgba(248, 245, 239, 0.35)",
-        "fg-ghost": "rgba(248, 245, 239, 0.18)",
+        bg: "#1C1C1C",
+        "bg-deep": "#141414",
+        fg: "#F4F4F6",
+        "fg-muted": "rgba(244, 244, 246, 0.55)",
+        "fg-subtle": "rgba(244, 244, 246, 0.35)",
+        "fg-ghost": "rgba(244, 244, 246, 0.18)",
 
-        surface: "#0F1013",
-        "surface-1": "#151619",
-        "surface-2": "#1A1B1F",
-        "surface-3": "#222327",
+        surface: "#1C1C1C",
+        "surface-1": "#232323",
+        "surface-2": "#2A2A2A",
+        "surface-3": "#333333",
 
         warm: {
-          50: "#0D0D12",
-          100: "#16161E",
-          200: "#222230",
-          300: "#33334A",
-          400: "#5A5A78",
-          500: "#8888A8",
-          600: "#AAAAC8",
-          700: "#CCCCDF",
-          800: "#E0E0EE",
-          900: "#F5F5FA",
+          50: "#141414",
+          100: "#1C1C1C",
+          200: "#2A2A2A",
+          300: "#3D3D3D",
+          400: "#666666",
+          500: "#888888",
+          600: "#AAAAAA",
+          700: "#CCCCCC",
+          800: "#E0E0E0",
+          900: "#F4F4F6",
         },
 
         brand: {
-          DEFAULT: "#6D63D4",
-          light: "#9B91EF",
-          dark: "#524ABE",
-          muted: "rgba(109, 99, 212, 0.10)",
-          glow: "rgba(109, 99, 212, 0.30)",
+          DEFAULT: "#4B83F5",
+          light: "#6B9CF7",
+          dark: "#3B6FDF",
+          muted: "rgba(75, 131, 245, 0.10)",
+          glow: "rgba(75, 131, 245, 0.30)",
         },
 
         carry: "#8B7CF6",
@@ -58,7 +59,13 @@ const config: Config = {
         "repo-accent": "#34D399",
         danger: "#F87171",
 
-        "micro-border": "rgba(248, 245, 239, 0.08)",
+        "micro-border": "rgba(255, 255, 255, 0.08)",
+
+        "page-bg": "var(--page-bg)",
+        "page-text": "var(--page-text)",
+        "page-text-muted": "var(--page-text-muted)",
+        "card-bg": "var(--card-bg)",
+        "card-border": "var(--card-border)",
 
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -95,21 +102,24 @@ const config: Config = {
         ring: "hsl(var(--ring))",
       },
       boxShadow: {
-        glass: "0 0 0 1px rgba(248,245,239,0.06), 0 20px 40px rgba(0,0,0,0.4)",
-        "glass-hover": "0 0 0 1px rgba(248,245,239,0.10), 0 24px 48px rgba(0,0,0,0.5)",
-        "glass-carry": "0 0 30px rgba(167,139,250,0.25), 0 0 60px rgba(167,139,250,0.10)",
+        glass: "0 0 0 1px rgba(255,255,255,0.06), 0 20px 40px rgba(0,0,0,0.4)",
+        "glass-hover": "0 0 0 1px rgba(255,255,255,0.10), 0 24px 48px rgba(0,0,0,0.5)",
+        "glass-carry": "0 0 30px rgba(139,124,246,0.25), 0 0 60px rgba(139,124,246,0.10)",
         "glass-solid": "0 0 20px rgba(52,211,153,0.15)",
         "glass-ghost": "0 0 20px rgba(248,113,113,0.15)",
-        "glow-brand": "0 0 40px rgba(124,111,255,0.4)",
-        "glow-carry": "0 0 50px rgba(167,139,250,0.3)",
-        "inner-soft": "inset 0 1px 0 rgba(248,245,239,0.06)",
+        "glow-brand": "0 0 40px rgba(75,131,245,0.4)",
+        "glow-carry": "0 0 50px rgba(139,124,246,0.3)",
+        "inner-soft": "inset 0 1px 0 rgba(255,255,255,0.06)",
         layered: "0 1px 2px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2)",
         "layered-md": "0 1px 3px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.25)",
         "layered-lg": "0 2px 4px rgba(0,0,0,0.3), 0 12px 40px rgba(0,0,0,0.3)",
         card: "0 2px 12px rgba(0,0,0,0.3)",
         "card-hover": "0 8px 30px rgba(0,0,0,0.4)",
-        "micro-card": "0 1px 3px rgba(0,0,0,0.2), 0 0 0 1px rgba(248,245,239,0.06)",
-        "micro-card-hover": "0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px rgba(248,245,239,0.10)",
+        "micro-card": "0 1px 3px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.06)",
+        "micro-card-hover": "0 4px 16px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.10)",
+        "card-light": "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+        "card-light-hover": "0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04)",
+        "card-light-featured": "0 0 0 1px rgba(75,131,245,0.15), 0 4px 16px rgba(75,131,245,0.08)",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -117,11 +127,11 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       spacing: {
-        "section": "100px",
+        section: "100px",
         "section-sm": "72px",
       },
       maxWidth: {
-        "container": "1200px",
+        container: "1200px",
         "container-sm": "900px",
         "container-xs": "680px",
       },
@@ -156,12 +166,12 @@ const config: Config = {
           "100%": { transform: "scale(1)" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 15px rgba(124,111,255,0.1)" },
-          "50%": { boxShadow: "0 0 25px rgba(124,111,255,0.25)" },
+          "0%, 100%": { boxShadow: "0 0 15px rgba(75,131,245,0.1)" },
+          "50%": { boxShadow: "0 0 25px rgba(75,131,245,0.25)" },
         },
         "border-glow": {
-          "0%, 100%": { borderColor: "rgba(124,111,255,0.2)" },
-          "50%": { borderColor: "rgba(124,111,255,0.6)" },
+          "0%, 100%": { borderColor: "rgba(75,131,245,0.2)" },
+          "50%": { borderColor: "rgba(75,131,245,0.6)" },
         },
       },
       animation: {
