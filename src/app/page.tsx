@@ -592,88 +592,117 @@ function BentoGrid() {
         </p>
       </FadeIn>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Speed */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Speed — wide card */}
         <FadeIn delay={0}>
-          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-6 h-full">
+          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-7 h-full">
             <h3 className="text-[16px] font-semibold text-fg mb-2">Speed</h3>
-            <p className="text-[14px] text-fg/35 leading-relaxed mb-6">
-              Results in 30 seconds. Not minutes, not hours.
+            <p className="text-[14px] text-fg/35 leading-relaxed mb-8">
+              Results in 30 seconds. Not minutes, not hours. Blazing fast keyboard shortcuts and navigation.
             </p>
-            <div className="flex items-center gap-3">
-              <div className="h-[44px] w-[44px] rounded-lg bg-fg/[0.04] border border-fg/[0.06] flex items-center justify-center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-fg/40">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>
+            <div className="flex items-center gap-4">
+              <div className="h-[48px] w-[48px] rounded-xl bg-fg/[0.05] border border-fg/[0.08] flex items-center justify-center">
+                <span className="text-[14px] font-mono text-fg/40">⌘</span>
               </div>
-              <span className="font-mono text-[13px] text-fg/25">~30s average</span>
+              <div className="h-[48px] w-[48px] rounded-xl bg-fg/[0.05] border border-fg/[0.08] flex items-center justify-center">
+                <span className="text-[14px] font-mono text-fg/40">K</span>
+              </div>
             </div>
           </div>
         </FadeIn>
 
-        {/* Accuracy */}
+        {/* Accuracy — wide card */}
         <FadeIn delay={0.08}>
-          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-6 h-full">
+          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-7 h-full">
             <h3 className="text-[16px] font-semibold text-fg mb-2">Accuracy</h3>
-            <p className="text-[14px] text-fg/35 leading-relaxed mb-6">
+            <p className="text-[14px] text-fg/35 leading-relaxed mb-8">
               Revision-level analysis. Every edit, every commit, weighted fairly.
             </p>
-            <div className="flex items-center gap-2">
-              {[85, 65, 95, 45, 75].map((h, i) => (
+            <div className="flex items-end gap-1.5 h-[48px]">
+              {[35, 55, 25, 70, 45, 85, 60, 95, 40, 75, 50, 90].map((h, i) => (
                 <div
                   key={i}
-                  className="w-3 rounded-sm bg-brand/30"
-                  style={{ height: `${h * 0.4}px` }}
+                  className="flex-1 rounded-sm transition-all"
+                  style={{
+                    height: `${h}%`,
+                    backgroundColor: h > 70 ? "rgba(139, 124, 246, 0.4)" : "rgba(248, 245, 239, 0.06)",
+                  }}
                 />
               ))}
             </div>
           </div>
         </FadeIn>
 
-        {/* Security */}
-        <FadeIn delay={0.16}>
-          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-6 h-full">
-            <h3 className="text-[16px] font-semibold text-fg mb-2">Security</h3>
-            <p className="text-[14px] text-fg/35 leading-relaxed mb-6">
-              Your data is encrypted in transit and at rest. We never store documents.
-            </p>
-            <div className="flex items-center gap-2">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-solid">
+        {/* Security — tall card */}
+        <FadeIn delay={0.12}>
+          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-7 h-full flex flex-col">
+            <div className="flex-1">
+              <h3 className="text-[16px] font-semibold text-fg mb-2">Security</h3>
+              <p className="text-[14px] text-fg/35 leading-relaxed">
+                Your data is encrypted in transit and at rest. We never store your documents.
+              </p>
+            </div>
+            <div className="mt-8 flex flex-col items-center gap-2">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="text-solid/60">
+                <path d="M9 12l2 2 4-4" />
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               </svg>
-              <span className="text-[12px] font-medium text-fg/30">Encrypted & ephemeral</span>
+              <span className="text-[11px] font-medium text-fg/25 uppercase tracking-wider">Encrypted &amp; ephemeral</span>
             </div>
           </div>
         </FadeIn>
 
-        {/* Privacy */}
-        <FadeIn delay={0.08}>
-          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-6 h-full">
-            <h3 className="text-[16px] font-semibold text-fg mb-2">Privacy</h3>
-            <p className="text-[14px] text-fg/35 leading-relaxed">
-              Read-only access. We analyze metadata and diffs — never store your content.
-            </p>
-          </div>
-        </FadeIn>
-
-        {/* Shareable */}
+        {/* Privacy + Shareable stacked */}
         <FadeIn delay={0.16}>
-          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-6 h-full">
-            <h3 className="text-[16px] font-semibold text-fg mb-2">Shareable</h3>
-            <p className="text-[14px] text-fg/35 leading-relaxed">
-              One-click share links. Send results to professors, managers, or teammates.
-            </p>
+          <div className="space-y-4 h-full flex flex-col">
+            <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-7 flex-1">
+              <h3 className="text-[16px] font-semibold text-fg mb-2">Privacy</h3>
+              <p className="text-[14px] text-fg/35 leading-relaxed">
+                Read-only access. We analyze metadata and diffs — never store your content.
+              </p>
+            </div>
+            <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-7 flex-1">
+              <h3 className="text-[16px] font-semibold text-fg mb-2">Shareable</h3>
+              <p className="text-[14px] text-fg/35 leading-relaxed">
+                One-click share links. Send results to professors, managers, or teammates.
+              </p>
+            </div>
           </div>
         </FadeIn>
 
-        {/* Mobile */}
-        <FadeIn delay={0.24}>
-          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-6 h-full">
-            <h3 className="text-[16px] font-semibold text-fg mb-2">Works everywhere</h3>
-            <p className="text-[14px] text-fg/35 leading-relaxed">
-              Desktop, tablet, phone. Check results anywhere, anytime.
-            </p>
+        {/* Works everywhere — full width */}
+        <FadeIn delay={0.2} className="md:col-span-2">
+          <div className="rounded-xl border border-fg/[0.07] bg-fg/[0.02] p-7">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h3 className="text-[16px] font-semibold text-fg mb-2">Works everywhere</h3>
+                <p className="text-[14px] text-fg/35 leading-relaxed">
+                  Desktop, tablet, phone. Check results anywhere, anytime. No app to install.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="h-[40px] w-[40px] rounded-lg bg-fg/[0.04] border border-fg/[0.06] flex items-center justify-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-fg/30">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                    <line x1="8" y1="21" x2="16" y2="21" />
+                    <line x1="12" y1="17" x2="12" y2="21" />
+                  </svg>
+                </div>
+                <div className="h-[40px] w-[40px] rounded-lg bg-fg/[0.04] border border-fg/[0.06] flex items-center justify-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-fg/30">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                    <line x1="12" y1="18" x2="12.01" y2="18" />
+                  </svg>
+                </div>
+                <div className="h-[40px] w-[40px] rounded-lg bg-fg/[0.04] border border-fg/[0.06] flex items-center justify-center">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-fg/30">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
           </div>
         </FadeIn>
       </div>
