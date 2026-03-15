@@ -12,13 +12,12 @@ const GlassPanel = forwardRef<HTMLDivElement, GlassPanelProps>(
         ref={ref}
         className={cn(
           "rounded-[14px] border",
-          "bg-white border-[#E5E5E5] shadow-card-light",
-          "dark:bg-white/[0.03] dark:border-white/[0.07] dark:shadow-none",
+          "bg-white/[0.03] border-white/[0.07]",
           hoverable && [
             "transition-all duration-200 cursor-pointer",
             "hover:-translate-y-[2px]",
-            "hover:shadow-card-light-hover",
-            "dark:hover:border-white/[0.12] dark:hover:bg-white/[0.05] dark:hover:shadow-none",
+            "hover:border-white/[0.12]",
+            "hover:bg-white/[0.05]",
           ],
           className
         )}

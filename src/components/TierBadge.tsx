@@ -5,34 +5,9 @@ interface TierBadgeProps {
   tier: ContributorTier;
   size?: "sm" | "md" | "lg";
   className?: string;
-  theme?: "light" | "dark" | "auto";
 }
 
-const TIER_LIGHT = {
-  carry: {
-    label: "LOCKED IN",
-    dotColor: "#6D63D4",
-    bg: "rgba(109, 99, 212, 0.08)",
-    border: "rgba(109, 99, 212, 0.18)",
-    text: "#6D63D4",
-  },
-  solid: {
-    label: "MID",
-    dotColor: "#16A34A",
-    bg: "rgba(22, 163, 74, 0.08)",
-    border: "rgba(22, 163, 74, 0.18)",
-    text: "#16A34A",
-  },
-  ghost: {
-    label: "SELLING",
-    dotColor: "#DC2626",
-    bg: "rgba(220, 38, 38, 0.07)",
-    border: "rgba(220, 38, 38, 0.16)",
-    text: "#DC2626",
-  },
-} as const;
-
-const TIER_DARK = {
+const TIER_CONFIG = {
   carry: {
     label: "LOCKED IN",
     dotColor: "#8B7CF6",
@@ -68,35 +43,28 @@ const DOT_SIZES = {
   lg: "h-[7px] w-[7px]",
 } as const;
 
-export function TierBadge({ tier, size = "md", className, theme = "auto" }: TierBadgeProps) {
-  const lightConfig = TIER_LIGHT[tier];
-  const darkConfig = TIER_DARK[tier];
-
-  if (theme === "light" || theme === "dark") {
-    const config = theme === "light" ? lightConfig : darkConfig;
-    return (
-      <span
-        className={cn("inline-flex items-center rounded-full font-semibold uppercase", SIZE_CLASSES[size], className)}
-        style={{ backgroundColor: config.bg, border: `1px solid ${config.border}`, color: config.text }}
-      >
-        <span className={cn("shrink-0 rounded-full", DOT_SIZES[size])} style={{ backgroundColor: config.dotColor }} />
-        <span>{config.label}</span>
-      </span>
-    );
-  }
-
-  // theme="auto" — use dark config (existing behavior, since app interior is always dark)
-  const config = darkConfig;
+export function TierBadge({ tier, size = "md", className }: TierBadgeProps) {
+  const config = TIER_CONFIG[tier];
   return (
     <span
-      className={cn("inline-flex items-center rounded-full font-semibold uppercase", SIZE_CLASSES[size], className)}
-      style={{ backgroundColor: config.bg, border: `1px solid ${config.border}`, color: config.text }}
+      className={cn(
+        "inline-flex items-center rounded-full font-semibold uppercase",
+        SIZE_CLASSES[size],
+        className
+      )}
+      style={{
+        backgroundColor: config.bg,
+        border: `1px solid ${config.border}`,
+        color: config.text,
+      }}
     >
-      <span className={cn("shrink-0 rounded-full", DOT_SIZES[size])} style={{ backgroundColor: config.dotColor }} />
+      <span
+        className={cn("shrink-0 rounded-full", DOT_SIZES[size])}
+        style={{ backgroundColor: config.dotColor }}
+      />
       <span>{config.label}</span>
     </span>
   );
 }
 
-export { TIER_LIGHT, TIER_DARK };
-export type { TierBadgeProps };
+export { TIER_CONFIG };

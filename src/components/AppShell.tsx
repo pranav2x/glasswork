@@ -405,7 +405,7 @@ export function AppShell({ children }: AppShellProps) {
   }
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-surface">
       <main className="relative z-10">{children}</main>
     </div>
   );
