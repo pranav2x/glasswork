@@ -138,7 +138,7 @@ const config: Config = {
       keyframes: {
         "scroll-left": {
           "0%": { transform: "translateX(0)" },
-          "100%": { transform: "translateX(-50%)" },
+          "100%": { transform: "translateX(-25%)" },
         },
         "fade-up": {
           "0%": { opacity: "0", transform: "translateY(20px)" },
