@@ -33,8 +33,8 @@ export function BentoGlobalScore({
 }) {
   return (
     <GlassPanel hoverable className={cn("flex flex-col justify-center p-6", className)}>
-      <p className="text-[10px] font-semibold text-[color:var(--app-text-muted)] uppercase tracking-[0.1em]">Global Score</p>
-      <div className="mt-2 font-body text-[4rem] font-black leading-none tracking-tight text-[color:var(--app-text)] tabular-nums">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: "rgba(255,255,255,0.40)" }}>Global Score</p>
+      <div className="mt-2 font-body text-[4rem] font-black leading-none tracking-tight tabular-nums" style={{ color: "#F2F2F2" }}>
         <AnimatedNumber value={avgScore} />
       </div>
       <div className="mt-3">
@@ -55,7 +55,7 @@ export function BentoAIFeed({
     <GlassPanel hoverable className={cn("flex flex-col p-6", className)}>
       <div className="flex items-center gap-2 mb-4">
         <MessageSquare className="h-4 w-4 text-[color:var(--app-text-muted)]" strokeWidth={1.5} />
-        <p className="text-[10px] font-semibold text-[color:var(--app-text-muted)] uppercase tracking-[0.1em]">AI Insights</p>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: "rgba(255,255,255,0.40)" }}>AI Insights</p>
       </div>
       <div className="flex flex-1 flex-col gap-3 overflow-hidden">
         {summaries.length === 0 ? (
@@ -65,7 +65,7 @@ export function BentoAIFeed({
         ) : (
           summaries.map((s) => (
             <Link key={s.id} href={`/results/${s.id}`}>
-              <div className="rounded-xl bg-[var(--app-hover-bg)] border border-[var(--app-card-border)] p-3 transition-colors hover:bg-[var(--app-hover-bg)]">
+              <div className="rounded-xl p-3 transition-colors" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)" }}>
                 <p className="text-[11px] font-semibold text-[color:var(--app-text)] mb-1">{s.title}</p>
                 <p className="text-[11px] leading-relaxed text-[color:var(--app-text-muted)] line-clamp-2">{s.summary}</p>
               </div>
@@ -119,7 +119,7 @@ export function BentoCarryStreak({
       <div className="mt-2 font-body text-[2.5rem] font-black leading-none text-[color:var(--app-text)] tabular-nums">
         {streak}
       </div>
-      <p className="mt-1 text-[10px] font-semibold text-[color:var(--app-text-muted)] uppercase tracking-[0.1em]">
+      <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: "rgba(255,255,255,0.40)" }}>
         project streak
       </p>
     </GlassPanel>
@@ -141,14 +141,18 @@ export function BentoRecentProjects({
 }) {
   return (
     <GlassPanel hoverable className={cn("flex flex-col p-6", className)}>
-      <p className="text-[10px] font-semibold text-[color:var(--app-text-muted)] uppercase tracking-[0.1em] mb-4">Recent Projects</p>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.1em] mb-4" style={{ color: "rgba(255,255,255,0.40)" }}>Recent Projects</p>
       <div className="flex flex-1 flex-col gap-2">
         {analyses.length === 0 ? (
           <p className="text-[12px] text-[color:var(--app-text-muted)] py-4 text-center">No projects yet</p>
         ) : (
           analyses.map((a) => (
             <Link key={a._id} href={`/results/${a._id}`}>
-              <div className="group flex items-center gap-3 rounded-xl p-2.5 transition-colors hover:bg-[var(--app-hover-bg)]">
+              <div
+                className="group flex items-center gap-3 rounded-xl p-2.5 transition-colors"
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.07)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              >
                 <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg", a.sourceType === "github_repo" ? "bg-repo-accent/10" : "bg-docs-accent/10")}>
                   {a.sourceType === "github_repo" ? (
                     <GitBranch className="h-3.5 w-3.5 text-repo-accent" strokeWidth={1.5} />
