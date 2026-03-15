@@ -1,68 +1,139 @@
+@font-face {
+  font-family: 'haffer';
+  src: url('/fonts/haffer.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'perfectlyNineties';
+  src: url('/fonts/perfectlyNineties.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Light mode — White Elegance palette */
-    --background: 210 14% 94%;
+    /* Fonts — fallback to system if woff2 not present */
+    --font-body: 'haffer', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'perfectlyNineties', 'Georgia', serif;
+
+    /* White Elegance palette */
+    --page-bg: #F2F2F2;
+    --page-text: #1C1C1C;
+    --page-text-muted: #828282;
+    --card-bg: #FFFFFF;
+    --card-border: rgba(28, 28, 28, 0.10);
+    --nav-border: rgba(28, 28, 28, 0.10);
+    --section-divider: rgba(28, 28, 28, 0.08);
+
+    /* Accent palette */
+    --accent-blue: #518BDB;
+    --accent-blue-hover: #3D7ACC;
+    --accent-orange: #E5A057;
+    --accent-teal: #36BAB8;
+    --accent-navy: #24426A;
+    --accent-green: #3A6B2A;
+    --accent-light-blue: #D5ECFB;
+
+    /* App interior — light mode */
+    --app-bg: #F2F2F2;
+    --app-sidebar-bg: #FFFFFF;
+    --app-sidebar-border: rgba(28, 28, 28, 0.08);
+    --app-topbar-bg: rgba(242, 242, 242, 0.85);
+    --app-topbar-border: rgba(28, 28, 28, 0.07);
+    --app-card-bg: #FFFFFF;
+    --app-card-border: rgba(28, 28, 28, 0.09);
+    --app-text: #1C1C1C;
+    --app-text-muted: #828282;
+    --app-text-faint: rgba(28, 28, 28, 0.35);
+    --app-hover-bg: rgba(28, 28, 28, 0.04);
+    --app-active-bg: rgba(81, 139, 219, 0.08);
+    --app-active-text: #518BDB;
+    --app-accent: #518BDB;
+    --app-accent-hover: #3D7ACC;
+    --app-accent-muted: rgba(81, 139, 219, 0.10);
+    --app-accent-border: rgba(81, 139, 219, 0.20);
+    --app-danger: #DC2626;
+    --app-danger-muted: rgba(220, 38, 38, 0.08);
+
+    /* shadcn compatibility */
+    --background: 0 0% 95%;
     --foreground: 0 0% 11%;
-    --card: 240 100% 99%;
+    --card: 0 0% 100%;
     --card-foreground: 0 0% 11%;
-    --popover: 240 100% 99%;
+    --popover: 0 0% 100%;
     --popover-foreground: 0 0% 11%;
-    --primary: 220 88% 63%;
-    --primary-foreground: 240 100% 99%;
-    --secondary: 55 17% 91%;
+    --primary: 213 62% 59%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 90%;
     --secondary-foreground: 0 0% 11%;
-    --muted: 55 17% 91%;
-    --muted-foreground: 220 9% 46%;
-    --accent: 55 17% 91%;
+    --muted: 0 0% 90%;
+    --muted-foreground: 0 0% 51%;
+    --accent: 0 0% 90%;
     --accent-foreground: 0 0% 11%;
     --destructive: 0 84% 60%;
-    --destructive-foreground: 240 100% 99%;
-    --border: 104 5% 86%;
-    --input: 104 5% 86%;
-    --ring: 220 88% 63%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 89%;
+    --input: 0 0% 89%;
+    --ring: 213 62% 59%;
     --radius: 0.75rem;
-
-    --page-bg: #EEF0F2;
-    --page-text: #1C1C1C;
-    --page-text-muted: #6B7280;
-    --card-bg: #FAFAFF;
-    --card-border: #DADDD8;
-    --nav-border: #DADDD8;
-    --section-divider: #DADDD8;
   }
 
   .dark {
+    --page-bg: #1C1C1C;
+    --page-text: #F2F2F2;
+    --page-text-muted: #828282;
+    --card-bg: #212121;
+    --card-border: rgba(242, 242, 242, 0.08);
+    --nav-border: rgba(242, 242, 242, 0.08);
+    --section-divider: rgba(242, 242, 242, 0.06);
+
+    /* App interior — dark mode */
+    --app-bg: #111113;
+    --app-sidebar-bg: #111114;
+    --app-sidebar-border: rgba(255, 255, 255, 0.07);
+    --app-topbar-bg: rgba(17, 17, 20, 0.85);
+    --app-topbar-border: rgba(255, 255, 255, 0.05);
+    --app-card-bg: rgba(255, 255, 255, 0.03);
+    --app-card-border: rgba(255, 255, 255, 0.07);
+    --app-text: #F2F2F2;
+    --app-text-muted: #828282;
+    --app-text-faint: rgba(255, 255, 255, 0.25);
+    --app-hover-bg: rgba(255, 255, 255, 0.04);
+    --app-active-bg: rgba(81, 139, 219, 0.12);
+    --app-active-text: #7FB3F5;
+    --app-accent: #518BDB;
+    --app-accent-hover: #5B93F7;
+    --app-accent-muted: rgba(81, 139, 219, 0.12);
+    --app-accent-border: rgba(81, 139, 219, 0.22);
+    --app-danger: #F87171;
+    --app-danger-muted: rgba(248, 113, 113, 0.08);
+
     --background: 0 0% 11%;
-    --foreground: 240 10% 96%;
-    --card: 0 0% 14%;
-    --card-foreground: 240 10% 96%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 13%;
+    --card-foreground: 0 0% 95%;
     --popover: 0 0% 12%;
-    --popover-foreground: 240 10% 96%;
-    --primary: 220 88% 63%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 213 62% 59%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 16%;
-    --secondary-foreground: 240 10% 96%;
-    --muted: 0 0% 14%;
-    --muted-foreground: 240 8% 55%;
+    --secondary-foreground: 0 0% 95%;
+    --muted: 0 0% 16%;
+    --muted-foreground: 0 0% 51%;
     --accent: 0 0% 16%;
-    --accent-foreground: 240 10% 96%;
+    --accent-foreground: 0 0% 95%;
     --destructive: 0 70% 65%;
-    --destructive-foreground: 240 10% 96%;
-    --border: 0 0% 16%;
-    --input: 0 0% 16%;
-    --ring: 220 88% 63%;
-
-    --page-bg: #1C1C1C;
-    --page-text: #F4F4F6;
-    --page-text-muted: #888888;
-    --card-bg: rgba(255, 255, 255, 0.04);
-    --card-border: rgba(255, 255, 255, 0.08);
-    --nav-border: rgba(255, 255, 255, 0.06);
-    --section-divider: rgba(255, 255, 255, 0.06);
+    --destructive-foreground: 0 0% 95%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
   }
 
   html {
@@ -78,7 +149,7 @@
     background-color: var(--page-bg);
     color: var(--page-text);
     min-height: 100svh;
-    font-family: var(--font-sans), Inter, system-ui, sans-serif;
+    font-family: var(--font-body);
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
@@ -91,9 +162,17 @@
   }
 
   ::selection {
-    background: rgba(75, 131, 245, 0.30);
-    color: #F4F4F6;
+    background: rgba(81, 139, 219, 0.30);
+    color: #F2F2F2;
   }
+}
+
+/* Sidebar gradient — light uses flat bg, dark uses gradient */
+.sidebar-gradient {
+  background: var(--app-sidebar-bg);
+}
+.dark .sidebar-gradient {
+  background: linear-gradient(180deg, #141417 0%, #111114 100%);
 }
 
 @layer utilities {
@@ -113,8 +192,8 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.06) 30%,
-    rgba(255, 255, 255, 0.06) 70%,
+    rgba(242, 242, 242, 0.06) 30%,
+    rgba(242, 242, 242, 0.06) 70%,
     transparent
   );
 }
