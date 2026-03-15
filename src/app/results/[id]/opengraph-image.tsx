@@ -6,10 +6,10 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "Glasswork Analysis Results";
 
-const TIER_CONFIG: Record<string, { label: string; bg: string; fg: string }> = {
-  carry: { label: "LOCKED IN", bg: "#111111", fg: "#ffffff" },
-  solid: { label: "MID", bg: "#E5E5E5", fg: "#404040" },
-  ghost: { label: "SELLING", bg: "#F5F5F5", fg: "#A3A3A3" },
+const TIER_CONFIG: Record<string, { label: string; bg: string; border: string; score: string; labelBg: string; labelText: string }> = {
+  carry: { label: "LOCKED IN", bg: "rgba(81,139,219,0.12)", border: "rgba(81,139,219,0.30)", score: "#518BDB", labelBg: "rgba(81,139,219,0.15)", labelText: "#7FB3F5" },
+  solid: { label: "MID", bg: "rgba(54,186,184,0.10)", border: "rgba(54,186,184,0.25)", score: "#36BAB8", labelBg: "rgba(54,186,184,0.12)", labelText: "#36BAB8" },
+  ghost: { label: "SELLING", bg: "rgba(229,160,87,0.10)", border: "rgba(229,160,87,0.25)", score: "#E5A057", labelBg: "rgba(229,160,87,0.12)", labelText: "#E5A057" },
 };
 
 interface OGData {
@@ -45,38 +45,37 @@ export default async function Image({ params }: { params: { id: string } }) {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "60px",
-          background: "linear-gradient(135deg, #FAFAF8 0%, #F0EDFF 50%, #FAFAF8 100%)",
+          background: "#111113",
+          padding: "56px 60px",
           fontFamily: "Inter, system-ui, sans-serif",
+          gap: "0px",
         }}
       >
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "40px" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={LOGO_BASE64}
             alt="Glasswork"
-            width={44}
-            height={44}
+            width={36}
+            height={36}
             style={{ borderRadius: "10px", objectFit: "contain" }}
           />
-          <span style={{ fontSize: "24px", fontWeight: 700, color: "#111111" }}>
-            Glasswork
+          <span style={{ fontSize: "22px", fontWeight: 700, color: "#F2F2F2", letterSpacing: "-0.02em" }}>
+            glass<span style={{ color: "#518BDB" }}>work</span>
           </span>
           {data.sourceType && (
             <span
               style={{
-                fontSize: "14px",
+                fontSize: "12px",
                 fontWeight: 600,
-                color: data.sourceType === "google_doc" ? "#6C63FF" : "#2DA44E",
-                background:
-                  data.sourceType === "google_doc"
-                    ? "rgba(108, 99, 255, 0.1)"
-                    : "rgba(45, 164, 78, 0.1)",
-                padding: "4px 12px",
+                color: "#828282",
+                background: "rgba(255,255,255,0.06)",
+                padding: "3px 10px",
                 borderRadius: "100px",
+                marginLeft: "4px",
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
               }}
             >
               {data.sourceType === "google_doc" ? "Google Doc" : "GitHub Repo"}
@@ -85,92 +84,84 @@ export default async function Image({ params }: { params: { id: string } }) {
         </div>
 
         {/* Title */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <h1
-            style={{
-              fontSize: "42px",
-              fontWeight: 800,
-              color: "#111111",
-              lineHeight: 1.1,
-              margin: 0,
-            }}
-          >
-            {data.title}
-          </h1>
-          {data.summary && (
-            <p
-              style={{
-                fontSize: "18px",
-                color: "#555555",
-                lineHeight: 1.4,
-                margin: 0,
-                maxWidth: "800px",
-              }}
-            >
-              {data.summary.length > 120
-                ? data.summary.slice(0, 120) + "..."
-                : data.summary}
-            </p>
-          )}
-        </div>
+        <h1 style={{
+          fontSize: "38px",
+          fontWeight: 800,
+          color: "#F2F2F2",
+          lineHeight: 1.1,
+          margin: "0 0 12px 0",
+          letterSpacing: "-0.025em",
+          maxWidth: "900px",
+        }}>
+          {data.title.length > 60 ? data.title.slice(0, 60) + "..." : data.title}
+        </h1>
 
-        {/* Contributors */}
+        {/* AI Summary */}
+        {data.summary && (
+          <p style={{
+            fontSize: "17px",
+            color: "#828282",
+            lineHeight: 1.5,
+            margin: "0 0 48px 0",
+            maxWidth: "780px",
+          }}>
+            {data.summary.length > 130 ? data.summary.slice(0, 130) + "..." : data.summary}
+          </p>
+        )}
+
+        {/* Contributor tier cards */}
         {data.contributors.length > 0 && (
-          <div style={{ display: "flex", gap: "24px" }}>
+          <div style={{ display: "flex", gap: "20px", marginTop: "auto" }}>
             {data.contributors.map((c, i) => {
-              const tier = TIER_CONFIG[c.tier] ?? TIER_CONFIG.solid;
+              const tc = TIER_CONFIG[c.tier] ?? TIER_CONFIG.solid;
               return (
-                <div
-                  key={i}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "8px",
-                    padding: "24px 32px",
-                    borderRadius: "20px",
-                    background: "rgba(255, 255, 255, 0.8)",
-                    border: "1px solid rgba(255, 255, 255, 0.6)",
-                    minWidth: "160px",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: "48px",
-                      fontWeight: 800,
-                      color: "#111111",
-                      lineHeight: 1,
-                    }}
-                  >
+                <div key={i} style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                  padding: "24px 28px",
+                  borderRadius: "18px",
+                  background: tc.bg,
+                  border: `1px solid ${tc.border}`,
+                  minWidth: "180px",
+                  flex: 1,
+                  maxWidth: "260px",
+                }}>
+                  <span style={{ fontSize: "52px", fontWeight: 900, color: tc.score, lineHeight: 1, letterSpacing: "-0.04em" }}>
                     {c.score}
                   </span>
-                  <span
-                    style={{
-                      fontSize: "16px",
-                      fontWeight: 600,
-                      color: "#555555",
-                    }}
-                  >
-                    {c.name.length > 14 ? c.name.slice(0, 14) + "..." : c.name}
+                  <span style={{ fontSize: "17px", fontWeight: 600, color: "#F2F2F2", letterSpacing: "-0.01em" }}>
+                    {c.name.length > 16 ? c.name.slice(0, 16) + "..." : c.name}
                   </span>
-                  <span
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 700,
-                      letterSpacing: "0.05em",
-                      color: tier.fg,
-                      background: tier.bg,
-                      padding: "4px 10px",
-                      borderRadius: "100px",
-                    }}
-                  >
-                    {tier.label}
+                  <span style={{
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    letterSpacing: "0.07em",
+                    color: tc.labelText,
+                    background: tc.labelBg,
+                    padding: "4px 10px",
+                    borderRadius: "100px",
+                    width: "fit-content",
+                  }}>
+                    {tc.label}
                   </span>
                 </div>
               );
             })}
           </div>
         )}
+
+        {/* Bottom watermark */}
+        <div style={{
+          position: "absolute",
+          bottom: "32px",
+          right: "48px",
+          fontSize: "13px",
+          color: "rgba(255,255,255,0.20)",
+          fontWeight: 500,
+        }}>
+          glasswork.app
+        </div>
       </div>
     ),
     {
