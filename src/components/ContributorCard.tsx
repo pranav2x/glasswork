@@ -4,7 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { LiquidHeatmap } from "@/components/LiquidHeatmap";
-import { TierBadge, TIER_CONFIG } from "@/components/TierBadge";
+import { TierBadge, TIER_DARK } from "@/components/TierBadge";
 import { Badge } from "@/components/ui/badge";
 import type { Contributor, DocStats, RepoStats } from "@/lib/types";
 import { getInitials } from "@/lib/formatters";
@@ -46,7 +46,7 @@ function AnimatedScore({ value, delay }: { value: number; delay: number }) {
 }
 
 function StatsRow({ contributor }: { contributor: Contributor }) {
-  const { source, stats } = contributor;
+  const { stats } = contributor;
   if (isDocStats(stats)) {
     return (
       <div className="flex flex-wrap gap-1.5">
@@ -100,7 +100,7 @@ function StatsRow({ contributor }: { contributor: Contributor }) {
 }
 
 export function ContributorCard({ contributor, index, maxScore, revealDelay }: ContributorCardProps) {
-  const tierConfig = TIER_CONFIG[contributor.tier];
+  const tierConfig = TIER_DARK[contributor.tier];
   const isCarry = contributor.tier === "carry";
   const isGhost = contributor.tier === "ghost";
   const baseDelay = revealDelay ?? index * 0.18;
